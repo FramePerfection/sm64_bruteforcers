@@ -302,7 +302,7 @@ endef
 
 all: $(TARGET)
 
-REQUIRED_OBJECTS := main.o
+REQUIRED_OBJECTS := main.o src/engine/surface_collision.o
 REQUIRED_O_FILES := $(addprefix $(BUILD_DIR)/, $(REQUIRED_OBJECTS))
 
 $(TARGET): $(O_FILES)

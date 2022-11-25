@@ -8,6 +8,16 @@
 #include "surface_collision.h"
 #include "surface_load.h"
 
+
+/**
+ *variables defined in other files that may be edited from outside later 
+ */
+s16 gFindFloorIncludeSurfaceIntangible;
+s16 gCheckingSurfaceCollisionsForCamera;
+SpatialPartitionCell gStaticSurfacePartition[NUM_CELLS][NUM_CELLS];
+SpatialPartitionCell gDynamicSurfacePartition[NUM_CELLS][NUM_CELLS];
+
+
 /**************************************************
  *                      WALLS                     *
  **************************************************/
@@ -120,7 +130,8 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode,
             }
 
             // If an object can pass through a vanish cap wall, pass through.
-            if (surf->type == SURFACE_VANISH_CAP_WALLS) {
+            // _EDIT_
+            /*if (surf->type == SURFACE_VANISH_CAP_WALLS) {
                 // If an object can pass through a vanish cap wall, pass through.
                 if (gCurrentObject != NULL
                     && (gCurrentObject->activeFlags & ACTIVE_FLAG_MOVE_THROUGH_GRATE)) {
@@ -132,7 +143,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode,
                     && (gMarioState->flags & MARIO_VANISH_CAP)) {
                     continue;
                 }
-            }
+            }*/
         }
 
         //! (Wall Overlaps) Because this doesn't update the x and z local variables,
@@ -211,7 +222,8 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     numCollisions += find_wall_collisions_from_list(node, colData);
 
     // Increment the debug tracker.
-    gNumCalls.wall++;
+    // _EDIT_
+    //gNumCalls.wall++;
 
     return numCollisions;
 }
@@ -348,7 +360,8 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     *pceil = ceil;
 
     // Increment the debug tracker.
-    gNumCalls.ceil++;
+    // _EDIT_
+    //gNumCalls.ceil++;
 
     return height;
 }
@@ -510,6 +523,7 @@ f32 unused_find_dynamic_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfl
 /**
  * Find the highest floor under a given position and return the height.
  */
+
 f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     s16 cellZ, cellX;
 
@@ -564,9 +578,10 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     }
 
     // If a floor was missed, increment the debug counter.
-    if (floor == NULL) {
+    // _EDIT_
+    /*if (floor == NULL) {
         gNumFindFloorMisses++;
-    }
+    }*/
 
     if (dynamicHeight > height) {
         floor = dynamicFloor;
@@ -576,7 +591,8 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     *pfloor = floor;
 
     // Increment the debug tracker.
-    gNumCalls.floor++;
+    // _EDIT_
+    //gNumCalls.floor++;
 
     return height;
 }
@@ -594,7 +610,8 @@ f32 find_water_level(f32 x, f32 z) {
     s16 val;
     f32 loX, hiX, loZ, hiZ;
     f32 waterLevel = FLOOR_LOWER_LIMIT;
-    s16 *p = gEnvironmentRegions;
+    // _EDIT_
+    s16 *p = NULL; /*gEnvironmentRegions;*/
 
     if (p != NULL) {
         numRegions = *p++;
@@ -630,7 +647,8 @@ f32 find_poison_gas_level(f32 x, f32 z) {
     s16 val;
     f32 loX, hiX, loZ, hiZ;
     f32 gasLevel = FLOOR_LOWER_LIMIT;
-    s16 *p = gEnvironmentRegions;
+    // _EDIT_
+    s16 *p = NULL; /*gEnvironmentRegions;*/
 
     if (p != NULL) {
         numRegions = *p++;
@@ -682,6 +700,7 @@ static s32 surface_list_length(struct SurfaceNode *list) {
  * Print the area,number of walls, how many times they were called,
  * and some allocation information.
  */
+/*
 void debug_surface_list_info(f32 xPos, f32 zPos) {
     struct SurfaceNode *list;
     s32 numFloors = 0;
@@ -733,6 +752,7 @@ void debug_surface_list_info(f32 xPos, f32 zPos) {
     gNumCalls.ceil = 0;
     gNumCalls.wall = 0;
 }
+*/
 
 /**
  * An unused function that finds and interacts with any type of surface.
