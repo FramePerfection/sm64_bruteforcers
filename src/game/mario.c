@@ -180,6 +180,9 @@ s32 is_anim_past_frame(struct MarioState *m, s16 animFrame) {
  * and returns the animation's flags.
  */
 s16 find_mario_anim_flags_and_translation(struct Object *obj, s32 yaw, Vec3s translation) {
+    // _EDIT_
+    return 0;
+    /*
     f32 dx;
     f32 dz;
 
@@ -199,6 +202,7 @@ s16 find_mario_anim_flags_and_translation(struct Object *obj, s32 yaw, Vec3s tra
     translation[2] = (-dx * s) + (dz * c);
 
     return curAnim->flags;
+    */
 }
 
 /**
@@ -1230,6 +1234,8 @@ void squish_mario_model(struct MarioState *m) {
  * Debug function that prints floor normal, velocity, and action information.
  */
 void debug_print_speed_action_normal(struct MarioState *m) {
+// _EDIT_
+/*
     f32 steepness;
     f32 floor_nY;
 
@@ -1245,6 +1251,7 @@ void debug_print_speed_action_normal(struct MarioState *m) {
         // STA short for "status," the official action name via SMS map.
         print_text_fmt_int(210, 56, "STA %x", (m->action & ACT_ID_MASK));
     }
+*/
 }
 
 /**
@@ -1662,6 +1669,8 @@ void mario_update_hitbox_and_cap_model(struct MarioState *m) {
  * An unused and possibly a debug function. Z + another button input
  * sets Mario with a different cap.
  */
+// _EDIT_
+/*
 UNUSED static void debug_update_mario_cap(u16 button, s32 flags, u16 capTimer, u16 capMusic) {
     // This checks for Z_TRIG instead of Z_DOWN flag
     // (which is also what other debug functions do),
@@ -1677,6 +1686,7 @@ UNUSED static void debug_update_mario_cap(u16 button, s32 flags, u16 capTimer, u
         play_cap_music(capMusic);
     }
 }
+*/
 
 #if ENABLE_RUMBLE
 void func_sh_8025574C(void) {
@@ -1703,8 +1713,10 @@ s32 execute_mario_action(UNUSED struct Object *o) {
         gMarioState->marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
         mario_reset_bodystate(gMarioState);
         update_mario_inputs(gMarioState);
+#ifdef BF_ENABLE_INTERACTIONS
         mario_handle_special_floors(gMarioState);
         mario_process_interactions(gMarioState);
+#endif
 
         // If Mario is OOB, stop executing actions.
         if (gMarioState->floor == NULL) {
@@ -1714,34 +1726,35 @@ s32 execute_mario_action(UNUSED struct Object *o) {
         // The function can loop through many action shifts in one frame,
         // which can lead to unexpected sub-frame behavior. Could potentially hang
         // if a loop of actions were found, but there has not been a situation found.
+        // _EDIT_
         while (inLoop) {
             switch (gMarioState->action & ACT_GROUP_MASK) {
                 case ACT_GROUP_STATIONARY:
-                    inLoop = mario_execute_stationary_action(gMarioState);
+                    //inLoop = mario_execute_stationary_action(gMarioState);
                     break;
 
                 case ACT_GROUP_MOVING:
-                    inLoop = mario_execute_moving_action(gMarioState);
+                    //inLoop = mario_execute_moving_action(gMarioState);
                     break;
 
                 case ACT_GROUP_AIRBORNE:
-                    inLoop = mario_execute_airborne_action(gMarioState);
+                    //inLoop = mario_execute_airborne_action(gMarioState);
                     break;
 
                 case ACT_GROUP_SUBMERGED:
-                    inLoop = mario_execute_submerged_action(gMarioState);
+                    //inLoop = mario_execute_submerged_action(gMarioState);
                     break;
 
                 case ACT_GROUP_CUTSCENE:
-                    inLoop = mario_execute_cutscene_action(gMarioState);
+                    //inLoop = mario_execute_cutscene_action(gMarioState);
                     break;
 
                 case ACT_GROUP_AUTOMATIC:
-                    inLoop = mario_execute_automatic_action(gMarioState);
+                    //inLoop = mario_execute_automatic_action(gMarioState);
                     break;
 
                 case ACT_GROUP_OBJECT:
-                    inLoop = mario_execute_object_action(gMarioState);
+                    //inLoop = mario_execute_object_action(gMarioState);
                     break;
             }
         }
@@ -1785,6 +1798,8 @@ s32 execute_mario_action(UNUSED struct Object *o) {
  *                  INITIALIZATION                *
  **************************************************/
 
+// _EDIT_
+/*
 void init_mario(void) {
     Vec3s capPos;
     struct Object *capObject;
@@ -1892,3 +1907,4 @@ void init_mario_from_save_file(void) {
     gHudDisplay.coins = 0;
     gHudDisplay.wedges = 8;
 }
+*/
