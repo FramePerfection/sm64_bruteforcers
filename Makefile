@@ -302,8 +302,14 @@ endef
 
 all: $(TARGET)
 
-REQUIRED_OBJECTS := main.o src/engine/surface_collision.o
+REQUIRED_OBJECTS := main.o
+REQUIRED_OBJECTS += src/engine/_engine_feed.o src/engine/_engine_stubs.o
+REQUIRED_OBJECTS += src/engine/math_util.o src/engine/surface_collision.o src/game/mario_step.o src/game/mario.o src/game/camera_reduced.o
 REQUIRED_O_FILES := $(addprefix $(BUILD_DIR)/, $(REQUIRED_OBJECTS))
+
+run: $(TARGET)
+	@$(info running...)
+	@./$(BUILD_DIR)/main.exe
 
 $(TARGET): $(O_FILES)
 	$(CC) -o $(BUILD_DIR)/main.exe $(REQUIRED_O_FILES)
