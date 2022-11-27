@@ -700,6 +700,7 @@ static s32 surface_list_length(struct SurfaceNode *list) {
  * Print the area,number of walls, how many times they were called,
  * and some allocation information.
  */
+// _EDIT_
 /*
 void debug_surface_list_info(f32 xPos, f32 zPos) {
     struct SurfaceNode *list;
