@@ -1,11 +1,15 @@
 #include <ultra64.h>
 
 #include "sm64.h"
-#include "engine/graph_node.h"
 #include "math_util.h"
 #include "surface_collision.h"
 
 #include "trig_tables.inc.c"
+
+Vec3f gVec3fZero = { 0.0f, 0.0f, 0.0f };
+Vec3s gVec3sZero = { 0, 0, 0 };
+Vec3f gVec3fOne = { 1.0f, 1.0f, 1.0f };
+UNUSED Vec3s gVec3sOne = { 1, 1, 1 };
 
 // Variables for a spline curve animation (used for the flight path in the grand star cutscene)
 Vec4s *gSplineKeyframe;
