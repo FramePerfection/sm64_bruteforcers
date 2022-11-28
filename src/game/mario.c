@@ -62,6 +62,9 @@ s32 is_anim_past_end(struct MarioState *m) {
  * Sets Mario's animation without any acceleration, running at its default rate.
  */
 s16 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
+    // _EDIT_
+    return 0;
+
     struct Object *o = m->marioObj;
     struct Animation *targetAnim = m->animList->bufTarget;
 
@@ -1727,14 +1730,16 @@ s32 execute_mario_action(UNUSED struct Object *o) {
         // which can lead to unexpected sub-frame behavior. Could potentially hang
         // if a loop of actions were found, but there has not been a situation found.
         // _EDIT_
+#define NOT_IMPL printf("action group not implemented\n"); inLoop = FALSE; break;
+
         while (inLoop) {
             switch (gMarioState->action & ACT_GROUP_MASK) {
                 case ACT_GROUP_STATIONARY:
-                    //inLoop = mario_execute_stationary_action(gMarioState);
+                    NOT_IMPL// inLoop = mario_execute_stationary_action(gMarioState);
                     break;
 
                 case ACT_GROUP_MOVING:
-                    //inLoop = mario_execute_moving_action(gMarioState);
+                    NOT_IMPL// inLoop = mario_execute_moving_action(gMarioState);
                     break;
 
                 case ACT_GROUP_AIRBORNE:
@@ -1742,22 +1747,23 @@ s32 execute_mario_action(UNUSED struct Object *o) {
                     break;
 
                 case ACT_GROUP_SUBMERGED:
-                    //inLoop = mario_execute_submerged_action(gMarioState);
+                    NOT_IMPL// inLoop = mario_execute_submerged_action(gMarioState);
                     break;
 
                 case ACT_GROUP_CUTSCENE:
-                    //inLoop = mario_execute_cutscene_action(gMarioState);
+                    NOT_IMPL// inLoop = mario_execute_cutscene_action(gMarioState);
                     break;
 
                 case ACT_GROUP_AUTOMATIC:
-                    //inLoop = mario_execute_automatic_action(gMarioState);
+                    NOT_IMPL// inLoop = mario_execute_automatic_action(gMarioState);
                     break;
 
                 case ACT_GROUP_OBJECT:
-                    //inLoop = mario_execute_object_action(gMarioState);
+                    NOT_IMPL// inLoop = mario_execute_object_action(gMarioState);
                     break;
             }
         }
+#undef NOT_IMPL
 
         sink_mario_in_quicksand(gMarioState);
         squish_mario_model(gMarioState);
