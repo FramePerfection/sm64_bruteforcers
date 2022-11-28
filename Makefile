@@ -304,7 +304,7 @@ all: $(TARGET)
 
 REQUIRED_OBJECTS := main.o
 REQUIRED_OBJECTS += src/engine/_engine_feed.o src/engine/_engine_stubs.o
-REQUIRED_OBJECTS += src/engine/math_util.o src/engine/surface_collision.o src/game/camera_reduced.o
+REQUIRED_OBJECTS += src/engine/math_util.o src/engine/surface_collision.o src/engine/surface_load_reduced.o src/game/camera_reduced.o
 REQUIRED_OBJECTS += src/game/mario_step.o src/game/mario.o src/game/mario_actions_airborne.o
 REQUIRED_O_FILES := $(addprefix $(BUILD_DIR)/, $(REQUIRED_OBJECTS))
 

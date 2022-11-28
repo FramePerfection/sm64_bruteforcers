@@ -4,6 +4,7 @@
 		"mario_actions_cutscene.h": "c",
 		"math.h": "c",
 		"math_util.h": "c",
-		"stdio.h": "c"
+		"stdio.h": "c",
+		"sm64.h": "c"
 	}
 }
