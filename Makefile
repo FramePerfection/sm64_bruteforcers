@@ -302,7 +302,7 @@ endef
 all: $(TARGET)
 
 REQUIRED_OBJECTS := bruteforce/main.o
-REQUIRED_OBJECTS += bruteforce/_engine_feed.o bruteforce/_engine_stubs.o
+REQUIRED_OBJECTS += bruteforce/bf_states.o bruteforce/readers.o bruteforce/json.o bruteforce/_engine_feed.o bruteforce/_engine_stubs.o
 REQUIRED_OBJECTS += src/engine/math_util.o src/engine/surface_collision.o src/engine/surface_load_reduced.o src/game/camera_reduced.o
 REQUIRED_OBJECTS += src/game/mario_step.o src/game/mario.o src/game/mario_actions_airborne.o
 REQUIRED_O_FILES := $(addprefix $(BUILD_DIR)/, $(REQUIRED_OBJECTS))
