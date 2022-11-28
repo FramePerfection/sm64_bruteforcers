@@ -1,7 +1,7 @@
 #include <PR/ultratypes.h>
 
 #include "sm64.h"
-#include "surface_load.h"
+#include "src/engine/surface_load.h"
 
 /**
  *variables defined in other files that may be edited from outside later 

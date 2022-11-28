@@ -143,7 +143,7 @@ LIBULTRA       := $(BUILD_DIR)/libultra.a
 LD_SCRIPT      := sm64.ld
 
 # Directories containing source files
-SRC_DIRS := src src/engine src/game src/audio src/menu src/buffers bin data assets asm lib sound
+SRC_DIRS := src src/engine src/game src/audio src/menu src/buffers bruteforce bin data assets asm lib sound
 BIN_DIRS := bin bin/$(VERSION)
 
 ULTRA_SRC_DIRS := lib/src lib/src/math lib/asm lib/data
@@ -159,8 +159,7 @@ ULTRA_S_FILES     := $(foreach dir,$(ULTRA_SRC_DIRS),$(wildcard $(dir)/*.s))
 
 # Object files
 O_FILES := $(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=.o)) \
-           $(foreach file,$(S_FILES),$(BUILD_DIR)/$(file:.s=.o)) \
-           $(BUILD_DIR)/main.o
+           $(foreach file,$(S_FILES),$(BUILD_DIR)/$(file:.s=.o))
 
 ULTRA_O_FILES := $(foreach file,$(ULTRA_S_FILES),$(BUILD_DIR)/$(file:.s=.o)) \
                  $(foreach file,$(ULTRA_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
@@ -302,8 +301,8 @@ endef
 
 all: $(TARGET)
 
-REQUIRED_OBJECTS := main.o
-REQUIRED_OBJECTS += src/engine/_engine_feed.o src/engine/_engine_stubs.o
+REQUIRED_OBJECTS := bruteforce/main.o
+REQUIRED_OBJECTS += bruteforce/_engine_feed.o bruteforce/_engine_stubs.o
 REQUIRED_OBJECTS += src/engine/math_util.o src/engine/surface_collision.o src/engine/surface_load_reduced.o src/game/camera_reduced.o
 REQUIRED_OBJECTS += src/game/mario_step.o src/game/mario.o src/game/mario_actions_airborne.o
 REQUIRED_O_FILES := $(addprefix $(BUILD_DIR)/, $(REQUIRED_OBJECTS))
@@ -312,7 +311,7 @@ run: $(TARGET)
 	@$(info running...)
 	@./$(BUILD_DIR)/main.exe
 
-$(TARGET): $(O_FILES)
+$(TARGET): $(REQUIRED_O_FILES)
 	$(CC) -o $(BUILD_DIR)/main.exe $(REQUIRED_O_FILES)
 
 clean:

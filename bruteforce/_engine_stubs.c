@@ -4,7 +4,7 @@
 */
 
 #include <PR/ultratypes.h>
-#include "math_util.h"
+#include "src/engine/math_util.h"
 #include "game/level_update.h"
 
 // external.c; data.c; sound_init.c
