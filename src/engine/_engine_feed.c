@@ -14,5 +14,7 @@ u32 gGlobalTimer;
 s16 gCurrLevelNum;
 struct Area *gCurrentArea = NULL;
 
+u8 gSpecialTripleJump;
+
 struct Controller gController;
 struct Controller *gPlayer1Controller = &gController;
