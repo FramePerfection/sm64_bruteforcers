@@ -730,6 +730,7 @@ s32 act_dive(struct MarioState *m) {
     }
 
     set_mario_animation(m, MARIO_ANIM_DIVE);
+#ifdef BF_ENABLE_INTERACTIONS
     if (mario_check_object_grab(m)) {
         mario_grab_used_object(m);
         m->marioBodyState->grabPos = GRAB_POS_LIGHT_OBJ;
@@ -737,6 +738,7 @@ s32 act_dive(struct MarioState *m) {
             return TRUE;
         }
     }
+#endif
 
     update_air_without_turn(m);
 
@@ -795,7 +797,9 @@ s32 act_dive(struct MarioState *m) {
 
 s32 act_air_throw(struct MarioState *m) {
     if (++(m->actionTimer) == 4) {
+#ifdef BF_ENABLE_INTERACTIONS
         mario_throw_held_object(m);
+#endif
     }
 
     play_sound_if_no_flag(m, SOUND_MARIO_WAH2, MARIO_MARIO_SOUND_PLAYED);
@@ -1277,7 +1281,9 @@ s32 act_getting_blown(struct MarioState *m) {
     }
 
     if (++(m->actionTimer) == 20) {
+#ifdef BF_ENABLE_INTERACTIONS
         mario_blow_off_cap(m, 50.0f);
+#endif
     }
 
     mario_set_forward_vel(m, m->forwardVel);
@@ -1308,7 +1314,9 @@ s32 act_getting_blown(struct MarioState *m) {
 
 s32 act_air_hit_wall(struct MarioState *m) {
     if (m->heldObj != NULL) {
+#ifdef BF_ENABLE_INTERACTIONS
         mario_drop_held_object(m);
+#endif
     }
 
     if (++(m->actionTimer) <= 2) {
@@ -1494,7 +1502,9 @@ s32 act_hold_butt_slide_air(struct MarioState *m) {
                 m->vel[1] = 0.0f;
             }
 
+#ifdef BF_ENABLE_INTERACTIONS
             mario_drop_held_object(m);
+#endif
             m->particleFlags |= PARTICLE_VERTICAL_STAR;
             set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
             break;
@@ -1756,7 +1766,8 @@ s32 act_flying(struct MarioState *m) {
 
         if (is_anim_at_end(m)) {
             if (m->actionArg == 2) {
-                load_level_init_text(0);
+                // _EDIT_
+                // load_level_init_text(0);
                 m->actionArg = 1;
             }
 
