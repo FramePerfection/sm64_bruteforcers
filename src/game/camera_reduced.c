@@ -1356,6 +1356,8 @@ void mode_outward_radial_camera(struct Camera *c) {
  * so Mario will run slightly towards the camera.
  */
 s32 update_parallel_tracking_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
+    printf("Warning: Parallel tracking camera has no state associations\n");
+    
     Vec3f path[2];
     Vec3f parMidPoint;
     Vec3f marioOffset;
