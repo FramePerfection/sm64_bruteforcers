@@ -1,5 +1,6 @@
 #include "sm64.h"
 #include <stdlib.h>
+#include <string.h>
 #include "bruteforce/json.h"
 #include "bruteforce/readers.h"
 
@@ -21,6 +22,10 @@ read_int(u8)
 
 void read_f32(Json *jsonNode, f32 *target) {
 	*target = (f32)jsonNode->valueFloat;
+}
+
+void read_string(Json *jsonNode, string *target) {
+	*target = strdup(jsonNode->valueString);
 }
 
 f32 advance_read(Json **nodePtr) {
