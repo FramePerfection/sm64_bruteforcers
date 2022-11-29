@@ -1,6 +1,7 @@
 {
 	"m64_start": 445,
 	"m64_input": "test.m64",
+	"m64_count": 100,
 	
 	"mario_x": 5572,
 	"mario_y": 2455.57153320313,

@@ -7,6 +7,10 @@ extern struct MarioState *gMarioState;
 
 #else
 
+BF_STATIC_STATE(string, m64_input, bfStaticState.m64_input)
+BF_STATIC_STATE(u32, m64_start, bfStaticState.m64_start)
+BF_STATIC_STATE(u32, m64_count, bfStaticState.m64_count)
+
 BF_STATIC_STATE(Triangles, static_tris, bfStaticState.static_tris)
 
 // Mario

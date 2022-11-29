@@ -12,7 +12,8 @@
 #include "src/game/game_init.h"
 #include "sm64.h"
 #include "misc_util.inc.c"
-#include "bf_states.h"
+#include "bruteforce/bf_states.h"
+#include "bruteforce/m64.h"
 
 void print_vec3f(Vec3f *vec) {
 	printf("\t%f;\t%f;\t%f", (*vec)[0], (*vec)[1], (*vec)[2]);
@@ -27,7 +28,15 @@ void main() {
 	printf("Running Bruteforcer...\n");
 	printf("Loading configuration...\n");
 	if (!bf_init_states()) {
-		printf("Failed to load configuration! Exiting...");
+		printf("Failed to load configuration! Exiting...\n");
+		return;
+	}
+
+	printf("Loading m64...");
+	InputSequence *inputs;
+	if (!read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_count, &inputs))
+	{
+		printf("Failed to load m64! Exiting...\n");
 		return;
 	}
 
@@ -75,15 +84,16 @@ void main() {
 		bf_load_dynamic_state(&bfInitialDynamicState);
 
 		u32 prev_action = gMarioState->action;
-		for (i = 0; i < 100; i++) {
-			testController.rawStickX = -128;
-			testController.rawStickY = 127;
-			testController.buttonPressed = 0;
-			testController.buttonDown = 0;
-			if (i == 0) {
-				testController.buttonPressed |= A_BUTTON;
-			}
-			testController.buttonDown |= A_BUTTON;
+		for (i = 0; i < inputs->count; i++) {
+			printf("Frame %d:\t", inputs->offset + i);
+			
+            testController.rawStickX = inputs->inputs[i].stick_x;
+            testController.rawStickY = inputs->inputs[i].stick_y;
+            testController.buttonPressed = inputs->inputs[i].button
+                                        & (inputs->inputs[i].button ^ testController.buttonDown);
+            // 0.5x A presses are a good meme
+            testController.buttonDown = inputs->inputs[i].button;
+
 			adjust_analog_stick(&testController);
 
 			execute_mario_action(gMarioState->marioObj);
@@ -94,7 +104,7 @@ void main() {
 			if (prev_action != gMarioState->action)
 				printf("Action transition: %x -> %x\n", prev_action, gMarioState->action);
 			prev_action = gMarioState->action;
-
+			
 			printf("Mario:");
 			print_vec3f(&gMarioState->pos);
 			printf("\tCamera:");
