@@ -1,7 +1,20 @@
 {
 	"m64_start": 445,
 	"m64_input": "test.m64",
-	"m64_count": 100,
+	"m64_output": "sm74b3textbox.behindthefail.m64",
+	"m64_count": 10,
+	
+	"rnd_seed": 2141,
+	"max_perturbation": 2,
+	"runs_per_survivor": 25,
+	"survivors_per_generation": 10,
+	"max_generations": 1000,
+	
+	"initial_button_state": 0,
+	
+	"plane_nx": 0.70710676908493,
+	"plane_nz": -0.70710676908493,
+	"plane_d": -5514.7255859375,
 	
 	"mario_x": 5572,
 	"mario_y": 2455.57153320313,
@@ -11,10 +24,11 @@
 	"mario_z_speed": 37.9953384399414,
 	"mario_h_speed": 48.942512512207,
 	"mario_action": "0x000008A7",
+	"mario_action_timer": 0,
+	"mario_wallkick_timer": 5,
 	"none_action_description": "air hitting wall",
 	"mario_previous_action": "0x03000888",
 	"none_prev._action_desc.": "long jump",
-	"none_de_facto_speed": 48.942512512207,
 	"mario_x_sliding_speed": -31.8084754943848,
 	"mario_z_sliding_speed": 37.9953384399414,
 	"none_h_sliding_speed": 49.5522437074505,

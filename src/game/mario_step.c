@@ -607,6 +607,8 @@ void apply_vertical_wind(struct MarioState *m) {
     }
 }
 
+Vec3f last_q_step;
+Vec3f last_q_step2;
 s32 perform_air_step(struct MarioState *m, u32 stepArg) {
     Vec3f intendedPos;
     s32 i;
@@ -619,6 +621,9 @@ s32 perform_air_step(struct MarioState *m, u32 stepArg) {
         intendedPos[0] = m->pos[0] + m->vel[0] / 4.0f;
         intendedPos[1] = m->pos[1] + m->vel[1] / 4.0f;
         intendedPos[2] = m->pos[2] + m->vel[2] / 4.0f;
+
+        vec3f_copy(last_q_step2, last_q_step);
+        vec3f_copy(last_q_step, intendedPos);
 
         quarterStepResult = perform_air_quarter_step(m, intendedPos, stepArg);
 
