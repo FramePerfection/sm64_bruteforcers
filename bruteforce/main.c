@@ -14,14 +14,15 @@
 #include "misc_util.inc.c"
 #include "bf_states.h"
 
-void* DUMMY;
-
 void print_vec3f(Vec3f *vec) {
 	printf("\t%f;\t%f;\t%f", (*vec)[0], (*vec)[1], (*vec)[2]);
 }
 
 void main() {
 	u32 i;
+
+	struct GraphNodeCamera testCamera;
+	gCamera = &testCamera;
 
 	printf("Running Bruteforcer...\n");
 	printf("Loading configuration...\n");
@@ -33,7 +34,6 @@ void main() {
 	struct Object testObj;
 	struct Controller testController;
 	struct Area testArea;
-	struct GraphNodeCamera testCamera;
 	struct MarioBodyState testBodyState;
 
 	gCurrentArea = &testArea;
@@ -47,7 +47,7 @@ void main() {
 		if (testFloor != NULL)
 			add_surface(testFloor, FALSE);
 		else
-			printf("found degenerate triangle: %d;%d;%d;%d;%d;%d;%d;%d;%d;\n", t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3);
+			printf("found degenerate triangle: (%d,%d,%d),(%d,%d,%d),(%d,%d,%d)\n", t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3);
 	}
 
 	testCamera.config.mode = CAMERA_MODE_8_DIRECTIONS;
@@ -64,16 +64,28 @@ void main() {
 	gMarioState->controller = &testController;
 	gMarioState->area = &testArea;
 	
-	testController.rawStickX = 127;
-	adjust_analog_stick(&testController);
-
+	// Still required to initialize something?
+	execute_mario_action(gMarioState->marioObj);
+	update_camera(gCurrentArea->camera);
+	
 	u32 k;
 	for (k = 0; k < 2; k++) {
 		printf("spawning...\n");
+
 		bf_load_dynamic_state(&bfInitialDynamicState);
 
 		u32 prev_action = gMarioState->action;
 		for (i = 0; i < 100; i++) {
+			testController.rawStickX = -128;
+			testController.rawStickY = 127;
+			testController.buttonPressed = 0;
+			testController.buttonDown = 0;
+			if (i == 0) {
+				testController.buttonPressed |= A_BUTTON;
+			}
+			testController.buttonDown |= A_BUTTON;
+			adjust_analog_stick(&testController);
+
 			execute_mario_action(gMarioState->marioObj);
 
 			if (gCurrentArea != NULL) {
@@ -82,11 +94,12 @@ void main() {
 			if (prev_action != gMarioState->action)
 				printf("Action transition: %x -> %x\n", prev_action, gMarioState->action);
 			prev_action = gMarioState->action;
-		printf("Mario:");
-		print_vec3f(&gMarioState->pos);
-		printf("\tCamera:");
-		print_vec3f(&gCurrentArea->camera->pos);
-		printf("\n");
+
+			printf("Mario:");
+			print_vec3f(&gMarioState->pos);
+			printf("\tCamera:");
+			print_vec3f(&gCurrentArea->camera->pos);
+			printf("\n");
 		}
 	}
 }
