@@ -10,6 +10,7 @@
 #include "bruteforce/bf_state_definitions.inc.c"
 #undef BF_STATE_INCLUDE
 
+
 BFStaticState bfStaticState;
 BFDynamicState bfInitialDynamicState;
 
@@ -39,11 +40,17 @@ u8 bf_init_states() {
 	
 		#define BF_STATIC_STATE(type, struct_name, target_expr) \
 			if (strcmp(#struct_name, node->name) == 0) \
-				bfStaticState.struct_name = target_expr = read_##type(node);
+			{ \
+				read_##type(node, &bfStaticState.struct_name); \
+				memcpy(&(target_expr), &bfStaticState.struct_name, sizeof bfStaticState.struct_name); \
+			}
 
 		#define BF_DYNAMIC_STATE(type, struct_name, target_expr) \
 			if (strcmp(#struct_name, node->name) == 0) \
-				bfInitialDynamicState.struct_name = target_expr = read_##type(node);
+			{ \
+				read_##type(node, &bfInitialDynamicState.struct_name); \
+				memcpy(&(target_expr), &bfInitialDynamicState.struct_name, sizeof bfInitialDynamicState.struct_name); \
+			}
 
 		#include "bruteforce/bf_state_definitions.inc.c"
 
@@ -60,7 +67,7 @@ u8 bf_init_states() {
 void bf_load_dynamic_state(BFDynamicState *state) {
 	#define BF_STATIC_STATE(_0, _1, _2)
 	#define BF_DYNAMIC_STATE(type, struct_name, target_expr) \
-		target_expr = state->struct_name;
+		memcpy(&(target_expr), &state->struct_name, sizeof state->struct_name);
 	
 	#include "bruteforce/bf_state_definitions.inc.c"
 

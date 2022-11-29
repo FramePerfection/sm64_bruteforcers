@@ -3,6 +3,11 @@
 
 #include "bruteforce/readers.h"
 
+#define BF_DYNAMIC_VEC3(name, expr) \
+	BF_DYNAMIC_STATE(f32, name##_x, expr[0]) \
+	BF_DYNAMIC_STATE(f32, name##_y, expr[1]) \
+	BF_DYNAMIC_STATE(f32, name##_z, expr[2])
+
 #define BF_STATIC_STATE(type, name, target_expr) \
 	type name;
 #define BF_DYNAMIC_STATE(type, name, target_expr)

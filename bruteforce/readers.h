@@ -3,16 +3,14 @@
 
 #include "bruteforce/json.h"
 #include <PR/ultratypes.h>
+#include "types.h"
 
-s32 read_s32(Json*);
-s16 read_s16(Json*);
-u32 read_u32(Json*);
-u16 read_u16(Json*);
-u8 read_u8(Json*);
-f32 read_f32(Json*);
-u32 read_u32hex(Json*);
-
-typedef u32 u32hex;
+void read_s32(Json*, s32*);
+void read_s16(Json*, s16*);
+void read_u32(Json*, u32*);
+void read_u16(Json*, u16*);
+void read_u8(Json*, u8*);
+void read_f32(Json*, f32*);
 
 typedef struct Triangle {
 	s16 x1, y1, z1;
@@ -25,6 +23,12 @@ typedef struct Triangles {
 	Triangle* data;
 } Triangles;
 
-Triangles read_Triangles(Json*);
+void read_Triangles(Json*, Triangles*);
+
+void read_Vec3f(Json*, Vec3f*);
+
+#define JSON_PARSE_FIELD(target, type, field_name, node) \
+	if (strcmp(node->name, field_name) == 0) \
+		target##read_##type(node);
 
 #endif // READERS_H
