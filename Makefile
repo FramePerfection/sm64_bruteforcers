@@ -27,34 +27,26 @@ $(eval $(call validate-option,VERSION,jp us eu sh))
 ifeq      ($(VERSION),jp)
   DEFINES   += VERSION_JP=1
   OPT_FLAGS := -g
-  GRUCODE   ?= f3d_old
   VERSION_JP_US  ?= true
 else ifeq ($(VERSION),us)
   DEFINES   += VERSION_US=1
   OPT_FLAGS := -g
-  GRUCODE   ?= f3d_old
   VERSION_JP_US  ?= true
 else ifeq ($(VERSION),eu)
   DEFINES   += VERSION_EU=1
   OPT_FLAGS := -O2
-  GRUCODE   ?= f3d_new
   VERSION_JP_US  ?= false
 else ifeq ($(VERSION),sh)
   DEFINES   += VERSION_SH=1
   OPT_FLAGS := -O2
-  GRUCODE   ?= f3d_new
   VERSION_JP_US  ?= false
 endif
+
+OPT_FLAGS := -O3
 
 TARGET := sm64.$(VERSION)
 
 DEFINES += NON_MATCHING=1 AVOID_UB=1 _LANGUAGE_C=1
-
-TARGET_STRING := sm64.$(VERSION).$(GRUCODE)
-# If non-default settings were chosen, disable COMPARE
-ifeq ($(filter $(TARGET_STRING), sm64.jp.f3d_old sm64.us.f3d_old sm64.eu.f3d_new sm64.sh.f3d_new),)
-  COMPARE := 0
-endif
 
 # Whether to hide commands or not
 VERBOSE ?= 0
@@ -69,18 +61,7 @@ COLOR ?= 1
 ifeq ($(filter clean,$(MAKECMDGOALS)),)
   $(info ==== Build Options ====)
   $(info Version:        $(VERSION))
-  $(info Microcode:      $(GRUCODE))
   $(info Target:         $(TARGET))
-  ifeq ($(COMPARE),1)
-    $(info Compare ROM:    yes)
-  else
-    $(info Compare ROM:    no)
-  endif
-  ifeq ($(NON_MATCHING),1)
-    $(info Build Matching: no)
-  else
-    $(info Build Matching: yes)
-  endif
   $(info =======================)
 endif
 
@@ -97,7 +78,6 @@ BUILD_DIR_BASE := build
 # BUILD_DIR is the location where all build artifacts are placed
 BUILD_DIR      := $(BUILD_DIR_BASE)/$(VERSION)
 BINARY_DIR     := binaries
-ELF            := $(BUILD_DIR)/$(TARGET).elf
 LIBULTRA       := $(BUILD_DIR)/libultra.a
 LD_SCRIPT      := sm64.ld
 
@@ -144,12 +124,7 @@ endif
 # Compiler Options                                                             #
 #==============================================================================#
 
-AS        := $(CROSS)as
 CC		  := $(CROSS)gcc
-LD        := $(CROSS)ld
-AR        := $(CROSS)ar
-OBJDUMP   := $(CROSS)objdump
-OBJCOPY   := $(CROSS)objcopy
 
 INCLUDE_DIRS := include $(BUILD_DIR) $(BUILD_DIR)/include src .
 
@@ -172,8 +147,6 @@ CC_CHECK_CFLAGS = -fsyntax-only -fsigned-char $(CC_CFLAGS) $(TARGET_CFLAGS) -std
 # C compiler options
 CFLAGS = $(OPT_FLAGS) $(TARGET_CFLAGS) $(MIPSISET) $(DEF_INC_CFLAGS)
 CFLAGS += -mhard-float -fno-stack-protector -fno-common -fno-zero-initialized-in-bss -fno-PIC -fno-strict-aliasing -fno-inline-functions -ffreestanding -fwrapv -Wall -Wextra
-
-ASFLAGS     := -march=vr4300 -mabi=32 $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(foreach d,$(DEFINES),--defsym $(d))
 
 ifeq ($(shell getconf LONG_BIT), 32)
   # Work around memory allocation bug in QEMU
@@ -211,14 +184,12 @@ endef
 # Main Targets                                                                 #
 #==============================================================================#
 
-include bruteforce/fp_gwk/make.split
+include $(wildcard ./bruteforce/**/make.split)
 
 all: $(ALL_TARGETS)
 
 clean:
 	$(RM) -r $(BUILD_DIR_BASE)
-
-libultra: $(BUILD_DIR)/libultra.a
 
 ifeq ($(VERSION),sh)
   $(BUILD_DIR)/src/audio/load_sh.o: $(SOUND_BIN_DIR)/bank_sets.inc.c $(SOUND_BIN_DIR)/sequences_header.inc.c $(SOUND_BIN_DIR)/ctl_header.inc.c $(SOUND_BIN_DIR)/tbl_header.inc.c
