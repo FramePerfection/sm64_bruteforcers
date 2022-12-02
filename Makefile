@@ -15,17 +15,6 @@ DEFINES :=
 # These options can either be set by building with 'make SETTING=value'.
 # 'make clean' may be required first.
 
-# Build for the N64 (turn this off for ports)
-TARGET_N64 ?= 0
-
-
-# COMPILER - selects the C compiler to use
-#   ido - uses the SGI IRIS Development Option compiler, which is used to build
-#         an original matching N64 ROM
-#   gcc - uses the GNU C Compiler
-COMPILER ?= gcc
-$(eval $(call validate-option,COMPILER,ido gcc))
-
 
 # VERSION - selects the version of the game to build
 #   jp - builds the 1996 Japanese version
@@ -77,7 +66,7 @@ endif
 COLOR ?= 1
 
 # display selected options unless 'make clean' or 'make distclean' is run
-ifeq ($(filter clean distclean,$(MAKECMDGOALS)),)
+ifeq ($(filter clean,$(MAKECMDGOALS)),)
   $(info ==== Build Options ====)
   $(info Version:        $(VERSION))
   $(info Microcode:      $(GRUCODE))
@@ -100,36 +89,6 @@ endif
 # Universal Dependencies                                                       #
 #==============================================================================#
 
-TOOLS_DIR := tools
-
-# (This is a bit hacky, but a lot of rules implicitly depend
-# on tools and assets, and we use directory globs further down
-# in the makefile that we want should cover assets.)
-
-PYTHON := python3
-
-ifeq ($(filter clean distclean print-%,$(MAKECMDGOALS)),)
-
-  # Make sure assets exist
-  NOEXTRACT ?= 0
-  ifeq ($(NOEXTRACT),0)
-    DUMMY != $(PYTHON) extract_assets.py $(VERSION) >&2 || echo FAIL
-    ifeq ($(DUMMY),FAIL)
-      $(error Failed to extract assets)
-    endif
-  endif
-
-  # Make tools if out of date
-  $(info Building tools...)
-  DUMMY != $(MAKE) -s -C $(TOOLS_DIR) $(if $(filter-out ido0,$(COMPILER)$(USE_QEMU_IRIX)),all-except-recomp,) >&2 || echo FAIL
-    ifeq ($(DUMMY),FAIL)
-      $(error Failed to build tools)
-    endif
-  $(info Building ROM...)
-
-endif
-
-
 #==============================================================================#
 # Target Executable and Sources                                                #
 #==============================================================================#
@@ -137,10 +96,12 @@ endif
 BUILD_DIR_BASE := build
 # BUILD_DIR is the location where all build artifacts are placed
 BUILD_DIR      := $(BUILD_DIR_BASE)/$(VERSION)
-EXE            := $(BUILD_DIR)/$(TARGET).exe
+BINARY_DIR     := binaries
 ELF            := $(BUILD_DIR)/$(TARGET).elf
 LIBULTRA       := $(BUILD_DIR)/libultra.a
 LD_SCRIPT      := sm64.ld
+
+BINARY_DIRS := $(foreach d,$(wildcard ./bruteforce/**/.),$(subst ./bruteforce/,,binaries/$(dir $(d))))
 
 # Directories containing source files
 SRC_DIRS := src src/engine src/game src/audio src/menu src/buffers bruteforce bin data assets asm lib sound
@@ -184,38 +145,16 @@ endif
 #==============================================================================#
 
 AS        := $(CROSS)as
-ifeq ($(COMPILER),gcc)
-  CC      := $(CROSS)gcc
-else
-  ifeq ($(USE_QEMU_IRIX),1)
-    IRIX_ROOT := $(TOOLS_DIR)/ido5.3_compiler
-    CC      := $(QEMU_IRIX) -silent -L $(IRIX_ROOT) $(IRIX_ROOT)/usr/bin/cc
-    ACPP    := $(QEMU_IRIX) -silent -L $(IRIX_ROOT) $(IRIX_ROOT)/usr/lib/acpp
-    COPT    := $(QEMU_IRIX) -silent -L $(IRIX_ROOT) $(IRIX_ROOT)/usr/lib/copt
-  else
-    IDO_ROOT := $(TOOLS_DIR)/ido5.3_recomp
-    CC      := $(IDO_ROOT)/cc
-    ACPP    := $(IDO_ROOT)/acpp
-    COPT    := $(IDO_ROOT)/copt
-  endif
-endif
+CC		  := $(CROSS)gcc
 LD        := $(CROSS)ld
 AR        := $(CROSS)ar
 OBJDUMP   := $(CROSS)objdump
 OBJCOPY   := $(CROSS)objcopy
 
-ifeq ($(TARGET_N64),1)
-  TARGET_CFLAGS := -nostdinc -DTARGET_N64 -D_LANGUAGE_C
-  CC_CFLAGS := -fno-builtin
-endif
-
 INCLUDE_DIRS := include $(BUILD_DIR) $(BUILD_DIR)/include src .
-ifeq ($(TARGET_N64),1)
-  INCLUDE_DIRS += include/libc
-endif
 
-C_DEFINES := $(foreach d,$(DEFINES),-D$(d))
-DEF_INC_CFLAGS := $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(C_DEFINES)
+C_DEFINES = $(foreach d,$(DEFINES),-D$(d)) -DMODULE_PATH=$(MODULE_PATH)
+DEF_INC_CFLAGS = $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(C_DEFINES)
 
 # Prefer clang as C preprocessor if installed on the system
 ifneq (,$(call find-command,clang))
@@ -228,18 +167,13 @@ endif
 
 # Check code syntax with host compiler
 CC_CHECK := gcc
-CC_CHECK_CFLAGS := -fsyntax-only -fsigned-char $(CC_CFLAGS) $(TARGET_CFLAGS) -std=gnu90 -Wall -Wextra -Wno-format-security -Wno-main -DNON_MATCHING -DAVOID_UB $(DEF_INC_CFLAGS)
+CC_CHECK_CFLAGS = -fsyntax-only -fsigned-char $(CC_CFLAGS) $(TARGET_CFLAGS) -std=gnu90 -Wall -Wextra -Wno-format-security -Wno-main -DNON_MATCHING -DAVOID_UB $(DEF_INC_CFLAGS)
 
 # C compiler options
 CFLAGS = $(OPT_FLAGS) $(TARGET_CFLAGS) $(MIPSISET) $(DEF_INC_CFLAGS)
-ifeq ($(COMPILER),gcc)
-  CFLAGS += -mhard-float -fno-stack-protector -fno-common -fno-zero-initialized-in-bss -fno-PIC -fno-strict-aliasing -fno-inline-functions -ffreestanding -fwrapv -Wall -Wextra
-else
-  CFLAGS += -non_shared -Wab,-r4300_mul -Xcpluscomm -Xfullwarn -signed -32
-endif
+CFLAGS += -mhard-float -fno-stack-protector -fno-common -fno-zero-initialized-in-bss -fno-PIC -fno-strict-aliasing -fno-inline-functions -ffreestanding -fwrapv -Wall -Wextra
 
 ASFLAGS     := -march=vr4300 -mabi=32 $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(foreach d,$(DEFINES),--defsym $(d))
-RSPASMFLAGS := $(foreach d,$(DEFINES),-definelabel $(subst =, ,$(d)))
 
 ifeq ($(shell getconf LONG_BIT), 32)
   # Work around memory allocation bug in QEMU
@@ -256,24 +190,7 @@ export LANG := C
 # Miscellaneous Tools                                                          #
 #==============================================================================#
 
-# N64 tools
-MIO0TOOL              := $(TOOLS_DIR)/mio0
-N64CKSUM              := $(TOOLS_DIR)/n64cksum
-N64GRAPHICS           := $(TOOLS_DIR)/n64graphics
-N64GRAPHICS_CI        := $(TOOLS_DIR)/n64graphics_ci
-TEXTCONV              := $(TOOLS_DIR)/textconv
-AIFF_EXTRACT_CODEBOOK := $(TOOLS_DIR)/aiff_extract_codebook
-VADPCM_ENC            := $(TOOLS_DIR)/vadpcm_enc
-EXTRACT_DATA_FOR_MIO  := $(TOOLS_DIR)/extract_data_for_mio
-SKYCONV               := $(TOOLS_DIR)/skyconv
-# Use the system installed armips if available. Otherwise use the one provided with this repository.
-ifneq (,$(call find-command,armips))
-  RSPASM              := armips
-else
-  RSPASM              := $(TOOLS_DIR)/armips
-endif
 ENDIAN_BITWIDTH       := $(BUILD_DIR)/endian-and-bitwidth
-SHA1SUM = sha1sum
 PRINT = printf
 
 ifeq ($(COLOR),1)
@@ -285,11 +202,6 @@ YELLOW  := \033[0;33m
 BLINK   := \033[33;5m
 endif
 
-# Use Objcopy instead of extract_data_for_mio
-ifeq ($(COMPILER),gcc)
-  EXTRACT_DATA_FOR_MIO := $(OBJCOPY) -O binary --only-section=.data
-endif
-
 # Common build print status function
 define print
   @$(PRINT) "$(GREEN)$(1) $(YELLOW)$(2)$(GREEN) -> $(BLUE)$(3)$(NO_COL)\n"
@@ -299,27 +211,12 @@ endef
 # Main Targets                                                                 #
 #==============================================================================#
 
-all: $(TARGET)
+include bruteforce/fp_gwk/make.split
 
-REQUIRED_OBJECTS := bruteforce/main.o
-REQUIRED_OBJECTS += bruteforce/m64.o bruteforce/bf_states.o bruteforce/readers.o bruteforce/json.o bruteforce/_engine_feed.o bruteforce/_engine_stubs.o
-REQUIRED_OBJECTS += src/engine/math_util.o src/engine/surface_collision.o src/engine/surface_load_reduced.o src/game/camera_reduced.o
-REQUIRED_OBJECTS += src/game/mario_step.o src/game/mario.o src/game/mario_actions_airborne.o
-REQUIRED_O_FILES := $(addprefix $(BUILD_DIR)/, $(REQUIRED_OBJECTS))
-
-run: $(TARGET)
-	@$(info running...)
-	@./$(BUILD_DIR)/main.exe
-
-$(TARGET): $(REQUIRED_O_FILES)
-	$(CC) -o $(BUILD_DIR)/main.exe $(REQUIRED_O_FILES)
+all: $(ALL_TARGETS)
 
 clean:
 	$(RM) -r $(BUILD_DIR_BASE)
-
-distclean: cleanmake 
-	$(PYTHON) extract_assets.py --clean
-	$(MAKE) -C $(TOOLS_DIR) clean
 
 libultra: $(BUILD_DIR)/libultra.a
 
@@ -331,7 +228,7 @@ ifeq ($(COMPILER),gcc)
   $(BUILD_DIR)/lib/src/math/%.o: CFLAGS += -fno-builtin
 endif
 
-ALL_DIRS := $(BUILD_DIR) $(addprefix $(BUILD_DIR)/,$(SRC_DIRS) $(ULTRA_SRC_DIRS) $(ULTRA_BIN_DIRS) $(BIN_DIRS))
+ALL_DIRS := $(BUILD_DIR) $(BINARY_DIRS) $(addprefix $(BUILD_DIR)/,$(SRC_DIRS) $(ULTRA_SRC_DIRS) $(ULTRA_BIN_DIRS) $(BIN_DIRS))
 
 # Make sure build directory exists before compiling anything
 DUMMY := $(shell mkdir -p $(ALL_DIRS))
@@ -351,7 +248,7 @@ $(BUILD_DIR)/%.o: $(BUILD_DIR)/%.c
 	@$(CC_CHECK) $(CC_CHECK_CFLAGS) -MMD -MP -MT $@ -MF $(BUILD_DIR)/$*.d $<
 	$(V)$(CC) -c $(CFLAGS) -o $@ $<
 
-.PHONY: all clean distclean default diff test load libultra
+.PHONY: all clean default diff test load libultra
 # with no prerequisites, .SECONDARY causes no intermediate target to be removed
 .SECONDARY:
 

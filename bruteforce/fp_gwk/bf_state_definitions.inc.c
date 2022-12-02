@@ -5,6 +5,7 @@
 #include "types.h"
 extern struct MarioState *gMarioState;
 extern struct Controller testController;
+extern f32 minSpeed;
 
 #else
 
@@ -13,6 +14,7 @@ BF_STATIC_STATE(u32, max_perturbation, bfStaticState.max_perturbation)
 BF_STATIC_STATE(u32, runs_per_survivor, bfStaticState.runs_per_survivor)
 BF_STATIC_STATE(u32, survivors_per_generation, bfStaticState.survivors_per_generation)
 BF_STATIC_STATE(u32, max_generations, bfStaticState.max_generations)
+BF_STATIC_STATE(u32, print_interval, bfStaticState.print_interval)
 
 BF_STATIC_STATE(string, m64_input, bfStaticState.m64_input)
 BF_STATIC_STATE(string, m64_output, bfStaticState.m64_output)
@@ -22,6 +24,8 @@ BF_STATIC_STATE(u32, m64_count, bfStaticState.m64_count)
 BF_STATIC_STATE(f32, plane_nx, bfStaticState.plane_nx)
 BF_STATIC_STATE(f32, plane_nz, bfStaticState.plane_nz)
 BF_STATIC_STATE(f32, plane_d, bfStaticState.plane_d)
+BF_STATIC_STATE(s16, approach_angle, bfStaticState.approach_angle)
+BF_STATIC_STATE(f32, minimum_h_speed, minSpeed)
 
 BF_STATIC_STATE(Triangles, static_tris, bfStaticState.static_tris)
 

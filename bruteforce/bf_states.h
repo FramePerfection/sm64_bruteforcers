@@ -3,6 +3,8 @@
 
 #include "bruteforce/readers.h"
 
+#define STATE_DEFINITION_FILE <bruteforce/MODULE_PATH/bf_state_definitions.inc.c>
+
 #define BF_DYNAMIC_VEC3(name, expr) \
 	BF_DYNAMIC_STATE(f32, name##_x, expr[0]) \
 	BF_DYNAMIC_STATE(f32, name##_y, expr[1]) \
@@ -13,7 +15,7 @@
 #define BF_DYNAMIC_STATE(type, name, target_expr)
 
 typedef struct BFStaticState_s {
-#include "bruteforce/bf_state_definitions.inc.c"
+#include STATE_DEFINITION_FILE
 } BFStaticState;
 
 
@@ -22,7 +24,7 @@ typedef struct BFStaticState_s {
 #define BF_STATIC_STATE(type, name, target_expr)
 
 typedef struct BFDyanmicState_s {
-#include "bruteforce/bf_state_definitions.inc.c"
+#include STATE_DEFINITION_FILE
 } BFDynamicState;
 
 #undef BF_STATIC_STATE

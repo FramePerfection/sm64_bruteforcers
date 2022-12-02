@@ -1,7 +1,4 @@
-extern void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool);
-extern void clear_static_surfaces(void);
-extern void add_surface(struct Surface *surface, s32 dynamic);
-extern struct Surface *alloc_surface(void);
+#include "bruteforce/misc_util.h"
 
 struct Surface *gen_surface(s16 x1, s16 y1, s16 z1, s16 x2, s16 y2, s16 z2, s16 x3, s16 y3, s16 z3) {
     // (v2 - v1) x (v3 - v2)

@@ -7,7 +7,7 @@
 #include "bruteforce/json.h"
 
 #define BF_STATE_INCLUDE
-#include "bruteforce/bf_state_definitions.inc.c"
+#include STATE_DEFINITION_FILE
 #undef BF_STATE_INCLUDE
 
 
@@ -52,7 +52,7 @@ u8 bf_init_states() {
 				memcpy(&(target_expr), &bfInitialDynamicState.struct_name, sizeof bfInitialDynamicState.struct_name); \
 			}
 
-		#include "bruteforce/bf_state_definitions.inc.c"
+		#include STATE_DEFINITION_FILE
 
 		#undef BF_STATIC_STATE
 		#undef BF_DYNAMIC_STATE
@@ -69,7 +69,7 @@ void bf_load_dynamic_state(BFDynamicState *state) {
 	#define BF_DYNAMIC_STATE(type, struct_name, target_expr) \
 		memcpy(&(target_expr), &state->struct_name, sizeof state->struct_name);
 	
-	#include "bruteforce/bf_state_definitions.inc.c"
+	#include STATE_DEFINITION_FILE
 
 	#undef BF_STATIC_STATE
 	#undef BF_DYNAMIC_STATE

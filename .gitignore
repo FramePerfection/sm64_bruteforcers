@@ -50,3 +50,8 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Files in binaries directory
+binaries/**/*
+!binaries/**/configuration.json
+!binaries/**/test.m64

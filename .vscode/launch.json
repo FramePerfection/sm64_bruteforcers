@@ -5,13 +5,13 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-		  "name": "Help",
+		  "name": "fp_gwk",
 		  "type": "cppdbg",
 		  "request": "launch",
-		  "program": "${cwd}\\build\\us\\main.exe",
+		  "program": "${workspaceFolder}\\binaries\\fp_gwk\\main.exe",
 		  "args": [],
 		  "stopAtEntry": false,
-		  "cwd": "${cwd}",
+		  "cwd": "${workspaceFolder}\\binaries\\fp_gwk",
 		  "environment": [],
 		  "externalConsole": false,
 		  "MIMode": "gdb",
