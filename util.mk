@@ -14,3 +14,13 @@ endef
 
 # Returns the path to the command $(1) if exists. Otherwise returns an empty string.
 find-command = $(shell which $(1) 2>/dev/null)
+
+define register-lib
+$(eval $(NAME)REQUIRED_O_FILES := $(addprefix $(BUILD_DIR)/, $($(NAME)REQUIRED_OBJECTS)))
+ALL_TARGETS += $(NAME)
+SRC_DIRS += bruteforce/$(NAME)
+BIN_DIRS += $(NAME)
+$(NAME): MODULE_PATH := $(NAME)
+$(NAME): $($(NAME)REQUIRED_O_FILES)
+	$(CC) -o $(BINARY_DIR)/$(NAME)/main.exe $($(NAME)REQUIRED_O_FILES)
+endef

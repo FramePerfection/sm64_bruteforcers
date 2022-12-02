@@ -1,15 +1,8 @@
-BASE_NAME := fp_gwk
-NAME := $(BASE_NAME).$(VERSION)
-ALL_TARGETS += $(NAME)
-SRC_DIRS += bruteforce/$(BASE_NAME)
-BIN_DIRS += $(BASE_NAME)
+NAME := fp_gwk
 
-$(NAME)REQUIRED_OBJECTS := bruteforce/fp_gwk/main.o
+$(NAME)REQUIRED_OBJECTS := bruteforce/$(NAME)/main.o
 $(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/,candidates.o m64.o bf_states.o readers.o json.o engine_feed.o engine_stubs.o misc_util.o)
 $(NAME)REQUIRED_OBJECTS += $(addprefix src/engine/,math_util.o surface_collision.o surface_load_reduced.o)
 $(NAME)REQUIRED_OBJECTS += $(addprefix src/game/,camera_reduced.o mario_step.o mario.o mario_actions_airborne.o)
-$(NAME)REQUIRED_O_FILES := $(addprefix $(BUILD_DIR)/, $($(NAME)REQUIRED_OBJECTS))
 
-$(NAME): MODULE_PATH = $(BASE_NAME)
-$(NAME): $($(NAME)REQUIRED_O_FILES)
-	$(CC) -o $(BINARY_DIR)/$(BASE_NAME)/main.exe $($(NAME)REQUIRED_O_FILES)
+$(eval $(call register-lib))
