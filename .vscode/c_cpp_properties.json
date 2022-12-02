@@ -14,6 +14,7 @@
                 "${workspaceFolder}/include",
                 "${workspaceFolder}/src/game",
                 "${workspaceFolder}/src",
+                "${workspaceFolder}/levels/**",
                 "${workspaceFolder}"
             ]
         }

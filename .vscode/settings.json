@@ -5,7 +5,11 @@
 	},
 	"files.exclude": {
 		"actors": true,
+		"levels": true,
 		"build": true,
 		"text": true
+	},
+	"C_Cpp.codeAnalysis.exclude": {
+		"**/*.inc.c": true
 	}
 }
