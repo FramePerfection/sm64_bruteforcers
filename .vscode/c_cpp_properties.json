@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "fp_gkw",
+            "defines": [
+                "_LANGUAGE_C",
+                "VERSION_US",
+                "NON_MATCHING=1",
+                "AVOID_UB=1",
+                "MODULE_PATH=fp_gwk"
+            ],
+            "cStandard": "gnu17",
+            "includePath": [
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/src/game",
+                "${workspaceFolder}/src",
+                "${workspaceFolder}"
+            ]
+        }
+    ],
+    "version": 4
+}
