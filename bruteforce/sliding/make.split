@@ -1,0 +1,8 @@
+NAME := sliding
+
+$(NAME)REQUIRED_OBJECTS := bruteforce/$(NAME)/main.o
+$(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/,$(NAME)/candidates.o m64.o $(NAME)/bf_states.o readers.o json.o engine_feed.o engine_stubs.o misc_util.o)
+$(NAME)REQUIRED_OBJECTS += $(addprefix src/engine/,math_util.o surface_collision.o surface_load_reduced.o)
+$(NAME)REQUIRED_OBJECTS += $(addprefix src/game/,camera_reduced.o mario_step.o mario.o mario_actions_airborne.o mario_actions_moving.o mario_actions_stationary.o)
+
+$(eval $(call register-lib))
