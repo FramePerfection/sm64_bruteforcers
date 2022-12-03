@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "name": "fp_gkw",
+            "name": "main",
             "defines": [
                 "_LANGUAGE_C",
                 "VERSION_US",
