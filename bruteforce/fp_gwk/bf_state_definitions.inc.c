@@ -20,6 +20,7 @@ BF_STATIC_STATE(string, m64_input, bfStaticState.m64_input)
 BF_STATIC_STATE(string, m64_output, bfStaticState.m64_output)
 BF_STATIC_STATE(u32, m64_start, bfStaticState.m64_start)
 BF_STATIC_STATE(u32, m64_count, bfStaticState.m64_count)
+BF_STATIC_STATE(u32, scoring_frame, bfStaticState.scoring_frame)
 
 BF_STATIC_STATE(f32, plane_nx, bfStaticState.plane_nx)
 BF_STATIC_STATE(f32, plane_nz, bfStaticState.plane_nz)
