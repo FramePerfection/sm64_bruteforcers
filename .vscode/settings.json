@@ -4,6 +4,7 @@
 		"*.h": "c"
 	},
 	"files.exclude": {
+		"binaries": true,
 		"actors": true,
 		"levels": true,
 		"build": true,
