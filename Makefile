@@ -8,6 +8,9 @@ default: all
 # Preprocessor definitions
 DEFINES :=
 
+# Optimization flag
+OPT_FLAGS := -O3
+
 #==============================================================================#
 # Build Options                                                                #
 #==============================================================================#
@@ -26,23 +29,17 @@ $(eval $(call validate-option,VERSION,jp us eu sh))
 
 ifeq      ($(VERSION),jp)
   DEFINES   += VERSION_JP=1
-  OPT_FLAGS := -g
   VERSION_JP_US  ?= true
 else ifeq ($(VERSION),us)
   DEFINES   += VERSION_US=1
-  OPT_FLAGS := -g
   VERSION_JP_US  ?= true
 else ifeq ($(VERSION),eu)
   DEFINES   += VERSION_EU=1
-  OPT_FLAGS := -O2
   VERSION_JP_US  ?= false
 else ifeq ($(VERSION),sh)
   DEFINES   += VERSION_SH=1
-  OPT_FLAGS := -O2
   VERSION_JP_US  ?= false
 endif
-
-OPT_FLAGS := -O3
 
 TARGET := sm64.$(VERSION)
 
