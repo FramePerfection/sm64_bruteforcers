@@ -589,7 +589,8 @@ void anim_and_audio_for_walk(struct MarioState *m) {
                         //! (Speed Crash) If Mario's speed is more than 2^17.
                         val14 = (s32)(val04 / 4.0f * 0x10000);
                         set_mario_anim_with_accel(m, MARIO_ANIM_RUNNING, val14);
-                        play_step_sound(m, 9, 45);
+                        // _EDIT_
+                        // play_step_sound(m, 9, 45);
                         targetPitch = tilt_body_running(m);
 
                         val0C = FALSE;
@@ -837,6 +838,8 @@ s32 act_walking(struct MarioState *m) {
     return FALSE;
 }
 
+#include <signal.h>
+#include <stdio.h>
 s32 act_move_punching(struct MarioState *m) {
     if (should_begin_sliding(m)) {
         return set_mario_action(m, ACT_BEGIN_SLIDING, 0);
@@ -848,7 +851,10 @@ s32 act_move_punching(struct MarioState *m) {
 
     m->actionState = 1;
 
-    mario_update_punch_sequence(m);
+    // _EDIT_
+    printf("mario_update_punch_sequence not implemented\n");
+    raise(5 /*SIGTRAP*/);
+    //mario_update_punch_sequence(m);
 
     if (m->forwardVel >= 0.0f) {
         apply_slope_decel(m, 0.5f);
@@ -873,9 +879,12 @@ s32 act_move_punching(struct MarioState *m) {
 }
 
 s32 act_hold_walking(struct MarioState *m) {
+    // _EDIT_
+    /*
     if (m->heldObj->behavior == segmented_to_virtual(bhvJumpingBox)) {
-        return set_mario_action(m, ACT_CRAZY_BOX_BOUNCE, 0);
+         return set_mario_action(m, ACT_CRAZY_BOX_BOUNCE, 0);
     }
+    */
 
     if (m->marioObj->oInteractStatus & INT_STATUS_MARIO_DROP_OBJECT) {
         return drop_and_set_mario_action(m, ACT_WALKING, 0);

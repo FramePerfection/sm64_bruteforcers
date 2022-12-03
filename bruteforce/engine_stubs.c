@@ -13,11 +13,13 @@ f32 gGlobalSoundSource[3];
 void play_sound(s32 soundBits, f32 *pos) {}
 void set_sound_moving_speed(u8 bank, u8 speed) {}
 void raise_background_noise(s32 a) {}
+void lower_background_noise(s32 a) {}
 void stop_cap_music(void) {}
 void fadeout_cap_music(void) {}
 void play_cap_music(u16 seqArgs) {}
 void play_infinite_stairs_music(void) {}
 void play_music(u8 player, u16 seqArgs, u16 fadeTimer) {}
+void stop_sound(u32 soundBits, f32 *pos) {}
 
 // memory.c
 s32 load_patchable_table(struct DmaHandlerList *list, s32 index) { return FALSE; }
@@ -31,6 +33,10 @@ struct MarioState *gMarioState = &gMarioStates[0];
 
 // interaction.c
 void mario_stop_riding_and_holding(struct MarioState *m) {}
+void mario_drop_held_object(struct MarioState *m) {}
+void mario_stop_riding_object(struct MarioState *m) {}
+u32 mario_check_object_grab(struct MarioState *m) {}
+void mario_grab_used_object(struct MarioState *m) {}
 
 // main.c
 s8 gDebugLevelSelect = FALSE;

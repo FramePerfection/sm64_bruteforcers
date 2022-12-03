@@ -44,9 +44,13 @@ u8 unused80339F1C[20];
  * Checks if Mario's animation has reached its end point.
  */
 s32 is_anim_at_end(struct MarioState *m) {
+    // _EDIT_
+    return FALSE;
+    /*
     struct Object *o = m->marioObj;
 
     return (o->header.gfx.animInfo.animFrame + 1) == o->header.gfx.animInfo.curAnim->loopEnd;
+    */
 }
 
 /**
@@ -98,6 +102,9 @@ s16 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
  * slowed down via acceleration.
  */
 s16 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel) {
+    // _EDIT_
+    return 0;
+    /*
     struct Object *o = m->marioObj;
     struct Animation *targetAnim = m->animList->bufTarget;
 
@@ -127,6 +134,7 @@ s16 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel)
     o->header.gfx.animInfo.animAccel = accel;
 
     return o->header.gfx.animInfo.animFrame;
+    */
 }
 
 /**
@@ -152,6 +160,9 @@ void set_anim_to_frame(struct MarioState *m, s16 animFrame) {
 }
 
 s32 is_anim_past_frame(struct MarioState *m, s16 animFrame) {
+    // _EDIT_
+    return FALSE;
+    /*
     s32 isPastFrame;
     s32 acceleratedFrame = animFrame << 0x10;
     struct AnimInfo *animInfo = &m->marioObj->header.gfx.animInfo;
@@ -176,6 +187,7 @@ s32 is_anim_past_frame(struct MarioState *m, s16 animFrame) {
     }
 
     return isPastFrame;
+    */
 }
 
 /**
@@ -1709,6 +1721,7 @@ void func_sh_8025574C(void) {
 /**
  * Main function for executing Mario's behavior.
  */
+#include "bruteforce/candidates.h"
 s32 execute_mario_action(UNUSED struct Object *o) {
     s32 inLoop = TRUE;
 
@@ -1730,16 +1743,16 @@ s32 execute_mario_action(UNUSED struct Object *o) {
         // which can lead to unexpected sub-frame behavior. Could potentially hang
         // if a loop of actions were found, but there has not been a situation found.
         // _EDIT_
-#define NOT_IMPL printf("action group not implemented\n"); inLoop = FALSE; break;
+#define NOT_IMPL desync("action group not implemented\n"); inLoop = FALSE; break;
 
         while (inLoop) {
             switch (gMarioState->action & ACT_GROUP_MASK) {
                 case ACT_GROUP_STATIONARY:
-                    NOT_IMPL// inLoop = mario_execute_stationary_action(gMarioState);
+                    inLoop = mario_execute_stationary_action(gMarioState);
                     break;
 
                 case ACT_GROUP_MOVING:
-                    NOT_IMPL// inLoop = mario_execute_moving_action(gMarioState);
+                    inLoop = mario_execute_moving_action(gMarioState);
                     break;
 
                 case ACT_GROUP_AIRBORNE:
