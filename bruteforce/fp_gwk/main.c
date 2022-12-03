@@ -96,6 +96,8 @@ void updateScore(Candidate *candidate, u32 frame_idx) {
 		u8 best = gMarioStates->forwardVel > minSpeed;
 		if (!best)
 			score += minSpeed - gMarioState->forwardVel;
+		else
+			score /= powf(2.0, (gMarioState->forwardVel - minSpeed) * 15);
 		candidate->stats.hSpeed = gMarioStates->forwardVel;
 		candidate->score = score;
 
