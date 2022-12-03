@@ -81,7 +81,7 @@ BINARY_DIR     := binaries
 LIBULTRA       := $(BUILD_DIR)/libultra.a
 LD_SCRIPT      := sm64.ld
 
-BINARY_DIRS := $(foreach d,$(wildcard ./bruteforce/**/.),$(subst ./bruteforce/,,binaries/$(dir $(d))))
+BINARY_DIRS := $(foreach d,$(wildcard ./bruteforce/**/main.c),$(subst ./bruteforce/,,binaries/$(dir $(d))))
 
 # Directories containing source files
 SRC_DIRS := src src/engine src/game src/audio src/menu src/buffers bruteforce bin data assets asm lib sound

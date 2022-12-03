@@ -53,3 +53,11 @@ void updateBestCandidates(Candidate *survivors, Candidate **best) {
 		memcpy(&survivors[candidate_idx].stats, &best[candidate_idx]->stats, sizeof(CandidateStats));
 	}
 }
+
+u8 desynced;
+
+void desync(char *message) {
+	desynced = TRUE;
+	if (bfStaticState.display_desync_messages)
+		printf(message);
+}
