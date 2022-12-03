@@ -184,5 +184,4 @@ void main() {
 			for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++)
 				printf("%d:\t%a;\t%f\n", candidate_idx, survivors[candidate_idx].score, survivors[candidate_idx].stats.hSpeed);
 	}
-	save_to_m64_file(bfStaticState.m64_input, bfStaticState.m64_output, best[0]->sequence);
 }

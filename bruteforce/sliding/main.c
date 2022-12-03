@@ -219,5 +219,4 @@ void main() {
 			printf("Best so far: %f\n", minSpeed);
 		}
 	}
-	save_to_m64_file(bfStaticState.m64_input, bfStaticState.m64_output, best[0]->sequence);
 }
