@@ -10,6 +10,9 @@ extern f32 minSpeed;
 
 #else
 
+BF_STATIC_STATE(u32, sliding_action, bfStaticState.sliding_action)
+BF_STATIC_STATE(u32, sliding_start_frame, bfStaticState.sliding_start_frame)
+BF_STATIC_STATE(u32, target_action, bfStaticState.target_action)
 BF_STATIC_STATE(u32, scoring_frame, bfStaticState.scoring_frame)
 
 BF_STATIC_STATE(s16, target_angle, bfStaticState.target_angle)

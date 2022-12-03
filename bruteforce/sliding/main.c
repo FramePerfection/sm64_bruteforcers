@@ -87,7 +87,7 @@ void perturbInput(OSContPad *input) {
 
 f32 minSpeed;
 u8 updateScore(Candidate *candidate, u32 frame_idx) {
-	if (frame_idx == 4 && gMarioState->action != 0x008C0453) {
+	if (frame_idx == bfStaticState.sliding_start_frame -1 && gMarioState->action != bfStaticState.sliding_action) {
 		candidate->score = INFINITY;
 		candidate->stats.hSpeed = INFINITY;
 		return FALSE;
@@ -99,7 +99,7 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 			dYaw = -dYaw;
 		if (dYaw > bfStaticState.target_angle_margin)
 			score = dYaw;
-		if (gMarioState->action != 0x0100088C)
+		if (gMarioState->action != bfStaticState.target_action)
 			score = INFINITY;
 		candidate->stats.hSpeed = gMarioState->forwardVel;
 		candidate->stats.angle = gMarioState->faceAngle[1];
@@ -155,15 +155,17 @@ void main() {
 	if (gen_mod == 0)
 		gen_mod = 100;
 
+	u32 frames = 0;
 	u32 gen;
 	for (gen = 0; gen < bfStaticState.max_generations; gen++) {
 		if (gen % gen_mod == 0)
 		{
 			clock_t curClock = clock();
 			float seconds = (float)(curClock - lastClock) / CLOCKS_PER_SEC;
-			float fps = gen_mod * original_inputs->count * bfStaticState.runs_per_survivor * bfStaticState.survivors_per_generation / seconds;
+			float fps = frames / seconds;
 			lastClock = curClock;
 			printf("Generation %d starting... (%f FPS)\n", gen, fps);
+			frames = 0;
 		}
 
 		// perform all runs
@@ -193,6 +195,7 @@ void main() {
 
 				u32 frame_idx;
 				for (frame_idx = 0; frame_idx < inputs->count; frame_idx++) {
+					frames++;
 					OSContPad *currentInput = &inputs->inputs[frame_idx];
 					perturbInput(currentInput);
 					updateGame(currentInput);
