@@ -44,13 +44,12 @@ u8 unused80339F1C[20];
  * Checks if Mario's animation has reached its end point.
  */
 s32 is_anim_at_end(struct MarioState *m) {
-    // _EDIT_
+    // _EDIT_ is_anim_at_end always return FALSE
     return FALSE;
-    /*
+    
     struct Object *o = m->marioObj;
 
     return (o->header.gfx.animInfo.animFrame + 1) == o->header.gfx.animInfo.curAnim->loopEnd;
-    */
 }
 
 /**
@@ -66,7 +65,7 @@ s32 is_anim_past_end(struct MarioState *m) {
  * Sets Mario's animation without any acceleration, running at its default rate.
  */
 s16 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
-    // _EDIT_
+    // _EDIT_ ignore set_mario_animation and return 0
     return 0;
 
     struct Object *o = m->marioObj;
@@ -102,9 +101,9 @@ s16 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
  * slowed down via acceleration.
  */
 s16 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel) {
-    // _EDIT_
+    // _EDIT_ ignore set_mario_anim_with_accel and return 0
     return 0;
-    /*
+    
     struct Object *o = m->marioObj;
     struct Animation *targetAnim = m->animList->bufTarget;
 
@@ -134,7 +133,6 @@ s16 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel)
     o->header.gfx.animInfo.animAccel = accel;
 
     return o->header.gfx.animInfo.animFrame;
-    */
 }
 
 /**
@@ -160,9 +158,9 @@ void set_anim_to_frame(struct MarioState *m, s16 animFrame) {
 }
 
 s32 is_anim_past_frame(struct MarioState *m, s16 animFrame) {
-    // _EDIT_
+    // _EDIT_ is_anim_past_frame always return FALSE
     return FALSE;
-    /*
+    
     s32 isPastFrame;
     s32 acceleratedFrame = animFrame << 0x10;
     struct AnimInfo *animInfo = &m->marioObj->header.gfx.animInfo;
@@ -187,7 +185,6 @@ s32 is_anim_past_frame(struct MarioState *m, s16 animFrame) {
     }
 
     return isPastFrame;
-    */
 }
 
 /**
@@ -195,9 +192,9 @@ s32 is_anim_past_frame(struct MarioState *m, s16 animFrame) {
  * and returns the animation's flags.
  */
 s16 find_mario_anim_flags_and_translation(struct Object *obj, s32 yaw, Vec3s translation) {
-    // _EDIT_
+    // _EDIT_ ignore find_mario_anim_flags_and_translation and return 0
     return 0;
-    /*
+    
     f32 dx;
     f32 dz;
 
@@ -217,7 +214,6 @@ s16 find_mario_anim_flags_and_translation(struct Object *obj, s32 yaw, Vec3s tra
     translation[2] = (-dx * s) + (dz * c);
 
     return curAnim->flags;
-    */
 }
 
 /**
@@ -1249,7 +1245,7 @@ void squish_mario_model(struct MarioState *m) {
  * Debug function that prints floor normal, velocity, and action information.
  */
 void debug_print_speed_action_normal(struct MarioState *m) {
-// _EDIT_
+// _EDIT_ ignore debug function
 /*
     f32 steepness;
     f32 floor_nY;
@@ -1684,7 +1680,7 @@ void mario_update_hitbox_and_cap_model(struct MarioState *m) {
  * An unused and possibly a debug function. Z + another button input
  * sets Mario with a different cap.
  */
-// _EDIT_
+// _EDIT_ remove debug function
 /*
 UNUSED static void debug_update_mario_cap(u16 button, s32 flags, u16 capTimer, u16 capMusic) {
     // This checks for Z_TRIG instead of Z_DOWN flag
@@ -1742,7 +1738,7 @@ s32 execute_mario_action(UNUSED struct Object *o) {
         // The function can loop through many action shifts in one frame,
         // which can lead to unexpected sub-frame behavior. Could potentially hang
         // if a loop of actions were found, but there has not been a situation found.
-        // _EDIT_
+        // _EDIT_ implement only 3 action groups
 #define NOT_IMPL desync("action group not implemented\n"); inLoop = FALSE; break;
 
         while (inLoop) {
@@ -1817,7 +1813,7 @@ s32 execute_mario_action(UNUSED struct Object *o) {
  *                  INITIALIZATION                *
  **************************************************/
 
-// _EDIT_
+// _EDIT_ remove init_mario and init_mario_from_save_file functions
 /*
 void init_mario(void) {
     Vec3s capPos;

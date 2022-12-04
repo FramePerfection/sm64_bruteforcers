@@ -120,7 +120,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode,
             }
 
             // If an object can pass through a vanish cap wall, pass through.
-            // _EDIT_
+            // _EDIT_ vanish cap wall functionality disabled
             /*if (surf->type == SURFACE_VANISH_CAP_WALLS) {
                 // If an object can pass through a vanish cap wall, pass through.
                 if (gCurrentObject != NULL
@@ -212,7 +212,7 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     numCollisions += find_wall_collisions_from_list(node, colData);
 
     // Increment the debug tracker.
-    // _EDIT_
+    // _EDIT_ ignore debug tracker
     //gNumCalls.wall++;
 
     return numCollisions;
@@ -350,7 +350,7 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     *pceil = ceil;
 
     // Increment the debug tracker.
-    // _EDIT_
+    // _EDIT_ ignore debug tracker
     //gNumCalls.ceil++;
 
     return height;
@@ -568,7 +568,7 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     }
 
     // If a floor was missed, increment the debug counter.
-    // _EDIT_
+    // _EDIT_ ignore debug tracker
     /*if (floor == NULL) {
         gNumFindFloorMisses++;
     }*/
@@ -581,7 +581,7 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     *pfloor = floor;
 
     // Increment the debug tracker.
-    // _EDIT_
+    // _EDIT_ ignore debug tracker
     //gNumCalls.floor++;
 
     return height;
@@ -600,7 +600,7 @@ f32 find_water_level(f32 x, f32 z) {
     s16 val;
     f32 loX, hiX, loZ, hiZ;
     f32 waterLevel = FLOOR_LOWER_LIMIT;
-    // _EDIT_
+    // _EDIT_ water boxes disabled
     s16 *p = NULL; /*gEnvironmentRegions;*/
 
     if (p != NULL) {
@@ -637,7 +637,7 @@ f32 find_poison_gas_level(f32 x, f32 z) {
     s16 val;
     f32 loX, hiX, loZ, hiZ;
     f32 gasLevel = FLOOR_LOWER_LIMIT;
-    // _EDIT_
+    // _EDIT_ poison gas boxes disabled
     s16 *p = NULL; /*gEnvironmentRegions;*/
 
     if (p != NULL) {
@@ -690,7 +690,7 @@ static s32 surface_list_length(struct SurfaceNode *list) {
  * Print the area,number of walls, how many times they were called,
  * and some allocation information.
  */
-// _EDIT_
+// _EDIT_ remove debug function
 /*
 void debug_surface_list_info(f32 xPos, f32 zPos) {
     struct SurfaceNode *list;

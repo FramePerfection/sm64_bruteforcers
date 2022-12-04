@@ -437,7 +437,7 @@ s32 act_coughing(struct MarioState *m) {
 }
 
 s32 act_hold_idle(struct MarioState *m) {
-    // _EDIT_
+    // _EDIT_ ignore crazybox
 #ifdef BF_ENABLE_INTERACTIONS
     if (segmented_to_virtual(&bhvJumpingBox) == m->heldObj->behavior) {
         return set_mario_action(m, ACT_CRAZY_BOX_BOUNCE, 0);
@@ -1000,7 +1000,7 @@ s32 act_air_throw_land(struct MarioState *m) {
     }
 
     if (++m->actionTimer == 4) {
-        // _EDIT_
+        // _EDIT_ ignore throw held object
 #ifdef BF_ENABLE_INTERACTIONS
         mario_throw_held_object(m);
 #endif
@@ -1072,7 +1072,7 @@ s32 act_first_person(struct MarioState *m) {
         return set_mario_action(m, ACT_IDLE, 0);
     }
 
-    // _EDIT_
+    // _EDIT_ ignore TotWC stage warp
     /*
     if (m->floor->type == SURFACE_LOOK_UP_WARP
         && save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1) >= 10) {
@@ -1091,7 +1091,7 @@ s32 act_first_person(struct MarioState *m) {
 
 s32 check_common_stationary_cancels(struct MarioState *m) {
     if (m->pos[1] < m->waterLevel - 100) {
-        // _EDIT_
+        // _EDIT_ ignore level init text
         /*
         if (m->action == ACT_SPAWN_SPIN_LANDING) {
             load_level_init_text(0);

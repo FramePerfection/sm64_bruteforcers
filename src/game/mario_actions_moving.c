@@ -68,6 +68,8 @@ s16 tilt_body_running(struct MarioState *m) {
 }
 
 void play_step_sound(struct MarioState *m, s16 frame1, s16 frame2) {
+    // _EDIT_ ignore playing sounds (this can alter RNG)
+    /*
     if (is_anim_past_frame(m, frame1) || is_anim_past_frame(m, frame2)) {
         if (m->flags & MARIO_METAL_CAP) {
             if (m->marioObj->header.gfx.animInfo.animID == MARIO_ANIM_TIPTOE) {
@@ -83,6 +85,7 @@ void play_step_sound(struct MarioState *m, s16 frame1, s16 frame2) {
             play_sound_and_spawn_particles(m, SOUND_ACTION_TERRAIN_STEP, 0);
         }
     }
+    */
 }
 
 void align_with_floor(struct MarioState *m) {
@@ -589,8 +592,7 @@ void anim_and_audio_for_walk(struct MarioState *m) {
                         //! (Speed Crash) If Mario's speed is more than 2^17.
                         val14 = (s32)(val04 / 4.0f * 0x10000);
                         set_mario_anim_with_accel(m, MARIO_ANIM_RUNNING, val14);
-                        // _EDIT_
-                        // play_step_sound(m, 9, 45);
+                        play_step_sound(m, 9, 45);
                         targetPitch = tilt_body_running(m);
 
                         val0C = FALSE;
@@ -851,7 +853,7 @@ s32 act_move_punching(struct MarioState *m) {
 
     m->actionState = 1;
 
-    // _EDIT_
+    // _EDIT_ break in mario_update_punch_sequence
     printf("mario_update_punch_sequence not implemented\n");
     raise(5 /*SIGTRAP*/);
     //mario_update_punch_sequence(m);
@@ -879,7 +881,7 @@ s32 act_move_punching(struct MarioState *m) {
 }
 
 s32 act_hold_walking(struct MarioState *m) {
-    // _EDIT_
+    // _EDIT_ ignore crazybox
     /*
     if (m->heldObj->behavior == segmented_to_virtual(bhvJumpingBox)) {
          return set_mario_action(m, ACT_CRAZY_BOX_BOUNCE, 0);

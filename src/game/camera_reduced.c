@@ -3121,7 +3121,7 @@ void update_camera(struct Camera *c) {
     UNUSED u8 filler[24];
 
     gCamera = c;
-    // _EDIT_
+    // _EDIT_ ignore HUD
     // update_camera_hud_status(c);
     if (c->cutscene == 0) {
         // Only process R_TRIG if 'fixed' is not selected in the menu
@@ -3448,7 +3448,7 @@ void init_camera(struct Camera *c) {
             // Since Bowser 1 has a demo entry, check for it
             // If it is, then set CamAct to the end to directly activate Bowser
             // If it isn't, then start cutscene
-            // _EDIT_
+            // _EDIT_ ignore demo inputs
             if (TRUE /*gCurrDemoInput == NULL*/) {
                 start_cutscene(c, CUTSCENE_ENTER_BOWSER_ARENA);
             } else if (gSecondCameraFocus != NULL) {
@@ -3606,7 +3606,7 @@ void select_mario_cam_mode(void) {
 #include <stdlib.h>
 void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool) {
     s16 mode = gc->config.mode;
-    // _EDIT_
+    // _EDIT_ alloc camera in system memory
     struct Camera *c = malloc(sizeof(struct Camera)); // alloc_only_pool_alloc(pool, sizeof(struct Camera));
 
     gc->config.camera = c;
@@ -7081,7 +7081,7 @@ void copy_spline_segment(struct CutsceneSplinePoint dst[], struct CutsceneSpline
  */
 s16 cutscene_common_set_dialog_state(s32 state) {
     s16 timer = gCutsceneTimer;
-    // _EDIT_
+    // _EDIT_ cutscenes?
     /*
     // If the dialog ended, return CUTSCENE_LOOP, which would end the cutscene shot
     if (set_mario_npc_dialog(state) == MARIO_DIALOG_STATUS_SPEAK) {
