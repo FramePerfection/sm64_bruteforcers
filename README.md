@@ -15,7 +15,7 @@ To install MinGW for Visual Studio Code, refer to this guide: https://code.visua
   
 To build the repository, simply run "make".  
 There exist targets for each module separately, for example "make fp_gwk".  
-When building from Visual Studio Code, make sure to run your commands in "bash" terminal, **not** in the default Powershell.  
+When building from Visual Studio Code, make sure to run your commands in a MinGW "bash" terminal (such as Git Bash), **not** in the default Powershell.  
   
 A configuration for Visual Studio Code is provided as well.  
 Adjust the MODULE_PATH define in c_cpp_properties.json for proper intellisense support on whichever module you are currently working on.  
