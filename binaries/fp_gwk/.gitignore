@@ -1,0 +1,4 @@
+*
+!.gitignore
+!configuration.json
+!test.m64
