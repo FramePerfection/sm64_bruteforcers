@@ -208,7 +208,6 @@ DUMMY := $(shell mkdir -p $(ALL_DIRS))
 
 # Compile C code
 $(BUILD_DIR)/%.o: %.c
-	$(call print,$(MODULE_PATH),,)
 	$(call print,Compiling:,$<,$@)
 	$(CC_CHECK) $(CC_CHECK_CFLAGS) -MMD -MP -MT $@ -MF $(BUILD_DIR)/$*.d $<
 	$(V)$(CC) -c $(CFLAGS) -o $@ $<
