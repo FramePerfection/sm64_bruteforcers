@@ -17,7 +17,7 @@
 	"plane_nx": 0.70710676908493,
 	"plane_nz": -0.70710676908493,
 	"plane_d": -5514.7255859375,
-	"approach_angle": 5298,
+	"gwk_angle": 11086,
 	"minimum_h_speed": 46.0,
 	
 	"mario_action_timer": 0,

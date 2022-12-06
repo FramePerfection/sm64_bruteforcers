@@ -101,7 +101,7 @@ void updateScore(Candidate *candidate, u32 frame_idx) {
 		candidate->stats.hSpeed = gMarioStates->forwardVel;
 		candidate->score = score;
 
-		if (gMarioState->faceAngle[1] != bfStaticState.approach_angle && gMarioState->faceAngle[1] != -bfStaticState.approach_angle)
+		if (gMarioState->faceAngle[1] == (s16)(bfStaticState.gwk_angle + 0x8000))
 		{
 			printf("Found one: %d, %f", gMarioState->faceAngle[1], gMarioState->forwardVel);
 			if (best) {

@@ -15,7 +15,7 @@ BF_STATIC_STATE(u32, scoring_frame, bfStaticState.scoring_frame)
 BF_STATIC_STATE(f32, plane_nx, bfStaticState.plane_nx)
 BF_STATIC_STATE(f32, plane_nz, bfStaticState.plane_nz)
 BF_STATIC_STATE(f32, plane_d, bfStaticState.plane_d)
-BF_STATIC_STATE(s16, approach_angle, bfStaticState.approach_angle)
+BF_STATIC_STATE(s16, gwk_angle, bfStaticState.gwk_angle)
 BF_STATIC_STATE(f32, minimum_h_speed, minSpeed)
 
 BF_STATIC_STATE(Triangles, static_tris, bfStaticState.static_tris)
