@@ -13,6 +13,7 @@
 
 BFStaticState bfStaticState;
 BFDynamicState bfInitialDynamicState;
+ProgramState *programState;
 
 const char *read_file(const char *fileName) {
 	FILE *file = fopen(fileName, "r");

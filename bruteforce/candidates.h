@@ -3,6 +3,10 @@
 
 #define STATE_INCLUDE <bruteforce/MODULE_PATH/state.h>
 
+#define STR1(x) #x
+#define STR2(x) STR1(x)
+#define MODULE_PATH_STR STR2(MODULE_PATH)
+
 #include "bruteforce/m64.h"
 #include <PR/ultratypes.h>
 #include <stdio.h>

@@ -9,19 +9,17 @@ static HANDLE *childToParentReadPipes;
 static HANDLE childReadPipe, childWritePipe;
 static OVERLAPPED readOverlapped;
 static BOOL pipeReadPending = FALSE;
-
+static HANDLE hMapFile;
+static void *pBuf;
 #endif
 
+#define BUF_SIZE sizeof(ProgramState)
 u32 transmissionCandidateSize;
 u32 sequenceSize;
 u32 pipeBufferSize;
 char *pipeBuffer;
 
-
-extern 
-BOOL
-APIENTRY
-MyCreatePipeEx(
+extern BOOL APIENTRY MyCreatePipeEx(
     OUT LPHANDLE lpReadPipe,
     OUT LPHANDLE lpWritePipe,
     IN LPSECURITY_ATTRIBUTES lpPipeAttributes,
@@ -51,7 +49,7 @@ static void createProcess(HANDLE readPipe, HANDLE writePipe, HANDLE hJob) {
 	
 	TCHAR lpszClientPath[500] = TEXT("main.exe");
 	TCHAR lpszArgs[500] = "-child";
-	sprintf(lpszArgs, "-child %p %p", readPipe, writePipe);
+	sprintf(lpszArgs, "-child %p %p %p", readPipe, writePipe, hMapFile);
 
 	if (!CreateProcess(lpszClientPath, lpszArgs, NULL, NULL, TRUE, CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi)) {
 		printf("Failed to launch child process. Error code %ld\n", GetLastError());
@@ -63,6 +61,17 @@ static void createProcess(HANDLE readPipe, HANDLE writePipe, HANDLE hJob) {
 }
 
 static void createChildProcesses() {
+	SECURITY_ATTRIBUTES saAttr;  
+	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
+	saAttr.bInheritHandle = TRUE; 
+	saAttr.lpSecurityDescriptor = NULL;
+
+	hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, &saAttr, PAGE_READWRITE, 0, BUF_SIZE, NULL);
+	if (hMapFile == NULL) {
+    	printf("Could create file mapping (%d).\n", GetLastError());
+		return;
+	}
+
     HANDLE                               hJob;
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
 	
@@ -96,10 +105,11 @@ void initializeMultiProcess(InputSequence *original_inputs, int argc, char *argv
     readOverlapped.hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
 	if (argc > 1) {
-		printf("%s %s %s\n", argv[0], argv[1], argv[2]);
+		printf("%s %s %s %s\n", argv[0], argv[1], argv[2], argv[3]);
 		char *end;
 		childReadPipe = strtol(argv[1], &end, 0x10);
 		childWritePipe = strtol(argv[2], &end, 0x10);
+		hMapFile = strtol(argv[3], &end, 0x10);
 	}
 	else {
 		printf("no arguments\n");
@@ -109,6 +119,16 @@ void initializeMultiProcess(InputSequence *original_inputs, int argc, char *argv
 
 	if (argc == 0 || strcmp("-child", argv[0]))
 		createChildProcesses();
+		
+   	pBuf = MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, BUF_SIZE);
+	
+	if (pBuf == NULL)
+	{
+		printf("Could not map view of file (%d).\n", GetLastError());
+    	CloseHandle(hMapFile);
+		return;
+	}
+	programState = pBuf;
 }
 
 u8 isParentProcess() {
@@ -125,8 +145,6 @@ static void writeSurvivorsToBuffer(Candidate *survivors) {
 }
 
 void parentMergeCandidates(Candidate *survivors) {
-	printf("attempt to merge child processes\n");
-
 	s32 numChildProcesses = bfStaticState.max_processes - 1;
 	if (numChildProcesses <= 0)
 		return;
@@ -161,7 +179,6 @@ void parentMergeCandidates(Candidate *survivors) {
 		}
 	}
 
-	printf("Merging child processes\n");
 	mergeCandidates(survivors, externalCandidates, k);
 	free(mergeBuffer);
 
@@ -189,12 +206,10 @@ void childUpdateMessages(Candidate *survivors) {
 		if (strcmp(cmd, "merge") == 0) {
 			DWORD written, read;
 			writeSurvivorsToBuffer(survivors);
-			printf("writing child merge data\n");
 			if (!WriteFile(childWritePipe, pipeBuffer, pipeBufferSize, &written, NULL)) {
 				printf("Failed to fulfil merge command: %ld", GetLastError());
 			}
 
-			printf("receiving child merge data\n");
 			if (!ReadFile(childReadPipe, pipeBuffer, pipeBufferSize, &read, NULL)) {
 				printf("Failed to read merge message:%ld\n", GetLastError());
 			}

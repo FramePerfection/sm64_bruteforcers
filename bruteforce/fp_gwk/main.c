@@ -94,11 +94,11 @@ void updateScore(Candidate *candidate, u32 frame_idx) {
 		f64 dist = last_q_step[0] * bfStaticState.plane_nx + last_q_step[2] * bfStaticState.plane_nz + bfStaticState.plane_d - 50.0;
 		f64 dist2 = last_q_step2[0] * bfStaticState.plane_nx + last_q_step2[2] * bfStaticState.plane_nz + bfStaticState.plane_d - 50.0;
 		f64 score = (dist * dist + dist2 * dist2);
-		u8 best = gMarioStates->forwardVel > minSpeed;
+		u8 best = gMarioStates->forwardVel > programState->bestSpeed;
 		if (!best)
 			score = INFINITY;
 		else
-			score /= powf(2.0, (gMarioState->forwardVel - minSpeed) * 15);
+			score /= powf(2.0, (gMarioState->forwardVel - programState->bestSpeed) * 15);
 
 		if (gMarioState->faceAngle[1] == (s16)(bfStaticState.gwk_angle + 0x8000))
 		{
@@ -106,7 +106,7 @@ void updateScore(Candidate *candidate, u32 frame_idx) {
 			if (best) {
 				save_to_m64_file(bfStaticState.m64_input, bfStaticState.m64_output, candidate->sequence);
 				printf("\t(new best!)");
-				minSpeed = gMarioState->forwardVel;
+				programState->bestSpeed = gMarioState->forwardVel;
 			}
 			printf("\n");
 		}
@@ -133,7 +133,7 @@ void brutefoceLoop() {
 			float seconds = (float)(curClock - lastClock) / CLOCKS_PER_SEC;
 			float fps = gen_mod * original_inputs->count * bfStaticState.runs_per_survivor * bfStaticState.survivors_per_generation / seconds;
 			lastClock = curClock;
-			printf("Generation %d starting... (minSpeed %f, %f FPS)\n", gen, minSpeed, fps);
+			printf("Generation %d starting... (bestSpeed %f, %f FPS)\n", gen, programState->bestSpeed, fps);
 		}
 
 		// perform all runs
@@ -147,7 +147,7 @@ void brutefoceLoop() {
 				InputSequence *inputs = candidate->sequence;
 				clone_m64_inputs(inputs, original->sequence);
 
-				u8 keepOriginal = run_idx == 0 && (rand() % 100 <= 100 -bfStaticState.forget_rate);
+				u8 keepOriginal = run_idx == 0 && (rand() % 100 <= 100 - bfStaticState.forget_rate);
 				/*if (keepOriginal) {
 					candidate->score = original->score;
 					candidate->stats.hSpeed = original->stats.hSpeed;
@@ -200,6 +200,7 @@ void main(int argc, char *argv[]) {
 	initCandidates(original_inputs, &survivors);
 
 	initializeMultiProcess(original_inputs, argc, argv);
+	programState->bestSpeed = minSpeed;
 
 	brutefoceLoop();
 }

@@ -3,6 +3,9 @@
 
 #include "bruteforce/readers.h"
 
+#define STATE_INCLUDE <bruteforce/MODULE_PATH/state.h>
+#include STATE_INCLUDE
+
 #define STATE_DEFINITION_FILE <bruteforce/MODULE_PATH/bf_state_definitions.inc.c>
 
 #define BF_DYNAMIC_VEC3(name, expr) \
@@ -32,6 +35,7 @@ typedef struct BFDyanmicState_s {
 
 extern BFStaticState bfStaticState;
 extern BFDynamicState bfInitialDynamicState;
+extern ProgramState *programState;
 
 u8 bf_init_states();
 void bf_load_dynamic_state(BFDynamicState*);

@@ -14,7 +14,9 @@ extern struct Area area;
 extern struct MarioBodyState marioBodyState;
 extern struct Controller testController;
 
-extern f32 minSpeed;
+typedef struct {
+	f32 bestSpeed;
+} ProgramState;
 
 typedef struct {
 	f32 hSpeed;

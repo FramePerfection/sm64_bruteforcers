@@ -23,6 +23,7 @@ struct Object marioObj;
 struct Area area;
 struct MarioBodyState marioBodyState;
 struct Controller testController;
+f32 minSpeed;
 
 void initGame() {
 	gCamera = &camera;
@@ -86,7 +87,6 @@ void perturbInput(OSContPad *input) {
 	}
 }
 
-f32 minSpeed;
 u8 updateScore(Candidate *candidate, u32 frame_idx) {
 	if (frame_idx == bfStaticState.sliding_start_frame -1 && gMarioState->action != bfStaticState.sliding_action) {
 		candidate->score = INFINITY;
@@ -109,11 +109,11 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 		candidate->stats.z = gMarioState->pos[2];
 		candidate->score = score;
 
-		u8 best = gMarioStates->forwardVel > minSpeed;
+		u8 best = gMarioStates->forwardVel > programState->bestSpeed;
 		if (score < 0 && best) {
-			minSpeed = gMarioState->forwardVel;
+			programState->bestSpeed = gMarioState->forwardVel;
 			save_to_m64_file(bfStaticState.m64_input, bfStaticState.m64_output, candidate->sequence);
-			printf("New best: %f\n", minSpeed);
+			printf("New best: %f\n", gMarioState->forwardVel);
 		}
 	}
 	return TRUE;
@@ -151,6 +151,8 @@ void main(int argc, char *argv[]) {
 	initCandidates(original_inputs, &survivors);
 
 	initializeMultiProcess(original_inputs, argc, argv);
+	
+	programState->bestSpeed = minSpeed;
 
 	clock_t lastClock = clock();
 	u32 gen_mod = bfStaticState.print_interval;
@@ -230,7 +232,7 @@ void main(int argc, char *argv[]) {
 					survivors[candidate_idx].stats.z, 
 					survivors[candidate_idx].stats.hSpeed);
 			}
-			printf("Best so far: %f\n", minSpeed);
+			printf("Best so far: %f\n", programState->bestSpeed);
 		}
 	}
 }
