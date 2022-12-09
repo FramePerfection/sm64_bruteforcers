@@ -43,7 +43,7 @@ void read_Vec3f(Json *jsonNode, Vec3f *target) {
 void read_Triangles(Json *jsonNode, Triangles *target) {
 	Json *triNode = jsonNode->child;
 	target->data_size = jsonNode->size;
-	target->data = malloc(sizeof(Triangle) * target->data_size);
+	target->data = calloc(target->data_size, sizeof(Triangle));
 	u32 i = 0;
 	while (triNode != NULL) {
 		Json *vertNode = triNode->child;

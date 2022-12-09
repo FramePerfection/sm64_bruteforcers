@@ -15,11 +15,11 @@ u8 read_m64_from_file(char *fileName, u32 offset, u32 max_count, InputSequence *
 	long size = ftell(file);
 	fseek(file, 0x400 + offset * sizeof(u32), SEEK_SET);
 	u32 buffersize = sizeof(InputSequence) + max_count * sizeof(OSContPad);
-	*inputs = malloc(buffersize);
+	*inputs = calloc(buffersize, sizeof(char));
 	(*inputs)->count = MIN(max_count, (size - 0x400) / 4);
 	(*inputs)->offset = offset;
 
-	char *inputBuffer = malloc(max_count * sizeof(u32));
+	char *inputBuffer = calloc(max_count, sizeof(u32));
 	fread(inputBuffer, sizeof(u32), (*inputs)->count, file);
 
 	u32 i;
@@ -52,7 +52,7 @@ u8 save_to_m64_file(char* originalFileName, char* fileName, InputSequence *seque
 	long size = ftell(src_file);
 	fseek(src_file, 0, SEEK_SET);
 
-	char *buffer = malloc(size);
+	char *buffer = calloc(size, sizeof(char));
 	fread(buffer, sizeof(char), size, src_file);
 	fwrite(buffer, sizeof(char), size, dst_file);
 
@@ -76,7 +76,7 @@ void clone_m64_inputs(InputSequence *dest, InputSequence *src) {
 }
 
 InputSequence *clone_m64(InputSequence *src) {
-	InputSequence *dest = malloc(sizeof(InputSequence) + sizeof(OSContPad) * src->count);
+	InputSequence *dest = calloc(sizeof(InputSequence) + sizeof(OSContPad) * src->count, sizeof(char));
 	dest->count = src->count;
 	dest->offset = src->offset;
 	clone_m64_inputs(dest, src);

@@ -21,7 +21,7 @@ const char *read_file(const char *fileName) {
 	fseek(file, 0, SEEK_END);
 	long size = ftell(file);
 	fseek(file, 0, SEEK_SET);
-	const char *fileContents = malloc(size);
+	const char *fileContents = calloc(size, sizeof(char));
 	fread(fileContents, sizeof(char), size, file);
 	fclose(file);
 	return fileContents;

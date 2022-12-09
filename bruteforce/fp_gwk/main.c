@@ -10,6 +10,7 @@
 #include "bruteforce/misc_util.h"
 #include "bruteforce/bf_states.h"
 #include "bruteforce/m64.h"
+#include "bruteforce/interprocess.h"
 #include <stdlib.h>
 #include "time.h"
 #include "bruteforce/candidates.h"
@@ -95,11 +96,9 @@ void updateScore(Candidate *candidate, u32 frame_idx) {
 		f64 score = (dist * dist + dist2 * dist2);
 		u8 best = gMarioStates->forwardVel > minSpeed;
 		if (!best)
-			score += minSpeed - gMarioState->forwardVel;
+			score = INFINITY;
 		else
 			score /= powf(2.0, (gMarioState->forwardVel - minSpeed) * 15);
-		candidate->stats.hSpeed = gMarioStates->forwardVel;
-		candidate->score = score;
 
 		if (gMarioState->faceAngle[1] == (s16)(bfStaticState.gwk_angle + 0x8000))
 		{
@@ -111,27 +110,18 @@ void updateScore(Candidate *candidate, u32 frame_idx) {
 			}
 			printf("\n");
 		}
+		candidate->stats.hSpeed = gMarioStates->forwardVel;
+		candidate->score = score;
 	}
 }
 
-void main() {
-	printf("Running Bruteforcer...\n");
-	initGame();
+InputSequence *original_inputs;
+Candidate *survivors;
 
-	printf("Loading m64...\n");
-	InputSequence *original_inputs;
-	if (!read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_count, &original_inputs))
-	{
-		printf("Failed to load m64! Exiting...\n");
-		exit(-1);
-	}
-
-	Candidate *survivors;
-	Candidate **best;
-	initCandidates(original_inputs, &survivors, &best);
-
+void brutefoceLoop() {
 	clock_t lastClock = clock();
 	u32 gen_mod = bfStaticState.print_interval;
+	u32 gen_merge_mod = bfStaticState.merge_interval;
 	if (gen_mod == 0)
 		gen_mod = 100;
 
@@ -149,8 +139,6 @@ void main() {
 		// perform all runs
 		u32 candidate_idx;
 		for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++) {
-			best[candidate_idx] = NULL;
-
 			u32 run_idx;
 			for (run_idx = 0; run_idx < bfStaticState.runs_per_survivor; run_idx++) {
 				Candidate *candidate = &survivors[candidate_idx].children[run_idx];
@@ -159,18 +147,20 @@ void main() {
 				InputSequence *inputs = candidate->sequence;
 				clone_m64_inputs(inputs, original->sequence);
 
-				if (run_idx == 0 && (rand() % 100 <= 98)) {
+				u8 keepOriginal = run_idx == 0 && (rand() % 100 <= 100 -bfStaticState.forget_rate);
+				/*if (keepOriginal) {
 					candidate->score = original->score;
 					candidate->stats.hSpeed = original->stats.hSpeed;
 					continue;
-				}
+				}*/
 
 				bf_load_dynamic_state(&bfInitialDynamicState);
 
 				u32 frame_idx;
 				for (frame_idx = 0; frame_idx < inputs->count; frame_idx++) {
 					OSContPad *currentInput = &inputs->inputs[frame_idx];
-					perturbInput(currentInput);
+					if (!keepOriginal)
+						perturbInput(currentInput);
 					updateGame(currentInput);
 					updateScore(candidate, frame_idx);
 				}
@@ -178,10 +168,38 @@ void main() {
 		}
 		
 		// sort by scoring
-		updateBestCandidates(survivors, best);
+		updateBestCandidates(survivors);
 
-		if (gen % gen_mod == 0)
-			for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++)
-				printf("%d:\t%a;\t%f\n", candidate_idx, survivors[candidate_idx].score, survivors[candidate_idx].stats.hSpeed);
+		if (isParentProcess()) {		
+			if (gen % gen_mod == 0) 
+				for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++)
+					printf("%d:\t%a;\t%f\n", candidate_idx, survivors[candidate_idx].score, survivors[candidate_idx].stats.hSpeed);
+			
+			// We're the parent process. Send a merge request to all children and merge, then send the merged results back to the children.
+			if (gen % gen_merge_mod == 0) {
+				parentMergeCandidates(survivors);
+			}
+		}
+		else
+			childUpdateMessages(survivors);
 	}
+}
+
+void main(int argc, char *argv[]) {
+	printf("Running Bruteforcer...\n");
+	
+	printf("Initializing game state...\n");
+	initGame();
+	
+	printf("Loading m64...\n");
+	if (!read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_count, &original_inputs))
+	{
+		printf("Failed to load m64! Exiting...\n");
+		exit(-1);
+	}
+	initCandidates(original_inputs, &survivors);
+
+	initializeMultiProcess(original_inputs, argc, argv);
+
+	brutefoceLoop();
 }

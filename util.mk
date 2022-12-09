@@ -15,7 +15,7 @@ endef
 # Returns the path to the command $(1) if exists. Otherwise returns an empty string.
 find-command = $(shell which $(1) 2>/dev/null)
 
-SPECIAL_O := bf_states?bf_state_definitions.inc.c candidates?state.h
+SPECIAL_O := bf_states?bf_state_definitions.inc.c candidates?state.h interprocess?state.h
 word-dot = $(word $2,$(subst ?, ,$1))
 
 define special
@@ -29,6 +29,7 @@ $(BUILD_DIR)/bruteforce/$(1)/$(_2).o: bruteforce/$(_2).c bruteforce/$(1)/$(_3)
 endef
 
 define register-lib
+$(eval $(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/, m64.o readers.o json.o engine_feed.o engine_stubs.o misc_util.o pipeex.o))
 $(eval $(NAME)REQUIRED_O_FILES := $(addprefix $(BUILD_DIR)/, $($(NAME)REQUIRED_OBJECTS)))
 ALL_TARGETS += $(NAME)
 SRC_DIRS += bruteforce/$(NAME)

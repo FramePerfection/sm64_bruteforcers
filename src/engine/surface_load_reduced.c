@@ -40,7 +40,7 @@ void clear_static_surfaces(void) {
  */
 #include <stdlib.h>
 static struct SurfaceNode *alloc_surface_node(void) {
-    struct SurfaceNode *node = malloc(sizeof(struct SurfaceNode));
+    struct SurfaceNode *node = calloc(1, sizeof(struct SurfaceNode));
 
     node->next = NULL;
     
@@ -48,7 +48,7 @@ static struct SurfaceNode *alloc_surface_node(void) {
 }
 
 struct Surface *alloc_surface(void) {
-    struct Surface *surface = malloc(sizeof(struct Surface));
+    struct Surface *surface = calloc(1, sizeof(struct Surface));
 
     surface->type = 0;
     surface->force = 0;

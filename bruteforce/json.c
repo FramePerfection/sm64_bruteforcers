@@ -73,8 +73,7 @@ static int Json_strcasecmp (const char* s1, const char* s2) {
 
 /* Internal constructor. */
 static Json *Json_new (void) {
-	Json *result = (Json*)malloc(sizeof(Json));
-	memset(result, 0, sizeof(Json));
+	Json *result = (Json*)calloc(1, sizeof(Json));
 	return result;
 }
 

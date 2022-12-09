@@ -4,11 +4,14 @@
 	"m64_output": "sm74b3textbox.behindthetower.bruteforce.m64",
 	"m64_count": 10,
 	
+	"max_processes": 4,
 	"rnd_seed": 2143,
 	"max_perturbation": 7,
 	"runs_per_survivor": 25,
 	"survivors_per_generation": 10,
 	"max_generations": 1000000,
+	"merge_interval": 40,
+	"forget_rate": 2,
 	"print_interval": 100,
 	
 	"initial_button_state": "0x2000",

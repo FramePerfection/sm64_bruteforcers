@@ -5,6 +5,7 @@
 	"m64_count": 27,
 	"scoring_frame": 27,
 	
+	"max_processes": 3,
 	"rnd_seed": 2140,
 	"max_perturbation": 4,
 	"runs_per_survivor": 400,

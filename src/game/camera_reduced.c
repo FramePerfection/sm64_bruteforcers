@@ -3607,7 +3607,7 @@ void select_mario_cam_mode(void) {
 void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool) {
     s16 mode = gc->config.mode;
     // _EDIT_ alloc camera in system memory
-    struct Camera *c = malloc(sizeof(struct Camera)); // alloc_only_pool_alloc(pool, sizeof(struct Camera));
+    struct Camera *c = calloc(1, sizeof(struct Camera)); // alloc_only_pool_alloc(pool, sizeof(struct Camera));
 
     gc->config.camera = c;
     c->mode = mode;

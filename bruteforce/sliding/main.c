@@ -10,6 +10,7 @@
 #include "bruteforce/misc_util.h"
 #include "bruteforce/bf_states.h"
 #include "bruteforce/m64.h"
+#include "bruteforce/interprocess.h"
 #include <stdlib.h>
 #include "time.h"
 #include "bruteforce/candidates.h"
@@ -134,7 +135,7 @@ void debug_print_run(s32 frame_idx) {
 	}
 }
 
-void main() {
+void main(int argc, char *argv[]) {
 	printf("Running Bruteforcer...\n");
 	initGame();
 
@@ -147,13 +148,18 @@ void main() {
 	}
 
 	Candidate *survivors;
-	Candidate **best;
-	initCandidates(original_inputs, &survivors, &best);
+	initCandidates(original_inputs, &survivors);
+
+	initializeMultiProcess(original_inputs, argc, argv);
 
 	clock_t lastClock = clock();
 	u32 gen_mod = bfStaticState.print_interval;
 	if (gen_mod == 0)
 		gen_mod = 100;
+
+	u32 gen_merge_mod = bfStaticState.merge_interval;
+	if (gen_merge_mod == 0)
+		gen_merge_mod = gen_mod;
 
 	u32 frames = 0;
 	u32 gen;
@@ -171,7 +177,6 @@ void main() {
 		// perform all runs
 		u32 candidate_idx;
 		for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++) {
-			best[candidate_idx] = NULL;
 
 			u32 run_idx;
 			for (run_idx = 0; run_idx < bfStaticState.runs_per_survivor; run_idx++) {
@@ -206,7 +211,13 @@ void main() {
 		}
 		
 		// sort by scoring
-		updateBestCandidates(survivors, best);
+		updateBestCandidates(survivors);
+		if (!isParentProcess())
+			childUpdateMessages(survivors);
+
+		if (gen % gen_merge_mod == 0)
+			if (isParentProcess())
+				parentMergeCandidates(survivors);
 
 		if (gen % gen_mod == 0)
 		{
