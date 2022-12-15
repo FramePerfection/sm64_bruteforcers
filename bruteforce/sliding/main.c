@@ -136,6 +136,8 @@ void debug_print_run(s32 frame_idx) {
 }
 
 void main(int argc, char *argv[]) {
+	parse_command_line_args(argc, argv);
+
 	printf("Running Bruteforcer...\n");
 	initGame();
 
@@ -152,7 +154,7 @@ void main(int argc, char *argv[]) {
 	initCandidates(original_inputs, &survivors);
 	initCandidates(original_inputs, &best);
 
-	initializeMultiProcess(original_inputs, argc, argv);
+	initializeMultiProcess(original_inputs);
 	
 	programState->bestSpeed = minSpeed;
 

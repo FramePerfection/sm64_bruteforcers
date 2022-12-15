@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include "time.h"
 #include "bruteforce/candidates.h"
+#include <string.h>
 
 #define STATE_INCLUDE <bruteforce/MODULE_PATH/state.h>
 #include STATE_INCLUDE
@@ -31,7 +32,7 @@ Candidate *best;
 
 extern Vec3f last_q_step, last_q_step2;
 
-void initGame() {
+void initGame(char* override_config_file) {
 	gCamera = &camera;
 	gCurrentArea = &area;
 	init_graph_node_object(NULL, &marioObj, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
@@ -193,10 +194,11 @@ void brutefoceLoop() {
 }
 
 void main(int argc, char *argv[]) {
+	parse_command_line_args(argc, argv);
 	printf("Running Bruteforcer...\n");
 	
 	printf("Initializing game state...\n");
-	initGame();
+	initGame(override_config_file);
 	
 	printf("Loading m64...\n");
 	if (!read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_count, &original_inputs))
@@ -207,7 +209,7 @@ void main(int argc, char *argv[]) {
 	initCandidates(original_inputs, &survivors);
 	initCandidates(original_inputs, &best);
 
-	initializeMultiProcess(original_inputs, argc, argv);
+	initializeMultiProcess(original_inputs);
 	programState->bestSpeed = minSpeed;
 
 	brutefoceLoop();

@@ -2,6 +2,10 @@
 #define BF_STATES_H
 
 #include "bruteforce/readers.h"
+extern char *override_config_file;
+extern char *child_args;
+
+void parse_command_line_args(int argc, char *argv[]);
 
 #define STATE_INCLUDE <bruteforce/MODULE_PATH/state.h>
 #include STATE_INCLUDE

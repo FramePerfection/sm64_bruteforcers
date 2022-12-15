@@ -4,7 +4,7 @@
 #include "bruteforce/candidates.h"
 
 u8 isParentProcess();
-void initializeMultiProcess(InputSequence *original_inputs, int argc, char *argv[]);
+void initializeMultiProcess(InputSequence *original_inputs);
 void writeSurvivorsToBuffer(Candidate *survivors);
 void childUpdateMessages(Candidate *survivors);
 void parentMergeCandidates(Candidate *survivors);

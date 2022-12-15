@@ -1,6 +1,7 @@
 #include <PR/ultratypes.h>
 #include "bruteforce/bf_states.h"
 #include "bruteforce/candidates.h"
+#include <string.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -47,9 +48,11 @@ static void createProcess(HANDLE readPipe, HANDLE writePipe, HANDLE hJob) {
 	PROCESS_INFORMATION pi;
 	memset(&si, 0, sizeof(PROCESS_INFORMATION));
 	
-	TCHAR lpszClientPath[500] = TEXT("main.exe");
-	TCHAR lpszArgs[500] = "-child";
-	sprintf(lpszArgs, "-child %p %p %p", readPipe, writePipe, hMapFile);
+	TCHAR lpszClientPath[1024] = TEXT("main.exe");
+	TCHAR lpszArgs[1024];
+	sprintf(lpszArgs, " --child=%p;%p;%p", readPipe, writePipe, hMapFile);
+	if (override_config_file != NULL)
+		sprintf(lpszArgs + strlen(lpszArgs), " --file %s", override_config_file);
 
 	if (!CreateProcess(lpszClientPath, lpszArgs, NULL, NULL, TRUE, CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi)) {
 		printf("Failed to launch child process. Error code %ld\n", GetLastError());
@@ -95,7 +98,7 @@ static void createChildProcesses() {
 	}
 }
 
-void initializeMultiProcess(InputSequence *original_inputs, int argc, char *argv[]) {
+void initializeMultiProcess(InputSequence *original_inputs) {
 	sequenceSize = sizeof(InputSequence) + original_inputs->count * sizeof(OSContPad);
 	transmissionCandidateSize = sizeof(Candidate) + sequenceSize;
 	pipeBufferSize = transmissionCandidateSize * bfStaticState.survivors_per_generation;
@@ -103,22 +106,26 @@ void initializeMultiProcess(InputSequence *original_inputs, int argc, char *argv
 	
 	ZeroMemory(&readOverlapped, sizeof(OVERLAPPED));
     readOverlapped.hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-
-	if (argc > 1) {
-		printf("%s %s %s %s\n", argv[0], argv[1], argv[2], argv[3]);
+	
+	if (child_args != NULL) {
+		char *arg0, *arg1, *arg2;
+		arg0 = strtok(child_args, ";");
+		arg1 = strtok(NULL, ";");
+		arg2 = strtok(NULL, ";");
+		if (arg2 == NULL) {
+			printf("Invalid arguments to create child process. Exiting...\n");
+			exit(0);
+		}
 		char *end;
-		childReadPipe = (HANDLE)strtol(argv[1], &end, 0x10);
-		childWritePipe = (HANDLE)strtol(argv[2], &end, 0x10);
-		hMapFile = (HANDLE)strtol(argv[3], &end, 0x10);
+		childReadPipe = (HANDLE)strtol(arg0, &end, 0x10);
+		childWritePipe = (HANDLE)strtol(arg1, &end, 0x10);
+		hMapFile = (HANDLE)strtol(arg2, &end, 0x10);
 	}
 	else {
-		printf("no arguments\n");
 		childReadPipe = NULL;
 		childWritePipe = NULL;
-	}
-
-	if (argc == 0 || strcmp("-child", argv[0]))
 		createChildProcesses();
+	}
 		
    	pBuf = MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, BUF_SIZE);
 	
