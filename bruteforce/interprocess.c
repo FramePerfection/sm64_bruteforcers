@@ -68,7 +68,7 @@ static void createChildProcesses() {
 
 	hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, &saAttr, PAGE_READWRITE, 0, BUF_SIZE, NULL);
 	if (hMapFile == NULL) {
-    	printf("Could create file mapping (%d).\n", GetLastError());
+    	printf("Could not create file mapping (%ld).\n", GetLastError());
 		return;
 	}
 
@@ -107,9 +107,9 @@ void initializeMultiProcess(InputSequence *original_inputs, int argc, char *argv
 	if (argc > 1) {
 		printf("%s %s %s %s\n", argv[0], argv[1], argv[2], argv[3]);
 		char *end;
-		childReadPipe = strtol(argv[1], &end, 0x10);
-		childWritePipe = strtol(argv[2], &end, 0x10);
-		hMapFile = strtol(argv[3], &end, 0x10);
+		childReadPipe = (HANDLE)strtol(argv[1], &end, 0x10);
+		childWritePipe = (HANDLE)strtol(argv[2], &end, 0x10);
+		hMapFile = (HANDLE)strtol(argv[3], &end, 0x10);
 	}
 	else {
 		printf("no arguments\n");
@@ -124,7 +124,7 @@ void initializeMultiProcess(InputSequence *original_inputs, int argc, char *argv
 	
 	if (pBuf == NULL)
 	{
-		printf("Could not map view of file (%d).\n", GetLastError());
+		printf("Could not map view of file (%ld).\n", GetLastError());
     	CloseHandle(hMapFile);
 		return;
 	}
@@ -171,10 +171,10 @@ void parentMergeCandidates(Candidate *survivors) {
 			printf("Failed to read merge message:%ld\n", GetLastError());
 		}
 		
-		s32 i;
+		u32 i;
 		for (i = 0; i < numRuns; i++) {
-			Candidate *candidate = mergeBuffer + i * transmissionCandidateSize + childProcId * pipeBufferSize;
-			candidate->sequence = candidate + 1;
+			Candidate *candidate = (Candidate*)(mergeBuffer + i * transmissionCandidateSize + childProcId * pipeBufferSize);
+			candidate->sequence = (InputSequence*)(candidate + 1);
 			externalCandidates[k++] = candidate;
 		}
 	}
@@ -215,8 +215,8 @@ void childUpdateMessages(Candidate *survivors) {
 			}
 			u32 i;
 			for (i = 0; i < bfStaticState.survivors_per_generation; i++) {
-				Candidate *candidate = pipeBuffer + i * transmissionCandidateSize;
-				candidate->sequence = candidate + 1;
+				Candidate *candidate = (Candidate*)(pipeBuffer + i * transmissionCandidateSize);
+				candidate->sequence = (InputSequence*)(candidate + 1);
 				survivors[i].score = candidate->score;
 				survivors[i].stats = candidate->stats;
 				clone_m64_inputs(survivors[i].sequence, candidate->sequence);

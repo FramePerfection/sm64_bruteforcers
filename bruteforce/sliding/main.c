@@ -56,7 +56,7 @@ void initGame() {
 			printf("found degenerate triangle: (%d,%d,%d),(%d,%d,%d),(%d,%d,%d)\n", t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3);
 	}
 
-	srand(bfStaticState.rnd_seed);
+	// srand(bfStaticState.rnd_seed);
 	
 	// Still required to initialize something?
 	execute_mario_action(gMarioState->marioObj);
@@ -78,7 +78,7 @@ void updateGame(OSContPad *input) {
 }
 
 void perturbInput(OSContPad *input) {
-	if (bfStaticState.max_perturbation > 0) {
+	if (bfStaticState.max_perturbation > 0 && randFloat() < bfStaticState.perturbation_chance) {
 		u16 perturb = (u16)(bfStaticState.max_perturbation);
 		u8 perturbation_x = (rand() % (2 * perturb) - perturb);
 		u8 perturbation_y = (rand() % (2 * perturb) - perturb);
@@ -148,7 +148,9 @@ void main(int argc, char *argv[]) {
 	}
 
 	Candidate *survivors;
+	Candidate *best;
 	initCandidates(original_inputs, &survivors);
+	initCandidates(original_inputs, &best);
 
 	initializeMultiProcess(original_inputs, argc, argv);
 	
@@ -188,7 +190,7 @@ void main(int argc, char *argv[]) {
 				InputSequence *inputs = candidate->sequence;
 				clone_m64_inputs(inputs, original->sequence);
 
-				if (run_idx == 0 && (rand() % 100 <= 98)) {
+				if (run_idx == 0 && (randFloat() <= bfStaticState.forget_rate)) {
 					candidate->score = original->score;
 					candidate->stats.hSpeed = original->stats.hSpeed;
 					candidate->stats.angle = original->stats.angle;
@@ -213,9 +215,10 @@ void main(int argc, char *argv[]) {
 		}
 		
 		// sort by scoring
-		updateBestCandidates(survivors);
+		updateSurvivors(survivors);
+		updateBest(best, survivors);
 		if (!isParentProcess())
-			childUpdateMessages(survivors);
+			childUpdateMessages(best);
 
 		if (gen % gen_merge_mod == 0)
 			if (isParentProcess())

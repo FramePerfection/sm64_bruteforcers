@@ -10,18 +10,22 @@ extern f32 minSpeed;
 
 #else
 
+// scoring parameters
 BF_STATIC_STATE(u32, sliding_action, bfStaticState.sliding_action)
 BF_STATIC_STATE(u32, sliding_start_frame, bfStaticState.sliding_start_frame)
 BF_STATIC_STATE(u32, target_action, bfStaticState.target_action)
 BF_STATIC_STATE(u32, scoring_frame, bfStaticState.scoring_frame)
-
 BF_STATIC_STATE(s16, target_angle, bfStaticState.target_angle)
 BF_STATIC_STATE(s16, target_angle_margin, bfStaticState.target_angle_margin)
 BF_STATIC_STATE(s16, min_speed, minSpeed)
+__NL__
 
+// World triangles
 BF_STATIC_STATE(Triangles, static_tris, bfStaticState.static_tris)
+__NL__
 
 BF_DYNAMIC_STATE(u16, initial_button_state, testController.buttonDown)
+__NL__
 
 // Mario
 BF_DYNAMIC_STATE(s16, mario_health, gMarioState->health)

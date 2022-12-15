@@ -7,7 +7,7 @@
                 "VERSION_US",
                 "NON_MATCHING=1",
                 "AVOID_UB=1",
-                "MODULE_PATH=sliding"
+                "MODULE_PATH=fp_gwk"
             ],
             "cStandard": "gnu17",
             "includePath": [

@@ -1,4 +1,9 @@
 #include "bruteforce/misc_util.h"
+#include "stdlib.h"
+
+f32 randFloat() {
+	return ((float)rand()/(float)(RAND_MAX));
+}
 
 struct Surface *gen_surface(s16 x1, s16 y1, s16 z1, s16 x2, s16 y2, s16 z2, s16 x3, s16 y3, s16 z3) {
     // (v2 - v1) x (v3 - v2)

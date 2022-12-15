@@ -12,6 +12,7 @@
 	BF_DYNAMIC_STATE(f32, name##_x, expr[0]) \
 	BF_DYNAMIC_STATE(f32, name##_y, expr[1]) \
 	BF_DYNAMIC_STATE(f32, name##_z, expr[2])
+#define __NL__
 
 #define BF_STATIC_STATE(type, name, target_expr) \
 	type name;

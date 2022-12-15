@@ -31,11 +31,14 @@ extern struct Camera *gCamera;
 
 #else
 
+// Camera data
 BF_DYNAMIC_VEC3(camera_old_position, sOldPosition)
 BF_DYNAMIC_VEC3(camera_old_focus, sOldFocus)
+__NL__
 
 BF_DYNAMIC_STATE(s16, camera_state_camera_event, gPlayerCameraState[0].cameraEvent)
 BF_DYNAMIC_STATE(u32, camera_state_usedObj, gPlayerCameraState[0].usedObj)
+__NL__
 
 BF_DYNAMIC_STATE(s16, camera_transition_pos_pitch, sModeTransition.posPitch)
 BF_DYNAMIC_STATE(s16, camera_transition_pos_yaw, sModeTransition.posYaw)
@@ -45,12 +48,14 @@ BF_DYNAMIC_STATE(s16, camera_transition_foc_yaw, sModeTransition.focYaw)
 BF_DYNAMIC_STATE(f32, camera_transition_foc_dist, sModeTransition.focDist)
 BF_DYNAMIC_STATE(s32, camera_transition_frames_left, sModeTransition.framesLeft)
 BF_DYNAMIC_VEC3(camera_transition_mario_pos, sModeTransition.marioPos)
+__NL__
 
 BF_DYNAMIC_STATE(s16, camera_avoid_yaw_vel, sAvoidYawVel)
 BF_DYNAMIC_STATE(s16, camera_yaw_after_door_cutscene, sCameraYawAfterDoorCutscene)
 BF_DYNAMIC_STATE(s16, camera_selection_flags, sSelectionFlags)
 BF_DYNAMIC_STATE(s16, camera_2nd_rotate_flags, s2ndRotateFlags)
 BF_DYNAMIC_STATE(u16, camera_c_buttons_pressed, sCButtonsPressed)
+__NL__
 
 //gLakituState may be incomplete
 BF_DYNAMIC_VEC3(camera_lakitu_cur_focus, gLakituState.curFocus)
@@ -59,6 +64,7 @@ BF_DYNAMIC_VEC3(camera_lakitu_goal_focus, gLakituState.goalFocus)
 BF_DYNAMIC_VEC3(camera_lakitu_goal_pos, gLakituState.goalPos)
 BF_DYNAMIC_STATE(u8, camera_lakitu_mode, gLakituState.mode)
 BF_DYNAMIC_STATE(u8, camera_lakitu_def_mode, gLakituState.defMode)
+__NL__
 
 BF_DYNAMIC_STATE(s16, camera_area_yaw, sAreaYaw)
 BF_DYNAMIC_STATE(s16, camera_area_yaw_change, sAreaYawChange)
@@ -72,29 +78,33 @@ BF_DYNAMIC_STATE(s16, camera_8dir_mode_base_yaw, s8DirModeBaseYaw)
 BF_DYNAMIC_STATE(s16, camera_8dir_mode_yaw_offset, s8DirModeYawOffset)
 BF_DYNAMIC_STATE(f32, camera_pan_distance, sPanDistance)
 BF_DYNAMIC_STATE(f32, camera_cannon_y_offset, sCannonYOffset)
+__NL__
 
 #define BF_DYNAMIC_LINEAR_TRANSITION_POINT(name, expr) \
-	BF_DYNAMIC_VEC3(name##_focus, expr.focus) \
-	BF_DYNAMIC_VEC3(name##_pos, expr.pos) \
-	BF_DYNAMIC_STATE(f32, name##_dist, expr.dist) \
-	BF_DYNAMIC_STATE(s16, name##_pitch, expr.pitch) \
+	BF_DYNAMIC_VEC3(name##_focus, expr.focus) __NL__\
+	BF_DYNAMIC_VEC3(name##_pos, expr.pos) __NL__\
+	BF_DYNAMIC_STATE(f32, name##_dist, expr.dist) __NL__\
+	BF_DYNAMIC_STATE(s16, name##_pitch, expr.pitch) __NL__\
 	BF_DYNAMIC_STATE(s16, name##_yaw, expr.yaw)
 	
 #define BF_DYNAMIC_MODE_TRANSITION_INFO(name, expr) \
-	BF_DYNAMIC_STATE(s16, name##_new_mode, expr.newMode) \
-	BF_DYNAMIC_STATE(s16, name##_last_mode, expr.lastMode) \
-	BF_DYNAMIC_STATE(s16, name##_max, expr.max) \
-	BF_DYNAMIC_STATE(s16, name##_frame, expr.frame) \
-	BF_DYNAMIC_LINEAR_TRANSITION_POINT(name##_transition_start, expr.transitionStart) \
+	BF_DYNAMIC_STATE(s16, name##_new_mode, expr.newMode) __NL__\
+	BF_DYNAMIC_STATE(s16, name##_last_mode, expr.lastMode) __NL__\
+	BF_DYNAMIC_STATE(s16, name##_max, expr.max) __NL__\
+	BF_DYNAMIC_STATE(s16, name##_frame, expr.frame) __NL__\
+	BF_DYNAMIC_LINEAR_TRANSITION_POINT(name##_transition_start, expr.transitionStart) __NL__\
 	BF_DYNAMIC_LINEAR_TRANSITION_POINT(name##_transition_end, expr.transitionEnd)
 	
 BF_DYNAMIC_MODE_TRANSITION_INFO(camera_mode_info, sModeInfo)
 BF_DYNAMIC_VEC3(camera_castle_entrance_offset, sCastleEntranceOffset)
+__NL__
 
 // TODO: implement sParTrackIndex, sParTrackPath, sParTrackTransOff, sCameraStoreCUp, sCameraStoreCutscene
+__NL__
 
 BF_DYNAMIC_STATE(s16, camera_movement_flags, gCameraMovementFlags)
 BF_DYNAMIC_STATE(s16, camera_status_flags, sStatusFlags)
+__NL__
 
 // base 8033cbd0 US; 8033b860 JP
 BF_DYNAMIC_STATE(u8, camera_mode, gCamera->mode)
@@ -106,5 +116,7 @@ BF_DYNAMIC_VEC3(camera_focus, gCamera->focus)
 BF_DYNAMIC_VEC3(camera_pos, gCamera->pos)
 BF_DYNAMIC_STATE(f32, camera_area_center_x, gCamera->areaCenX)
 BF_DYNAMIC_STATE(f32, camera_area_center_z, gCamera->areaCenZ)
+__NL__
+__NL__
 
 #endif

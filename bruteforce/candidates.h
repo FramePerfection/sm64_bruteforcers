@@ -25,7 +25,8 @@ typedef struct Candidate_s {
 } Candidate;
 
 void initCandidates(InputSequence *original_inputs, Candidate **survivors);
-void updateBestCandidates(Candidate *survivors);
+void updateSurvivors(Candidate *survivors);
+void updateBest(Candidate *best, Candidate *survivors);
 void mergeCandidates(Candidate *survivors, Candidate **externalSurvivors, u32 externalSurvivorsCount);
 
 #endif //CANDIDATES_H

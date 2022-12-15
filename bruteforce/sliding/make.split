@@ -5,4 +5,4 @@ $(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/,$(NAME)/candidates.o $(NAME)/
 $(NAME)REQUIRED_OBJECTS += $(addprefix src/engine/,math_util.o surface_collision.o surface_load_reduced.o)
 $(NAME)REQUIRED_OBJECTS += $(addprefix src/game/,camera_reduced.o mario_step.o mario.o mario_actions_airborne.o mario_actions_moving.o mario_actions_stationary.o)
 
-$(eval $(call register-lib))
+$(eval $(call register-module))

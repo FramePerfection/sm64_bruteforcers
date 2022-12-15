@@ -25,6 +25,10 @@ struct MarioBodyState marioBodyState;
 struct Controller testController;
 f32 minSpeed;
 
+InputSequence *original_inputs;
+Candidate *survivors;
+Candidate *best;
+
 extern Vec3f last_q_step, last_q_step2;
 
 void initGame() {
@@ -58,7 +62,9 @@ void initGame() {
 			printf("found degenerate triangle: (%d,%d,%d),(%d,%d,%d),(%d,%d,%d)\n", t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3);
 	}
 
-	srand(bfStaticState.rnd_seed);
+	time_t t;
+	srand((unsigned) time(&t));
+	//srand(bfStaticState.rnd_seed);
 	
 	// Still required to initialize something?
 	execute_mario_action(gMarioState->marioObj);
@@ -80,7 +86,7 @@ void updateGame(OSContPad *input) {
 }
 
 void perturbInput(OSContPad *input) {
-	if (bfStaticState.max_perturbation > 0) {
+	if (bfStaticState.max_perturbation > 0 && randFloat() <= bfStaticState.perturbation_chance) {
 		u16 perturb = (u16)(bfStaticState.max_perturbation);
 		u8 perturbation_x = (rand() % (2 * perturb) - perturb);
 		u8 perturbation_y = (rand() % (2 * perturb) - perturb);
@@ -115,9 +121,6 @@ void updateScore(Candidate *candidate, u32 frame_idx) {
 	}
 }
 
-InputSequence *original_inputs;
-Candidate *survivors;
-
 void brutefoceLoop() {
 	clock_t lastClock = clock();
 	u32 gen_mod = bfStaticState.print_interval;
@@ -147,7 +150,7 @@ void brutefoceLoop() {
 				InputSequence *inputs = candidate->sequence;
 				clone_m64_inputs(inputs, original->sequence);
 
-				u8 keepOriginal = run_idx == 0 && (rand() % 100 <= 100 - bfStaticState.forget_rate);
+				u8 keepOriginal = run_idx == 0 && (randFloat() < bfStaticState.forget_rate);
 				/*if (keepOriginal) {
 					candidate->score = original->score;
 					candidate->stats.hSpeed = original->stats.hSpeed;
@@ -164,13 +167,17 @@ void brutefoceLoop() {
 					updateGame(currentInput);
 					updateScore(candidate, frame_idx);
 				}
+
+				if (candidate->stats.hSpeed < programState->bestSpeed - bfStaticState.score_leniency)
+					clone_m64_inputs(inputs, original->sequence);
 			}
 		}
 		
 		// sort by scoring
-		updateBestCandidates(survivors);
+		updateSurvivors(survivors);
+		updateBest(best, survivors);
 
-		if (isParentProcess()) {		
+		if (isParentProcess()) {
 			if (gen % gen_mod == 0) 
 				for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++)
 					printf("%d:\t%a;\t%f\n", candidate_idx, survivors[candidate_idx].score, survivors[candidate_idx].stats.hSpeed);
@@ -181,7 +188,7 @@ void brutefoceLoop() {
 			}
 		}
 		else
-			childUpdateMessages(survivors);
+			childUpdateMessages(best);
 	}
 }
 
@@ -198,6 +205,7 @@ void main(int argc, char *argv[]) {
 		exit(-1);
 	}
 	initCandidates(original_inputs, &survivors);
+	initCandidates(original_inputs, &best);
 
 	initializeMultiProcess(original_inputs, argc, argv);
 	programState->bestSpeed = minSpeed;

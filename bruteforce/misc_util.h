@@ -7,6 +7,7 @@
 #include "types.h"
 #include "engine/graph_node.h"
 
+f32 randFloat();
 extern void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool);
 extern void clear_static_surfaces(void);
 extern void add_surface(struct Surface *surface, s32 dynamic);
