@@ -50,6 +50,7 @@ void read_Triangles(Json *jsonNode, Triangles *target) {
 		#define ADVANCE \
 			(s16)vertNode->valueInt; \
 			vertNode = vertNode->next;
+		
 		target->data[i].x1 = ADVANCE
 		target->data[i].y1 = ADVANCE
 		target->data[i].z1 = ADVANCE
@@ -59,7 +60,12 @@ void read_Triangles(Json *jsonNode, Triangles *target) {
 		target->data[i].x3 = ADVANCE
 		target->data[i].y3 = ADVANCE
 		target->data[i].z3 = ADVANCE
+		if (vertNode) {
+			target->data[i].surf_type = ADVANCE
+		}
 		i++;
 		triNode = triNode->next;
+
+		#undef ADVANCE
 	}
 }

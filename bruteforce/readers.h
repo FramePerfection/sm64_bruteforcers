@@ -18,6 +18,7 @@ typedef struct Triangle {
 	s16 x1, y1, z1;
 	s16 x2, y2, z2;
 	s16 x3, y3, z3;
+	s16 surf_type;
 } Triangle;
 
 typedef struct Triangles {
