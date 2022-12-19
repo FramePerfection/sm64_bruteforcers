@@ -39,8 +39,6 @@
 	"mario_previous_action": "0x03000888",
 	"prev._action_desc.": "long jump",
 	"de_facto_speed": 45.9324836730957,
-	"x_sliding_speed": -31.0459117889404,
-	"z_sliding_speed": 35.272274017334,
 	"h_sliding_speed": 46.9891684663664,
 	"sliding_yaw": 58007.8152662794,
 	"yaw_moving": 60238,
