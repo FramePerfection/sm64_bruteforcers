@@ -1,5 +1,4 @@
 #include "bruteforce/m64.h"
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -36,6 +35,20 @@ u8 read_m64_from_file(char *fileName, u32 offset, u32 max_count, InputSequence *
 
 	fclose(file);
 	return TRUE;
+}
+
+u8 fwrite_input_sequence(FILE *file, InputSequence *sequence) {
+	u32 i;
+	for (i = 0; i < sequence->count; i++) {
+		u8 input_buffer[] = {
+			(char)(sequence->inputs[i].button >> 8),
+			(char)(sequence->inputs[i].button & 0xFF), 
+			(char)(sequence->inputs[i].stick_x & 0xFF),
+			(char)(sequence->inputs[i].stick_y & 0xFF),
+		};
+		fprintf(file, "0x%lx ", (long unsigned int)(((u32)input_buffer[0]) << 0x18 | ((u32)input_buffer[1]) << 0x10 | ((u32)input_buffer[2]) << 0x8 | ((u32)input_buffer[3])));
+	}
+	fprintf(file, ";\n");
 }
 
 u8 save_to_m64_file(char* originalFileName, char* fileName, InputSequence *sequence) {

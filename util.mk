@@ -32,7 +32,7 @@ endef
 
 # Function to register a module from its make.split file
 define register-module
-$(eval $(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/, m64.o readers.o json.o engine_feed.o engine_stubs.o misc_util.o pipeex.o))
+$(eval $(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/, interface.o m64.o readers.o json.o engine_feed.o engine_stubs.o misc_util.o pipeex.o))
 $(eval $(NAME)REQUIRED_O_FILES := $(addprefix $(BUILD_DIR)/, $($(NAME)REQUIRED_OBJECTS)))
 ALL_TARGETS += $(NAME)
 SRC_DIRS += bruteforce/$(NAME)

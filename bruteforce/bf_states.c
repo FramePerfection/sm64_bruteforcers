@@ -1,11 +1,10 @@
-#include "sm64.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "bruteforce/readers.h"
 #include "bruteforce/bf_states.h"
 #include "bruteforce/json.h"
-#include <getopt.h>
+#include "bruteforce/interface.h"
 
 #define BF_STATE_INCLUDE
 #include STATE_DEFINITION_FILE
@@ -15,29 +14,6 @@
 BFStaticState bfStaticState;
 BFDynamicState bfInitialDynamicState;
 ProgramState *programState;
-char *override_config_file = NULL;
-char *child_args = NULL;
-
-void parse_command_line_args(int argc, char *argv[]) {
-	int c, long_opt_idx = 0;
-	static struct option long_opts[] = {
-		{"file", required_argument, 0, 'f'},
-		{"child", required_argument, 0, 'c'}
-	};
-	while ((c = getopt_long(argc, argv, "f:c:", long_opts, &long_opt_idx)) != -1) {
-		switch (c) {
-			case 'f':
-				override_config_file = malloc(sizeof(char) * (strlen(optarg) + 1));
-				strcpy(override_config_file, optarg);
-				break;
-			case 'c':
-				child_args = malloc(sizeof(char) * (strlen(optarg) + 1));
-				strcpy(child_args, optarg);
-				break;
-		}
-	}
-
-}
 
 const char *read_file(const char *fileName) {
 	FILE *file = fopen(fileName, "r");

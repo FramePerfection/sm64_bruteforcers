@@ -1,6 +1,7 @@
 #include <PR/ultratypes.h>
 #include "bruteforce/bf_states.h"
 #include "bruteforce/candidates.h"
+#include "bruteforce/interface.h"
 #include <string.h>
 
 #ifdef _WIN32
@@ -52,7 +53,7 @@ static void createProcess(HANDLE readPipe, HANDLE writePipe, HANDLE hJob) {
 	TCHAR lpszArgs[1024];
 	sprintf(lpszArgs, " --child=%p;%p;%p", readPipe, writePipe, hMapFile);
 	if (override_config_file != NULL)
-		sprintf(lpszArgs + strlen(lpszArgs), " --file %s", override_config_file);
+		sprintf(lpszArgs + strlen(lpszArgs), " --file %s --outputmode %s", override_config_file, output_mode);
 
 	if (!CreateProcess(lpszClientPath, lpszArgs, NULL, NULL, TRUE, CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi)) {
 		printf("Failed to launch child process. Error code %ld\n", GetLastError());

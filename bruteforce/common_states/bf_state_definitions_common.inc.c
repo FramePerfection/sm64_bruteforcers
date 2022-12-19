@@ -1,4 +1,6 @@
 #ifdef BF_STATE_INCLUDE
+extern char *m64_input;
+extern char *m64_output;
 
 #else
 // general bruteforcing parameters
@@ -17,8 +19,8 @@ BF_STATIC_STATE(u32, display_desync_messages, bfStaticState.display_desync_messa
 __NL__
 
 // m64 parameters
-BF_STATIC_STATE(string, m64_input, bfStaticState.m64_input)
-BF_STATIC_STATE(string, m64_output, bfStaticState.m64_output)
+BF_STATIC_STATE(string, m64_input, m64_input)
+BF_STATIC_STATE(string, m64_output, m64_output)
 BF_STATIC_STATE(u32, m64_start, bfStaticState.m64_start)
 BF_STATIC_STATE(u32, m64_count, bfStaticState.m64_count)
 __NL__

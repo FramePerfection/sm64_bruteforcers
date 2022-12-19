@@ -11,6 +11,7 @@
 #include "bruteforce/bf_states.h"
 #include "bruteforce/m64.h"
 #include "bruteforce/interprocess.h"
+#include "bruteforce/interface.h"
 #include <stdlib.h>
 #include "time.h"
 #include "bruteforce/candidates.h"
@@ -46,15 +47,7 @@ void initGame() {
 	}
 	
 	clear_static_surfaces();
-	u32 i;
-	for (i = 0; i < bfStaticState.static_tris.data_size; i++) {
-		Triangle t = bfStaticState.static_tris.data[i];
-		struct Surface *surface = gen_surface(t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3);
-		if (surface != NULL)
-			add_surface(surface, FALSE);
-		else
-			printf("found degenerate triangle: (%d,%d,%d),(%d,%d,%d),(%d,%d,%d)\n", t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3);
-	}
+	init_static_surfaces(bfStaticState.static_tris);
 
 	// srand(bfStaticState.rnd_seed);
 	
@@ -112,7 +105,7 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 		u8 best = gMarioStates->forwardVel > programState->bestSpeed;
 		if (score < 0 && best) {
 			programState->bestSpeed = gMarioState->forwardVel;
-			save_to_m64_file(bfStaticState.m64_input, bfStaticState.m64_output, candidate->sequence);
+			output_input_sequence(candidate->sequence);
 			printf("New best: %f\n", gMarioState->forwardVel);
 		}
 	}
@@ -192,15 +185,7 @@ void main(int argc, char *argv[]) {
 				InputSequence *inputs = candidate->sequence;
 				clone_m64_inputs(inputs, original->sequence);
 
-				if (run_idx == 0 && (randFloat() <= bfStaticState.forget_rate)) {
-					candidate->score = original->score;
-					candidate->stats.hSpeed = original->stats.hSpeed;
-					candidate->stats.angle = original->stats.angle;
-					candidate->stats.x = original->stats.x;
-					candidate->stats.y = original->stats.y;
-					candidate->stats.z = original->stats.z;
-					continue;
-				}
+				u8 keepOriginal = run_idx == 0 && (randFloat() > bfStaticState.forget_rate);
 
 				bf_load_dynamic_state(&bfInitialDynamicState);
 
@@ -208,7 +193,8 @@ void main(int argc, char *argv[]) {
 				for (frame_idx = 0; frame_idx < inputs->count; frame_idx++) {
 					frames++;
 					OSContPad *currentInput = &inputs->inputs[frame_idx];
-					perturbInput(currentInput);
+					if (!keepOriginal)
+						perturbInput(currentInput);
 					updateGame(currentInput);
 					if (!updateScore(candidate, frame_idx))
 						break;

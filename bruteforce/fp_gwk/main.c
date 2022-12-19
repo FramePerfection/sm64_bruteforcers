@@ -10,6 +10,7 @@
 #include "bruteforce/misc_util.h"
 #include "bruteforce/bf_states.h"
 #include "bruteforce/m64.h"
+#include "bruteforce/interface.h"
 #include "bruteforce/interprocess.h"
 #include <stdlib.h>
 #include "time.h"
@@ -105,17 +106,18 @@ void updateScore(Candidate *candidate, u32 frame_idx) {
 		if (!best)
 			score = INFINITY;
 		else
-			score /= powf(2.0, (gMarioState->forwardVel - programState->bestSpeed) * 15);
+		 	score /= powf(2.0, (gMarioState->forwardVel - programState->bestSpeed) * 15);
 
 		if (gMarioState->faceAngle[1] == (s16)(bfStaticState.gwk_angle + 0x8000))
 		{
 			printf("Found one: %d, %f", gMarioState->faceAngle[1], gMarioState->forwardVel);
 			if (best) {
-				save_to_m64_file(bfStaticState.m64_input, bfStaticState.m64_output, candidate->sequence);
-				printf("\t(new best!)");
+				printf("\t(new best!)\n");
+				output_input_sequence(candidate->sequence);
 				programState->bestSpeed = gMarioState->forwardVel;
 			}
-			printf("\n");
+			else
+				printf("\n");
 		}
 		candidate->stats.hSpeed = gMarioStates->forwardVel;
 		candidate->score = score;
@@ -151,13 +153,8 @@ void brutefoceLoop() {
 				InputSequence *inputs = candidate->sequence;
 				clone_m64_inputs(inputs, original->sequence);
 
-				u8 keepOriginal = run_idx == 0 && (randFloat() < bfStaticState.forget_rate);
-				/*if (keepOriginal) {
-					candidate->score = original->score;
-					candidate->stats.hSpeed = original->stats.hSpeed;
-					continue;
-				}*/
-
+				u8 keepOriginal = run_idx == 0 && (randFloat() > bfStaticState.forget_rate);
+				
 				bf_load_dynamic_state(&bfInitialDynamicState);
 
 				u32 frame_idx;
