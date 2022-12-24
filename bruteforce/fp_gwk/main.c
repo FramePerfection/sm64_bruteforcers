@@ -54,15 +54,7 @@ void initGame(char* override_config_file) {
 	}
 	
 	clear_static_surfaces();
-	u32 i;
-	for (i = 0; i < bfStaticState.static_tris.data_size; i++) {
-		Triangle t = bfStaticState.static_tris.data[i];
-		struct Surface *surface = gen_surface(t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3);
-		if (surface != NULL)
-			add_surface(surface, FALSE);
-		else
-			printf("found degenerate triangle: (%d,%d,%d),(%d,%d,%d),(%d,%d,%d)\n", t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3);
-	}
+	init_static_surfaces(bfStaticState.static_tris);
 
 	time_t t;
 	srand((unsigned) time(&t));
