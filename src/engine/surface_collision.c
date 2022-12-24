@@ -600,8 +600,7 @@ f32 find_water_level(f32 x, f32 z) {
     s16 val;
     f32 loX, hiX, loZ, hiZ;
     f32 waterLevel = FLOOR_LOWER_LIMIT;
-    // _EDIT_ water boxes disabled
-    s16 *p = NULL; /*gEnvironmentRegions;*/
+    s16 *p = gEnvironmentRegions;
 
     if (p != NULL) {
         numRegions = *p++;

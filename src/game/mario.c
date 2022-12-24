@@ -1756,7 +1756,7 @@ s32 execute_mario_action(UNUSED struct Object *o) {
                     break;
 
                 case ACT_GROUP_SUBMERGED:
-                    NOT_IMPL// inLoop = mario_execute_submerged_action(gMarioState);
+                    inLoop = mario_execute_submerged_action(gMarioState);
                     break;
 
                 case ACT_GROUP_CUTSCENE:

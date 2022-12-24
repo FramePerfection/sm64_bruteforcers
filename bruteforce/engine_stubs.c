@@ -20,6 +20,8 @@ void play_cap_music(u16 seqArgs) {}
 void play_infinite_stairs_music(void) {}
 void play_music(u8 player, u16 seqArgs, u16 fadeTimer) {}
 void stop_sound(u32 soundBits, f32 *pos) {}
+void stop_shell_music(void) {}
+void play_shell_music(void) {}
 
 // memory.c
 s32 load_patchable_table(struct DmaHandlerList *list, s32 index) { return FALSE; }

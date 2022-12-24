@@ -17,6 +17,9 @@ find-command = $(shell which $(1) 2>/dev/null)
 
 # List of o files compiled from the same source, but into different module directories, and their dependencies, separated by <o-file>?<dependency>
 SPECIAL_O := bf_states?bf_state_definitions.inc.c candidates?state.h interprocess?state.h
+
+MARIO_STEP_OBJECTS := mario_step.o mario.o mario_actions_airborne.o mario_actions_moving.o mario_actions_stationary.o mario_actions_submerged.o
+
 word-dot = $(word $2,$(subst ?, ,$1))
 
 # Rule to compile a SPECIAL_O file

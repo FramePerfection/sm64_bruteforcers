@@ -69,3 +69,13 @@ void read_Triangles(Json *jsonNode, Triangles *target) {
 		#undef ADVANCE
 	}
 }
+
+void read_EnvironmentRegions(Json *jsonNode, EnvironmentRegions *target) {
+	*target = calloc(jsonNode->size, sizeof(s16));
+	u32 i;
+	Json *n = jsonNode->child;
+	for (i = 0; i < jsonNode->size; i++) {
+		(*target)[i] = n->valueInt;
+		n = n->next;
+	}
+}

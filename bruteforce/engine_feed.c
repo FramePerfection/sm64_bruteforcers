@@ -12,7 +12,9 @@ SpatialPartitionCell gStaticSurfacePartition[NUM_CELLS][NUM_CELLS];
 SpatialPartitionCell gDynamicSurfacePartition[NUM_CELLS][NUM_CELLS];
 u32 gGlobalTimer;
 s16 gCurrLevelNum;
+s16 gCurrAreaIndex;
 struct Area *gCurrentArea = NULL;
+s16 *gEnvironmentRegions;
 
 u8 gSpecialTripleJump;
 

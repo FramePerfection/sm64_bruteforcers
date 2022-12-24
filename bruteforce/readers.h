@@ -28,6 +28,10 @@ typedef struct Triangles {
 
 void read_Triangles(Json*, Triangles*);
 
+typedef s16* EnvironmentRegions;
+
+void read_EnvironmentRegions(Json*, EnvironmentRegions*);
+
 void read_Vec3f(Json*, Vec3f*);
 
 #define JSON_PARSE_FIELD(target, type, field_name, node) \
