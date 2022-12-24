@@ -1717,7 +1717,7 @@ void func_sh_8025574C(void) {
 /**
  * Main function for executing Mario's behavior.
  */
-#include "bruteforce/candidates.h"
+#include "bruteforce/framework/candidates.h"
 s32 execute_mario_action(UNUSED struct Object *o) {
     s32 inLoop = TRUE;
 

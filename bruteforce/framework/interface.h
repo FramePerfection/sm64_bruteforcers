@@ -1,4 +1,4 @@
-#include "bruteforce/m64.h"
+#include "bruteforce/framework/m64.h"
 
 void parse_command_line_args(int argc, char *argv[]);
 u8 output_input_sequence(InputSequence *inputSequence);

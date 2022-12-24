@@ -1,7 +1,7 @@
 #include <PR/ultratypes.h>
-#include "bruteforce/bf_states.h"
-#include "bruteforce/candidates.h"
-#include "bruteforce/interface.h"
+#include "bruteforce/framework/bf_states.h"
+#include "bruteforce/framework/candidates.h"
+#include "bruteforce/framework/interface.h"
 #include <string.h>
 
 #ifdef _WIN32

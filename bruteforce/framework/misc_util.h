@@ -6,7 +6,7 @@
 #include <PR/ultratypes.h>
 #include "types.h"
 #include "engine/graph_node.h"
-#include "bruteforce/readers.h"
+#include "bruteforce/framework/readers.h"
 
 f32 randFloat();
 extern void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool);

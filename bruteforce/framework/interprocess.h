@@ -1,7 +1,7 @@
 #ifndef INTERPROCESS_H
 #define INTERPROCESS_H
 
-#include "bruteforce/candidates.h"
+#include "bruteforce/framework/candidates.h"
 
 u8 isParentProcess();
 void initializeMultiProcess(InputSequence *original_inputs);

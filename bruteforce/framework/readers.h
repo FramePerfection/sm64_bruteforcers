@@ -1,7 +1,7 @@
 #ifndef READERS_H
 #define READERS_H
 
-#include "bruteforce/json.h"
+#include "bruteforce/framework/json.h"
 #include <PR/ultratypes.h>
 #include "types.h"
 

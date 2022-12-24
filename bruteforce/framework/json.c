@@ -31,7 +31,7 @@
 #define _BSD_SOURCE
 #endif
 
-#include "bruteforce/Json.h"
+#include "bruteforce/framework/Json.h"
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h> /* strtod (C89), strtof (C99) */

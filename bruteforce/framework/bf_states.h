@@ -1,12 +1,12 @@
 #ifndef BF_STATES_H
 #define BF_STATES_H
 
-#include "bruteforce/readers.h"
+#include "bruteforce/framework/readers.h"
 
-#define STATE_INCLUDE <bruteforce/MODULE_PATH/state.h>
+#define STATE_INCLUDE <bruteforce/modules/MODULE_PATH/state.h>
 #include STATE_INCLUDE
 
-#define STATE_DEFINITION_FILE <bruteforce/MODULE_PATH/bf_state_definitions.inc.c>
+#define STATE_DEFINITION_FILE <bruteforce/modules/MODULE_PATH/bf_state_definitions.inc.c>
 
 #define BF_DYNAMIC_VEC3(name, expr) \
 	BF_DYNAMIC_STATE(f32, name##_x, expr[0]) \

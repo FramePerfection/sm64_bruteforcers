@@ -1,5 +1,5 @@
-#include "bruteforce/candidates.h"
-#include "bruteforce/bf_states.h"
+#include "bruteforce/framework/candidates.h"
+#include "bruteforce/framework/bf_states.h"
 #include <memory.h>
 #include "sm64.h"
 

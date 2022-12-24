@@ -1,8 +1,8 @@
 #include "sm64.h"
 #include <stdlib.h>
 #include <string.h>
-#include "bruteforce/json.h"
-#include "bruteforce/readers.h"
+#include "bruteforce/framework/json.h"
+#include "bruteforce/framework/readers.h"
 
 #define read_int(cast_type) \
 void read_##cast_type(Json *jsonNode, cast_type *target) { \

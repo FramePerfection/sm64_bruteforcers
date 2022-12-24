@@ -6,5 +6,5 @@ type struct_name
 	BF_DYNAMIC_STATE(f32, name##_y, expr[1]) __NL__\
 	BF_DYNAMIC_STATE(f32, name##_z, expr[2])
 #undef __NL__
-#define STATE_DEFINITION_FILE <bruteforce/MODULE_PATH/bf_state_definitions.inc.c>
+#define STATE_DEFINITION_FILE <bruteforce/modules/MODULE_PATH/bf_state_definitions.inc.c>
 #include STATE_DEFINITION_FILE

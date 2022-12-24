@@ -1,4 +1,4 @@
-#include "bruteforce/misc_util.h"
+#include "bruteforce/framework/misc_util.h"
 #include "stdlib.h"
 
 f32 randFloat() {

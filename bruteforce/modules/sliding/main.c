@@ -7,17 +7,14 @@
 #include "src/game/area.h"
 #include "src/game/camera.h"
 #include "src/game/game_init.h"
-#include "bruteforce/misc_util.h"
-#include "bruteforce/bf_states.h"
-#include "bruteforce/m64.h"
-#include "bruteforce/interprocess.h"
-#include "bruteforce/interface.h"
+#include "bruteforce/framework/misc_util.h"
+#include "bruteforce/framework/bf_states.h"
+#include "bruteforce/framework/m64.h"
+#include "bruteforce/framework/interprocess.h"
+#include "bruteforce/framework/interface.h"
 #include <stdlib.h>
 #include "time.h"
-#include "bruteforce/candidates.h"
-
-#define STATE_INCLUDE <bruteforce/MODULE_PATH/state.h>
-#include STATE_INCLUDE
+#include "bruteforce/framework/candidates.h"
 
 struct GraphNodeCamera camera;
 struct Object marioObj;

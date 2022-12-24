@@ -1,10 +1,10 @@
-#include "bruteforce/interface.h"
+#include "bruteforce/framework/interface.h"
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "bruteforce/m64.h"
+#include "bruteforce/framework/m64.h"
 
 char *override_config_file = NULL;
 char *child_args = NULL;

@@ -2,6 +2,8 @@
 
 include util.mk
 
+FIND := $(call find-command,find)
+
 # Default target
 default: all
 
@@ -78,10 +80,12 @@ BINARY_DIR     := binaries
 LIBULTRA       := $(BUILD_DIR)/libultra.a
 LD_SCRIPT      := sm64.ld
 
-BINARY_DIRS := $(foreach d,$(wildcard ./bruteforce/**/main.c),$(subst ./bruteforce/,,binaries/$(dir $(d))))
+BINARY_DIRS := $(foreach d,$(wildcard ./bruteforce/modules/**/main.c),$(subst ./bruteforce/,,binaries/$(dir $(d))))
 
 # Directories containing source files
-SRC_DIRS := src src/engine src/game src/audio src/menu src/buffers bruteforce bin data assets asm lib sound
+BRUTEFORCE_DIRS := $(shell $(FIND) bruteforce/* -type d)
+
+SRC_DIRS := src src/engine src/game src/audio src/menu src/buffers $(BRUTEFORCE_DIRS) bin data assets asm lib sound
 BIN_DIRS := bin bin/$(VERSION)
 
 ULTRA_SRC_DIRS := lib/src lib/src/math lib/asm lib/data
@@ -181,7 +185,7 @@ endef
 # Main Targets                                                                 #
 #==============================================================================#
 
-include $(wildcard ./bruteforce/**/make.split)
+include $(wildcard ./bruteforce/modules/**/make.split)
 
 all: $(ALL_TARGETS)
 

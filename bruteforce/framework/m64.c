@@ -1,4 +1,4 @@
-#include "bruteforce/m64.h"
+#include "bruteforce/framework/m64.h"
 #include <string.h>
 #include <stdlib.h>
 

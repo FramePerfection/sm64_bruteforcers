@@ -1,10 +1,10 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "bruteforce/readers.h"
-#include "bruteforce/bf_states.h"
-#include "bruteforce/json.h"
-#include "bruteforce/interface.h"
+#include "bruteforce/framework/readers.h"
+#include "bruteforce/framework/bf_states.h"
+#include "bruteforce/framework/json.h"
+#include "bruteforce/framework/interface.h"
 
 #define BF_STATE_INCLUDE
 #include STATE_DEFINITION_FILE
