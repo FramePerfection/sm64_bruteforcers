@@ -13,7 +13,7 @@ void initCandidates(InputSequence *original_inputs, Candidate **survivors) {
 
 	u32 i;
 	for (i = 0; i < bfStaticState.survivors_per_generation; i++) {
-		(*survivors)[i].score = INFINITY;
+		(*survivors)[i].score = -INFINITY;
 		(*survivors)[i].children = calloc(bfStaticState.runs_per_survivor, sizeof(Candidate));
 		u32 k;
 		for (k = 0; k < bfStaticState.runs_per_survivor; k++)
@@ -32,7 +32,7 @@ void insertSorted(Candidate *new) {
 	
 	s32 rank;
 	for (rank = bfStaticState.survivors_per_generation; rank > 0; rank--)
-		if (temp[rank-1] != NULL && temp[rank-1]->score <= new->score)
+		if (temp[rank-1] != NULL && temp[rank-1]->score >= new->score)
 			break;
 
 	if (rank == bfStaticState.survivors_per_generation)

@@ -8,6 +8,10 @@
 
 #define STATE_DEFINITION_FILE <bruteforce/modules/MODULE_PATH/bf_state_definitions.inc.c>
 
+#define BF_STATE_INCLUDE
+#include STATE_DEFINITION_FILE
+#undef BF_STATE_INCLUDE
+
 #define BF_DYNAMIC_VEC3(name, expr) \
 	BF_DYNAMIC_STATE(f32, name##_x, expr[0]) \
 	BF_DYNAMIC_STATE(f32, name##_y, expr[1]) \
@@ -38,6 +42,7 @@ extern BFStaticState bfStaticState;
 extern BFDynamicState bfInitialDynamicState;
 extern ProgramState *programState;
 
+void read_state_json(Json*);
 u8 bf_init_states();
 void bf_load_dynamic_state(BFDynamicState*);
 

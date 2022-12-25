@@ -84,14 +84,14 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 		return FALSE;
 	}
 	if (frame_idx == bfStaticState.scoring_frame - 1) {
-		f64 score = -gMarioStates->forwardVel;
+		f64 score = gMarioStates->forwardVel;
 		s16 dYaw = gMarioState->faceAngle[1] - bfStaticState.target_angle;
 		if (dYaw < 0)
 			dYaw = -dYaw;
 		if (dYaw > bfStaticState.target_angle_margin)
-			score = dYaw;
+			score = -dYaw;
 		if (gMarioState->action != bfStaticState.target_action)
-			score = INFINITY;
+			score = -INFINITY;
 		candidate->stats.hSpeed = gMarioState->forwardVel;
 		candidate->stats.angle = gMarioState->faceAngle[1];
 		candidate->stats.x = gMarioState->pos[0];
@@ -100,7 +100,7 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 		candidate->score = score;
 
 		u8 best = gMarioStates->forwardVel > programState->bestSpeed;
-		if (score < 0 && best) {
+		if (score > 0 && best) {
 			programState->bestSpeed = gMarioState->forwardVel;
 			output_input_sequence(candidate->sequence);
 			printf("New best: %f\n", gMarioState->forwardVel);

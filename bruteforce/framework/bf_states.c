@@ -28,6 +28,27 @@ const char *read_file(const char *fileName) {
 	return fileContents;
 }
 
+void read_state_json(Json *node) {
+	#define BF_STATIC_STATE(type, struct_name, target_expr) \
+		if (strcmp(#struct_name, node->name) == 0) \
+		{ \
+			read_##type(node, &bfStaticState.struct_name); \
+			memcpy(&(target_expr), &bfStaticState.struct_name, sizeof bfStaticState.struct_name); \
+		}
+
+	#define BF_DYNAMIC_STATE(type, struct_name, target_expr) \
+		if (strcmp(#struct_name, node->name) == 0) \
+		{ \
+			read_##type(node, &bfInitialDynamicState.struct_name); \
+			memcpy(&(target_expr), &bfInitialDynamicState.struct_name, sizeof bfInitialDynamicState.struct_name); \
+		}
+
+	#include STATE_DEFINITION_FILE
+
+	#undef BF_STATIC_STATE
+	#undef BF_DYNAMIC_STATE
+}
+
 u8 bf_init_states() {
 	const char* fileContents = read_file(override_config_file != NULL ? override_config_file : "configuration.json");
 	Json *root = Json_create(fileContents);
@@ -38,26 +59,7 @@ u8 bf_init_states() {
 	}
 	Json *node = root->child;
 	while (node != NULL) {
-	
-		#define BF_STATIC_STATE(type, struct_name, target_expr) \
-			if (strcmp(#struct_name, node->name) == 0) \
-			{ \
-				read_##type(node, &bfStaticState.struct_name); \
-				memcpy(&(target_expr), &bfStaticState.struct_name, sizeof bfStaticState.struct_name); \
-			}
-
-		#define BF_DYNAMIC_STATE(type, struct_name, target_expr) \
-			if (strcmp(#struct_name, node->name) == 0) \
-			{ \
-				read_##type(node, &bfInitialDynamicState.struct_name); \
-				memcpy(&(target_expr), &bfInitialDynamicState.struct_name, sizeof bfInitialDynamicState.struct_name); \
-			}
-
-		#include STATE_DEFINITION_FILE
-
-		#undef BF_STATIC_STATE
-		#undef BF_DYNAMIC_STATE
-
+		read_state_json(node);
 		node = node->next;
 	}
 	free(fileContents);

@@ -80,7 +80,7 @@ BINARY_DIR     := binaries
 LIBULTRA       := $(BUILD_DIR)/libultra.a
 LD_SCRIPT      := sm64.ld
 
-BINARY_DIRS := $(foreach d,$(wildcard ./bruteforce/modules/**/main.c),$(subst ./bruteforce/,,binaries/$(dir $(d))))
+BINARY_DIRS := $(foreach d,$(wildcard ./bruteforce/modules/**/main.c),$(subst ./bruteforce/modules/,,binaries/$(dir $(d))))
 
 # Directories containing source files
 BRUTEFORCE_DIRS := $(shell $(FIND) bruteforce/* -type d)
