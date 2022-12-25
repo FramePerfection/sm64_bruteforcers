@@ -13,7 +13,7 @@
 	"max_generations": 1000000,
 	"merge_interval": 20,
 	"score_leniency": 0.1,
-	"forget_rate": 0.0,
+	"forget_rate": 0.02,
 	"print_interval": 100,
 	
 	"initial_button_state": "0x2000",
