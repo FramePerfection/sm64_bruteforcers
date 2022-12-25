@@ -8,6 +8,7 @@
 typedef struct InputSequence_s {
 	u32 offset;
 	u32 count;
+	OSContPad originalInput;
 	OSContPad inputs[0];
 } InputSequence;
 
