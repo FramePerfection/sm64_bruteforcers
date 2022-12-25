@@ -8,7 +8,7 @@
 SCORING_FUNC(<function name>)
 
 implementation must look as follows:
-f64 sm_<function_name>(<function_name>Parameters args, Candidate *candidate, u8 *success) { ... }
+f64 sm_<function_name>(<function_name>Parameters args, Candidate *candidate, u8 *success, u8 *abort) { ... }
 
 */
 
