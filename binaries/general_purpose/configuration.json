@@ -38,16 +38,7 @@
 	"forget_rate": 0.02,
 	"display_desync_messages": 0,
 	
-	"initial_button_state": "0x8000",
-	
-	"sliding_action": "0x008C0453",
-	"sliding_start_frame": 5,
-	"target_action": "0x0100088C",
 	"mario_health": "0x0880",
-	"target_angle": 1923,
-	"target_angle_margin": 32,
-	"min_speed": 63,
-	
 	"mario_x": -3613.70751953125,
 	"mario_y": 102.993499755859,
 	"mario_z": -6222.45849609375,

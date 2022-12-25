@@ -15,7 +15,7 @@ extern struct MarioBodyState marioBodyState;
 extern struct Controller testController;
 
 typedef struct {
-	f32 bestSpeed;
+	f32 bestScore;
 } ProgramState;
 
 typedef struct {

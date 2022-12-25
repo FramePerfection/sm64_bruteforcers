@@ -99,9 +99,9 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 		candidate->stats.z = gMarioState->pos[2];
 		candidate->score = score;
 
-		u8 best = gMarioStates->forwardVel > programState->bestSpeed;
+		u8 best = gMarioStates->forwardVel > programState->bestScore;
 		if (score > 0 && best) {
-			programState->bestSpeed = gMarioState->forwardVel;
+			programState->bestScore = gMarioState->forwardVel;
 			output_input_sequence(candidate->sequence);
 			printf("New best: %f\n", gMarioState->forwardVel);
 		}
@@ -125,6 +125,8 @@ void debug_print_run(s32 frame_idx) {
 	}
 }
 
+#include "bruteforce/snippets/bruteforce_loop.inc.c"
+
 void main(int argc, char *argv[]) {
 	parse_command_line_args(argc, argv);
 
@@ -146,81 +148,7 @@ void main(int argc, char *argv[]) {
 
 	initializeMultiProcess(original_inputs);
 	
-	programState->bestSpeed = minSpeed;
-
-	clock_t lastClock = clock();
-	u32 gen_mod = bfStaticState.print_interval;
-	if (gen_mod == 0)
-		gen_mod = 100;
-
-	u32 gen_merge_mod = bfStaticState.merge_interval;
-	if (gen_merge_mod == 0)
-		gen_merge_mod = gen_mod;
-
-	u32 frames = 0;
-	u32 gen;
-	for (gen = 0; gen < bfStaticState.max_generations; gen++) {
-		if (gen % gen_mod == 0)
-		{
-			clock_t curClock = clock();
-			float seconds = (float)(curClock - lastClock) / CLOCKS_PER_SEC;
-			float fps = frames / seconds;
-			lastClock = curClock;
-			printf("Generation %d starting... (%f FPS)\n", gen, fps);
-			frames = 0;
-		}
-
-		// perform all runs
-		u32 candidate_idx;
-		for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++) {
-
-			u32 run_idx;
-			for (run_idx = 0; run_idx < bfStaticState.runs_per_survivor; run_idx++) {
-				Candidate *candidate = &survivors[candidate_idx].children[run_idx];
-				Candidate *original = &survivors[candidate_idx];
-				
-				InputSequence *inputs = candidate->sequence;
-				clone_m64_inputs(inputs, original->sequence);
-
-				u8 keepOriginal = run_idx == 0 && (randFloat() > bfStaticState.forget_rate);
-
-				bf_load_dynamic_state(&bfInitialDynamicState);
-
-				u32 frame_idx;
-				for (frame_idx = 0; frame_idx < inputs->count; frame_idx++) {
-					frames++;
-					OSContPad *currentInput = &inputs->inputs[frame_idx];
-					if (!keepOriginal)
-						perturbInput(currentInput);
-					updateGame(currentInput);
-					if (!updateScore(candidate, frame_idx))
-						break;
-				}
-			}
-		}
-		
-		// sort by scoring
-		updateSurvivors(survivors);
-		updateBest(best, survivors);
-		if (!isParentProcess())
-			childUpdateMessages(best);
-
-		if (gen % gen_merge_mod == 0)
-			if (isParentProcess())
-				parentMergeCandidates(survivors);
-
-		if (gen % gen_mod == 0)
-		{
-			for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++) {
-				printf("%d:\tscore: %f;\tangle: %d\tx: %f\ty: %f\tz: %f\thspeed: %f\n", 
-					candidate_idx, survivors[candidate_idx].score, 
-					survivors[candidate_idx].stats.angle, 
-					survivors[candidate_idx].stats.x, 
-					survivors[candidate_idx].stats.y, 
-					survivors[candidate_idx].stats.z, 
-					survivors[candidate_idx].stats.hSpeed);
-			}
-			printf("Best so far: %f\n", programState->bestSpeed);
-		}
-	}
+	programState->bestScore = minSpeed;
+	
+	bruteforce_loop(original_inputs);
 }

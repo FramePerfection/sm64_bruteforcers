@@ -52,10 +52,10 @@ f64 sm_CheckAction(CheckActionParameters args, Candidate *candidate, u8 *success
 
 f64 sm_RestrictAngle(RestrictAngleParameters args, Candidate *candidate, u8 *success, u8 *abort) {
 	if ((candidate->stats.frame_index + 1) == args->frame) {
-		s16 dYaw = gMarioState->faceAngle[1] - bfStaticState.target_angle;
+		s16 dYaw = gMarioState->faceAngle[1] - args->angle;
 		if (dYaw < 0)
 			dYaw = -dYaw;
-		*success = dYaw <= bfStaticState.target_angle_margin;
+		*success = dYaw <= args->margin;
 		if (!*success) {
 			candidate->score = -dYaw;
 			return 0;

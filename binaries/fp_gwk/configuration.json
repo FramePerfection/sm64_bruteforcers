@@ -16,8 +16,6 @@
 	"forget_rate": 0.02,
 	"print_interval": 100,
 	
-	"initial_button_state": "0x2000",
-	
 	"scoring_frame": 9,
 	"plane_nx": 0.70710676908493,
 	"plane_nz": -0.70710676908493,

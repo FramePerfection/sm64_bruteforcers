@@ -124,18 +124,10 @@ u32 m64_count
 
 
 // scoring parameters
-u32 sliding_action
-u32 sliding_start_frame
-u32 target_action
-u32 scoring_frame
-s16 target_angle
-s16 target_angle_margin
 ScoringMethods scoring_methods
 
 // World triangles
 Triangles static_tris
-
-u16 initial_button_state
 
 // Mario
 s16 mario_health
