@@ -23,9 +23,6 @@ __NL__
 BF_STATIC_STATE(Triangles, static_tris, bfStaticState.static_tris)
 __NL__
 
-BF_DYNAMIC_STATE(u16, initial_button_state, testController.buttonDown)
-__NL__
-
 // Mario
 BF_DYNAMIC_VEC3(mario, gMarioState->pos)
 BF_DYNAMIC_VEC3(mario_vel, gMarioState->vel)

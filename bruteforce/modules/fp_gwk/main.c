@@ -86,16 +86,16 @@ void perturbInput(OSContPad *input) {
 	}
 }
 
-void updateScore(Candidate *candidate, u32 frame_idx) {
+u8 updateScore(Candidate *candidate, u32 frame_idx) {
 	if (frame_idx == bfStaticState.scoring_frame - 1) {
 		f64 dist = last_q_step[0] * bfStaticState.plane_nx + last_q_step[2] * bfStaticState.plane_nz + bfStaticState.plane_d - 50.0;
 		f64 dist2 = last_q_step2[0] * bfStaticState.plane_nx + last_q_step2[2] * bfStaticState.plane_nz + bfStaticState.plane_d - 50.0;
 		f64 score = -(dist * dist + dist2 * dist2);
-		u8 best = gMarioStates->forwardVel > programState->bestSpeed;
+		u8 best = gMarioStates->forwardVel > programState->bestScore;
 		if (!best)
 			score = -INFINITY;
 		else
-		 	score /= powf(2.0, (gMarioState->forwardVel - programState->bestSpeed) * 15);
+		 	score /= powf(2.0, (gMarioState->forwardVel - programState->bestScore) * 15);
 
 		if (gMarioState->faceAngle[1] == (s16)(bfStaticState.gwk_angle + 0x8000))
 		{
@@ -103,7 +103,7 @@ void updateScore(Candidate *candidate, u32 frame_idx) {
 			if (best) {
 				printf("\t(new best!)\n");
 				output_input_sequence(candidate->sequence);
-				programState->bestSpeed = gMarioState->forwardVel;
+				programState->bestScore = gMarioState->forwardVel;
 			}
 			else
 				printf("\n");
@@ -111,9 +111,11 @@ void updateScore(Candidate *candidate, u32 frame_idx) {
 		candidate->stats.hSpeed = gMarioStates->forwardVel;
 		candidate->score = score;
 	}
+
+	return TRUE;
 }
 
-void brutefoceLoop() {
+void bruteforceLoop() {
 	clock_t lastClock = clock();
 	u32 gen_mod = bfStaticState.print_interval;
 	u32 gen_merge_mod = bfStaticState.merge_interval;
@@ -128,7 +130,7 @@ void brutefoceLoop() {
 			float seconds = (float)(curClock - lastClock) / CLOCKS_PER_SEC;
 			float fps = gen_mod * original_inputs->count * bfStaticState.runs_per_survivor * bfStaticState.survivors_per_generation / seconds;
 			lastClock = curClock;
-			printf("Generation %d starting... (bestSpeed %f, %f FPS)\n", gen, programState->bestSpeed, fps);
+			printf("Generation %d starting... (bestSpeed %f, %f FPS)\n", gen, programState->bestScore, fps);
 		}
 
 		// perform all runs
@@ -145,6 +147,9 @@ void brutefoceLoop() {
 				u8 keepOriginal = run_idx == 0 && (randFloat() > bfStaticState.forget_rate);
 				
 				bf_load_dynamic_state(&bfInitialDynamicState);
+				testController.rawStickX = inputs->originalInput.stick_x;
+				testController.rawStickY = inputs->originalInput.stick_y;
+				testController.buttonDown = inputs->originalInput.button;
 
 				u32 frame_idx;
 				for (frame_idx = 0; frame_idx < inputs->count; frame_idx++) {
@@ -155,7 +160,7 @@ void brutefoceLoop() {
 					updateScore(candidate, frame_idx);
 				}
 
-				if (candidate->stats.hSpeed < programState->bestSpeed - bfStaticState.score_leniency)
+				if (candidate->stats.hSpeed < programState->bestScore - bfStaticState.score_leniency)
 					clone_m64_inputs(inputs, original->sequence);
 			}
 		}
@@ -196,7 +201,7 @@ void main(int argc, char *argv[]) {
 	initCandidates(original_inputs, &best);
 
 	initializeMultiProcess(original_inputs);
-	programState->bestSpeed = minSpeed;
+	programState->bestScore = minSpeed;
 
-	brutefoceLoop();
+	bruteforceLoop();
 }
