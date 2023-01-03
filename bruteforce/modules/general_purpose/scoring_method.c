@@ -1,16 +1,10 @@
-#include "scoring_method.h"
 #include "bruteforce/framework/bf_states.h"
+#include "bruteforce/framework/readers.h"
+#include "scoring_method.h"
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include "types.h"
-
-ScoringMethod *currentReadMethod;
-
-#define SCORING_FUNC(NAME) \
-NAME##Parameters *currentRead##NAME##Parameters;
-#include "scoring_funcs.inc.c"
-#undef SCORING_FUNC
 
 void read_ScoringMethods(Json *jsonNode, ScoringMethods *target) {
 	target->n_methods = jsonNode->size;
@@ -24,7 +18,13 @@ void read_ScoringMethods(Json *jsonNode, ScoringMethods *target) {
 		Json *paramsNode = NULL;
 		char *methodName = NULL;
 		while (innerNode != NULL) {
-			if (strcmp(innerNode->name, "func") == 0) {
+			if (strcmp(innerNode->name, "weight") == 0) {
+				currentReadMethod->weight = innerNode->valueFloat;
+			}
+			else if (strcmp(innerNode->name, "frame") == 0) {
+				currentReadMethod->frame = innerNode->valueInt;
+			}
+			else if (strcmp(innerNode->name, "func") == 0) {
 				methodName = innerNode->valueString;
 
 				#define SCORING_FUNC(NAME) \
@@ -33,6 +33,8 @@ void read_ScoringMethods(Json *jsonNode, ScoringMethods *target) {
 				#include "scoring_funcs.inc.c"
 				#undef SCORING_FUNC
 
+				if (currentReadMethod->func == NULL)
+					printf("Warning: Unknown scoring function '%s'\n", methodName);
 			}
 			else if (strcmp(innerNode->name, "params") == 0)
 				paramsNode = innerNode;
@@ -44,8 +46,8 @@ void read_ScoringMethods(Json *jsonNode, ScoringMethods *target) {
 			printf("hey %s\n", methodName);
 			#define SCORING_FUNC(NAME) \
 				if (strcmp(methodName, #NAME) == 0) { \
-					currentReadMethod->args = calloc(1, sizeof(NAME##Parameters)); \
-					printf("allocated %s (%d bytes) \n", methodName, sizeof(NAME##Parameters)); \
+					currentReadMethod->args = calloc(1, sizeof(struct NAME##Parameters_s)); \
+					printf("allocated %s (%d bytes) \n", methodName, sizeof(struct NAME##Parameters_s)); \
 					read_##NAME##Parameters(paramsNode, (NAME##Parameters*)&(currentReadMethod->args)); \
 				}
 			#include "scoring_funcs.inc.c"
@@ -58,6 +60,8 @@ void read_ScoringMethods(Json *jsonNode, ScoringMethods *target) {
 }
 
 void applyMethod(ScoringMethod *method, Candidate *candidate, u8 *success, u8 *abort) {
+	if (!method->func)
+		return;
 	u8 partialSuccess = TRUE;
 	f64 partialScore = method->func(method->args, candidate, &partialSuccess, abort);
 	candidate->score += partialScore * method->weight;
@@ -68,7 +72,7 @@ void applyMethod(ScoringMethod *method, Candidate *candidate, u8 *success, u8 *a
 #include "scoring_funcs.inc.c"
 #undef SCORING_FUNC_IMPL
 
-#define PARAM_MEMBER(type, MEMBER_NAME) \
+#define PARAM_MEMBER(type, MEMBER_NAME, _) \
 	if (strcmp(#MEMBER_NAME, innerNode->name) == 0) \
 	{ \
 		read_##type(innerNode, &((*target)->MEMBER_NAME)); \

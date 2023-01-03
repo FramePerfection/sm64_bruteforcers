@@ -12,6 +12,7 @@ extern f32 minSpeed;
 #else
 
 // scoring parameters
+BF_STATIC_STATE(Boolean, score_on_last_frame, bfStaticState.score_on_last_frame)
 BF_STATIC_STATE(ScoringMethods, scoring_methods, bfStaticState.scoring_methods)
 __NL__
 
@@ -32,5 +33,6 @@ BF_DYNAMIC_STATE(u8, mario_wallkick_timer, gMarioState->wallKickTimer)
 BF_DYNAMIC_STATE(u32, mario_previous_action, gMarioState->prevAction)
 BF_DYNAMIC_STATE(s16, mario_yaw_facing, gMarioState->faceAngle[1])
 BF_DYNAMIC_STATE(s16, mario_slide_yaw, gMarioState->slideYaw)
+BF_DYNAMIC_STATE(u16, area_terrain_type, gMarioState->area->terrainType)
 
 #endif

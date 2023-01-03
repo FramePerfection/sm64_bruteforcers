@@ -9,6 +9,7 @@ typedef f64 (*scoringFunc)(void*, Candidate*, u8*, u8*);
 
 typedef struct ScoringMethod_s {
 	f64 weight;
+	u32 frame;
 	void *args;
 	scoringFunc func;
 } ScoringMethod;
@@ -23,11 +24,13 @@ void read_ScoringMethods(Json *jsonNode, ScoringMethods *target);
 void applyMethod(ScoringMethod *method, Candidate *candidate, u8 *success, u8 *abort);
 
 
-#define PARAM_MEMBER(TYPE, MEMBER_NAME) TYPE MEMBER_NAME;
+#undef SCORING_FUNC_IMPL
+#define PARAM_MEMBER(TYPE, MEMBER_NAME, _) TYPE MEMBER_NAME;
 #define SCORING_FUNC(NAME) \
-typedef struct { \
+struct NAME##Parameters_s { \
  PARAM_MEMBERS_##NAME \
-} *NAME##Parameters; \
+}; \
+typedef struct NAME##Parameters_s *NAME##Parameters; \
  \
 f64 sm_##NAME(NAME##Parameters parameters, Candidate *candidate, u8 *success, u8 *abort); \
 void read_##NAME##Parameters(Json*, NAME##Parameters*);

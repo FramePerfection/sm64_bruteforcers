@@ -42,6 +42,7 @@ void initGame() {
 		printf("Failed to load configuration! Exiting...\n");
 		exit(-1);
 	}
+	printf("m64 path is %s, %p, loaded from %s \n", bfStaticState.m64_input, &bfStaticState.m64_input[0], override_config_file);
 	
 	clear_static_surfaces();
 	init_static_surfaces(bfStaticState.static_tris);
@@ -81,16 +82,20 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 	u8 success = TRUE;
 	u32 i;
 
+	if (bfStaticState.score_on_last_frame && frame_idx + 1 != candidate->sequence->count)
+		success = FALSE;
+
 	candidate->stats.frame_index = frame_idx;
 	candidate->score = 0.0;
-	for (i = 0; i < bfStaticState.scoring_methods.n_methods; i++) {
-		u8 abort = FALSE;
-		applyMethod(&bfStaticState.scoring_methods.methods[i], candidate, &success, &abort);
-		if (abort)
-			return FALSE;
-	}
+	for (i = 0; i < bfStaticState.scoring_methods.n_methods; i++) 
+		if (bfStaticState.scoring_methods.methods[i].frame == frame_idx + 1) {
+			u8 abort = FALSE;
+			applyMethod(&bfStaticState.scoring_methods.methods[i], candidate, &success, &abort);
+			if (abort)
+				return FALSE;
+		}
 
-	u8 best = candidate->score > 0 && success && candidate->score > programState->bestScore;
+	u8 best = success && candidate->score > programState->bestScore;
 	if (best) {
 		programState->bestScore = candidate->score;
 		output_input_sequence(candidate->sequence);
@@ -112,11 +117,13 @@ void main(int argc, char *argv[]) {
 	InputSequence *original_inputs;
 	if (!read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_count, &original_inputs))
 	{
-		printf("Failed to load m64! Exiting...\n");
+		printf("Failed to load m64! (%s) Exiting...\n", bfStaticState.m64_input);
 		exit(-1);
 	}
 
 	initializeMultiProcess(original_inputs);
+	if (isParentProcess())
+		programState->bestScore = -INFINITY;
 
 	bruteforce_loop(original_inputs);
 }

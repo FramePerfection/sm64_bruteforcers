@@ -124,6 +124,7 @@ u32 m64_count
 
 
 // scoring parameters
+Boolean score_on_last_frame
 ScoringMethods scoring_methods
 
 // World triangles
@@ -146,3 +147,4 @@ u8 mario_wallkick_timer
 u32 mario_previous_action
 s16 mario_yaw_facing
 s16 mario_slide_yaw
+u16 area_terrain_type

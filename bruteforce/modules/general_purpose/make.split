@@ -1,8 +1,16 @@
 NAME := general_purpose
 
+$(eval $(NAME)_dep: force; \
+	$(call create-state-definition-file,./bruteforce/modules/general_purpose/generate_param_definition.c,tmp.txt); \
+	tr -d '"' < $(BINARY_DIR)/$(NAME)/tmp.txt > $(BINARY_DIR)/$(NAME)/param_definitions.txt; \
+	$(RM) $(BINARY_DIR)/$(NAME)/tmp.txt)
+
+
 $(NAME)REQUIRED_OBJECTS := $(addprefix bruteforce/modules/$(NAME)/,main.o scoring_method.o)
 $(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/,$(NAME)/candidates.o $(NAME)/bf_states.o $(NAME)/interprocess.o)
 $(NAME)REQUIRED_OBJECTS += $(addprefix src/engine/,math_util.o surface_collision.o surface_load_reduced.o)
 $(NAME)REQUIRED_OBJECTS += $(addprefix src/game/,camera_reduced.o $(MARIO_STEP_OBJECTS))
+
+$(NAME)ADDITIONAL_DEPENDENCIES := $(NAME)_dep
 
 $(eval $(call register-module))
