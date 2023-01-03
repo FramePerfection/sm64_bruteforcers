@@ -28,6 +28,7 @@ u8 read_m64_from_file(char *fileName, u32 offset, u32 count, InputSequence **inp
 	fseek(file, 0x400 + offset * sizeof(u32), SEEK_SET);
 	char *inputBuffer = calloc(count, sizeof(u32));
 	fread(inputBuffer, sizeof(u32), count, file);
+	fclose(file);
 
 	u32 i;
 	for (i = 0; i < count; i++) {
@@ -43,7 +44,6 @@ u8 read_m64_from_file(char *fileName, u32 offset, u32 count, InputSequence **inp
 		targetInput->button = (buttons_hi << 8) | buttons_lo;
 	}
 
-	fclose(file);
 	return TRUE;
 }
 
