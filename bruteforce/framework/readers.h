@@ -6,13 +6,16 @@
 #include "types.h"
 
 typedef char* string;
+typedef u8 Boolean;
 void read_s32(Json*, s32*);
 void read_s16(Json*, s16*);
 void read_u32(Json*, u32*);
 void read_u16(Json*, u16*);
 void read_u8(Json*, u8*);
 void read_f32(Json*, f32*);
+void read_f64(Json*, f64*);
 void read_string(Json*, string*);
+void read_Boolean(Json*, Boolean*);
 
 typedef struct Triangle {
 	s16 x1, y1, z1;

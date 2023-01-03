@@ -24,8 +24,25 @@ void read_f32(Json *jsonNode, f32 *target) {
 	*target = (f32)jsonNode->valueFloat;
 }
 
+void read_f64(Json *jsonNode, f64 *target) {
+	*target = (f64)jsonNode->valueFloat;
+}
+
 void read_string(Json *jsonNode, string *target) {
 	*target = strdup(jsonNode->valueString);
+}
+
+void read_Boolean(Json *jsonNode, Boolean *target) {
+	if (jsonNode->type == Json_String) {
+		char *p = jsonNode->valueString;
+		for ( ; *p; ++p) *p = tolower(*p);
+		if (strcmp(jsonNode->valueString, "true") == 0)
+			*target = 1;
+		else if (strcmp(jsonNode->valueString, "false") == 0)
+			*target = 0;
+	}
+	else if (jsonNode->type == Json_Number)
+		*target = (jsonNode->valueInt != 0) ? 1 : 0;
 }
 
 f32 advance_read(Json **nodePtr) {
