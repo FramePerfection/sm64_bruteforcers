@@ -12,6 +12,12 @@ define validate-option
   endif
 endef
 
+# Creates a text file documentation by running the preprocessor on a given source file
+define create-state-definition-file
+	$(CC) -E -CC -P $(foreach i,$(INCLUDE_DIRS),-I$(i)) -DMODULE_PATH=$(NAME) $1 \
+		| sed -e 's/__NL__ /\n/g' -e 's/__NL__//g' > $(BINARY_DIR)/$(NAME)/$2
+endef
+
 # Returns the path to the command $(1) if exists. Otherwise returns an empty string.
 find-command = $(shell which $(1) 2>/dev/null)
 
@@ -41,11 +47,10 @@ ALL_TARGETS += $(NAME)
 SRC_DIRS += bruteforce/$(NAME)
 BIN_DIRS += $(NAME)
 $(eval $(NAME): MODULE_PATH := $(NAME))
+$(eval $(NAME): $($(NAME)ADDITIONAL_DEPENDENCIES))
 $(NAME): $($(NAME)REQUIRED_O_FILES)
 	$(CC) -o $(BINARY_DIR)/$(NAME)/main.exe $($(NAME)REQUIRED_O_FILES)
-	$(CC) -E -CC -P $(foreach i,$(INCLUDE_DIRS),-I$(i)) -DMODULE_PATH=$(NAME) ./bruteforce/framework/generate_state_defintion.c \
-	 | sed -e 's/__NL__ /\n/g' -e 's/__NL__//g' > $(BINARY_DIR)/$(NAME)/state_definitions.txt 
+	$(call create-state-definition-file,./bruteforce/framework/generate_state_defintion.c,state_definitions.txt)
 
 $(foreach o,$(SPECIAL_O),$(eval $(call special,$(NAME),$(o))))
-$(eval $(call create-state-definition,$(NAME)))
 endef
