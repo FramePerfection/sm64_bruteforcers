@@ -185,6 +185,10 @@ endef
 # Main Targets                                                                 #
 #==============================================================================#
 
+default: all
+force: 
+#used to force targets to be built
+
 include $(wildcard ./bruteforce/modules/**/make.split)
 
 all: $(ALL_TARGETS)
@@ -192,8 +196,6 @@ all: $(ALL_TARGETS)
 clean:
 	$(RM) -r $(BUILD_DIR_BASE)
 	
-force: 
-#used to force targets to be built
 
 ifeq ($(VERSION),sh)
   $(BUILD_DIR)/src/audio/load_sh.o: $(SOUND_BIN_DIR)/bank_sets.inc.c $(SOUND_BIN_DIR)/sequences_header.inc.c $(SOUND_BIN_DIR)/ctl_header.inc.c $(SOUND_BIN_DIR)/tbl_header.inc.c
