@@ -1,5 +1,6 @@
 #include "bruteforce/framework/candidates.h"
 #include "bruteforce/framework/bf_states.h"
+#include "bruteforce/framework/interprocess.h"
 #include <memory.h>
 #include "sm64.h"
 
@@ -108,5 +109,5 @@ u8 desynced;
 void desync(char *message) {
 	desynced = TRUE;
 	if (bfStaticState.display_desync_messages)
-		printf(message);
+		safePrintf(message);
 }

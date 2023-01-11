@@ -1,10 +1,12 @@
 #include "bruteforce/framework/interface.h"
+#include "bruteforce/framework/interprocess.h"
+#include "bruteforce/framework/m64.h"
+
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "bruteforce/framework/m64.h"
 
 char *override_config_file = NULL;
 char *child_args = NULL;
@@ -55,7 +57,7 @@ u8 save_to_sequence_file(char *fileName, InputSequence *inputSequence) {
 #define TRY_WRITE(expr) \
 	while (!expr) { \
 		if(++fail_counter > max_write_fails){ \
-			printf("Failed to write result to file!\n"); \
+			safePrintf("Failed to write result to file!\n"); \
 			return FALSE; \
 		} \
 		usleep(1000000); \

@@ -1,5 +1,7 @@
 #include "bruteforce/framework/misc_util.h"
-#include "stdlib.h"
+#include "bruteforce/framework/interprocess.h"
+
+#include <stdlib.h>
 
 f32 randFloat() {
 	return ((float)rand()/(float)(RAND_MAX));
@@ -13,7 +15,7 @@ void init_static_surfaces(Triangles tris) {
 		if (surface != NULL)
 			add_surface(surface, FALSE);
 		else
-			printf("found degenerate triangle: (%d,%d,%d),(%d,%d,%d),(%d,%d,%d)\n", t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3);
+			safePrintf("found degenerate triangle: (%d,%d,%d),(%d,%d,%d),(%d,%d,%d)\n", t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3);
 	}
 
 }

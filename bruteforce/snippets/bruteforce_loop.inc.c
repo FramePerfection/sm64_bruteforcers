@@ -21,7 +21,7 @@ void bruteforce_loop(InputSequence *original_inputs) {
 		{
 			float fps = frames / seconds;
 			lastClock = curClock;
-			printf("Generation %d starting... (%f FPS) (Best score: %f)\n", gen, fps, programState->bestScore);
+			safePrintf("Generation %d starting... (%f FPS) (Best score: %f)\n", gen, fps, programState->bestScore);
 			frames = 0;
 		}
 

@@ -37,9 +37,9 @@ void initGame() {
 	gMarioState->controller = &testController;
 	gMarioState->area = &area;
 	
-	printf("Loading configuration...\n");
+	safePrintf("Loading configuration...\n");
 	if (!bf_init_states()) {
-		printf("Failed to load configuration! Exiting...\n");
+		safePrintf("Failed to load configuration! Exiting...\n");
 		exit(-1);
 	}
 	
@@ -103,26 +103,10 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 		if (score > 0 && best) {
 			programState->bestScore = gMarioState->forwardVel;
 			output_input_sequence(candidate->sequence);
-			printf("New best: %f\n", gMarioState->forwardVel);
+			safePrintf("New best: %f\n", gMarioState->forwardVel);
 		}
 	}
 	return TRUE;
-}
-
-void printVec3f(Vec3f *v) {
-	printf("(%f, %f, %f)", (*v)[0], (*v)[1], (*v)[2]);
-}
-
-void debug_print_run(s32 frame_idx) {
-	printf("%d - Mario (%x); (%x): ", frame_idx, gMarioState->health, gMarioState->action);
-	printVec3f(&gMarioState->pos);
-	printf("\tSliding (%f, -,%f)\t", gMarioState->slideVelX, gMarioState->slideVelZ);
-	printVec3f(&gMarioState->vel);
-	printf("\n");
-
-	if (frame_idx == bfStaticState.m64_count - 1) {
-		printf("break;\n");
-	}
 }
 
 #include "bruteforce/snippets/bruteforce_loop.inc.c"
@@ -130,14 +114,14 @@ void debug_print_run(s32 frame_idx) {
 void main(int argc, char *argv[]) {
 	parse_command_line_args(argc, argv);
 
-	printf("Running Bruteforcer...\n");
+	safePrintf("Running Bruteforcer...\n");
 	initGame();
 
-	printf("Loading m64...\n");
+	safePrintf("Loading m64...\n");
 	InputSequence *original_inputs;
 	if (!read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_count, &original_inputs))
 	{
-		printf("Failed to load m64! Exiting...\n");
+		safePrintf("Failed to load m64! Exiting...\n");
 		exit(-1);
 	}
 

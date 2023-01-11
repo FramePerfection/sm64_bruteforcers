@@ -26,6 +26,9 @@ typedef struct BFStaticState_s {
 #include STATE_DEFINITION_FILE
 } BFStaticState;
 
+#undef BF_STATIC_STATE
+#undef BF_DYNAMIC_STATE
+
 
 #define BF_DYNAMIC_STATE(type, name, target_expr) \
 	type name;

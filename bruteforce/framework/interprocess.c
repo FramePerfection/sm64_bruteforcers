@@ -1,8 +1,10 @@
+#include <string.h>
+#include <pthread.h>
+
 #include <PR/ultratypes.h>
 #include "bruteforce/framework/bf_states.h"
 #include "bruteforce/framework/candidates.h"
 #include "bruteforce/framework/interface.h"
-#include <string.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -15,7 +17,9 @@ static HANDLE hMapFile;
 static void *pBuf;
 #endif
 
-#define BUF_SIZE sizeof(ProgramState)
+#define BUF_SIZE (sizeof(ProgramState) + sizeof(pthread_mutex_t))
+
+pthread_mutex_t *shm_lock = NULL;
 u32 transmissionCandidateSize;
 u32 sequenceSize;
 u32 pipeBufferSize;
@@ -37,10 +41,10 @@ static void createPipe(HANDLE *readPipe, HANDLE *writePipe) {
 	saAttr.lpSecurityDescriptor = NULL;
 
 	if (!MyCreatePipeEx(readPipe, writePipe, &saAttr, 0, FILE_FLAG_OVERLAPPED, 0)) {
-		printf("Failed to create pipe: Error code %ld\n", GetLastError());
+		safePrintf("Failed to create pipe: Error code %ld\n", GetLastError());
 		return;
 	}
-	printf("Successfully created pipes %p (read) and %p (write)\n", *readPipe, *writePipe);
+	safePrintf("Successfully created pipes %p (read) and %p (write)\n", *readPipe, *writePipe);
 }
 
 static void createProcess(HANDLE readPipe, HANDLE writePipe, HANDLE hJob) {
@@ -56,15 +60,15 @@ static void createProcess(HANDLE readPipe, HANDLE writePipe, HANDLE hJob) {
 		sprintf(lpszArgs + strlen(lpszArgs), " --file %s --outputmode %s", override_config_file, output_mode);
 
 	if (!CreateProcess(lpszClientPath, lpszArgs, NULL, NULL, TRUE, CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi)) {
-		printf("Failed to launch child process. Error code %ld\n", GetLastError());
+		safePrintf("Failed to launch child process. Error code %ld\n", GetLastError());
 		return;
 	}
 
 	if (!AssignProcessToJobObject(hJob, pi.hProcess))
-		printf("Failed AssignProcessToJobObject: %ld\n", GetLastError());
+		safePrintf("Failed AssignProcessToJobObject: %ld\n", GetLastError());
 }
 
-static void createChildProcesses() {
+static void createMapFile() {
 	SECURITY_ATTRIBUTES saAttr;  
 	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
 	saAttr.bInheritHandle = TRUE; 
@@ -72,10 +76,22 @@ static void createChildProcesses() {
 
 	hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, &saAttr, PAGE_READWRITE, 0, BUF_SIZE, NULL);
 	if (hMapFile == NULL) {
-    	printf("Could not create file mapping (%ld).\n", GetLastError());
+    	safePrintf("Could not create file mapping (%ld).\n", GetLastError());
 		return;
 	}
+}
 
+static void createMapFileView() {	
+   	pBuf = MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, BUF_SIZE);
+	if (pBuf == NULL)
+	{
+		safePrintf("Could not map view of file (%ld).\n", GetLastError());
+    	CloseHandle(hMapFile);
+		return;
+	}
+}
+
+static void createChildProcesses() {
     HANDLE                               hJob;
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
 	
@@ -88,7 +104,7 @@ static void createChildProcesses() {
 	parentToChildWritePipes = calloc(num_processes, sizeof(HANDLE));
 	childToParentReadPipes = calloc(num_processes, sizeof(HANDLE));
 
-	printf("Running %d processes...\n", num_processes);
+	safePrintf("Running %d processes...\n", num_processes);
 	s32 i;
 	for (i = 0; i < num_processes; i++) {
 		HANDLE childReadPipe, childWritePipe;
@@ -97,6 +113,10 @@ static void createChildProcesses() {
 		createPipe(&childToParentReadPipes[i], &childWritePipe);
 		createProcess(childReadPipe, childWritePipe, hJob);
 	}
+}
+
+u8 isParentProcess() {
+	return child_args == NULL;
 }
 
 void initializeMultiProcess(InputSequence *original_inputs) {
@@ -114,33 +134,32 @@ void initializeMultiProcess(InputSequence *original_inputs) {
 		arg1 = strtok(NULL, ";");
 		arg2 = strtok(NULL, ";");
 		if (arg2 == NULL) {
-			printf("Invalid arguments to create child process. Exiting...\n");
+			safePrintf("Invalid arguments to create child process. Exiting...\n");
 			exit(0);
 		}
 		char *end;
 		childReadPipe = (HANDLE)strtol(arg0, &end, 0x10);
 		childWritePipe = (HANDLE)strtol(arg1, &end, 0x10);
 		hMapFile = (HANDLE)strtol(arg2, &end, 0x10);
+		createMapFileView();
+		shm_lock = pBuf;
 	}
 	else {
 		childReadPipe = NULL;
 		childWritePipe = NULL;
+
+		createMapFile();
+		createMapFileView();
+		shm_lock = pBuf;
+		pthread_mutexattr_t attr;
+		pthread_mutexattr_init(&attr);
+		pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
+		pthread_mutex_init(shm_lock, &attr);
+		pthread_mutexattr_destroy(&attr);
+
 		createChildProcesses();
 	}
-		
-   	pBuf = MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, BUF_SIZE);
-	
-	if (pBuf == NULL)
-	{
-		printf("Could not map view of file (%ld).\n", GetLastError());
-    	CloseHandle(hMapFile);
-		return;
-	}
-	programState = pBuf;
-}
-
-u8 isParentProcess() {
-	return childReadPipe == NULL;
+	programState = pBuf + sizeof(pthread_mutex_t);
 }
 
 static void writeSurvivorsToBuffer(Candidate *survivors) {
@@ -164,7 +183,7 @@ void parentMergeCandidates(Candidate *survivors) {
 	// Send a merge request to all children
 	for (childProcId = 0; childProcId < bfStaticState.max_processes - 1; childProcId++) {
 		if (!WriteFile(parentToChildWritePipes[childProcId], pipeBuffer, pipeBufferSize, &written, NULL)) {
-			printf("Failed to write sync message:%ld\n", GetLastError());
+			safePrintf("Failed to write sync message:%ld\n", GetLastError());
 		}
 	}
 
@@ -176,7 +195,7 @@ void parentMergeCandidates(Candidate *survivors) {
 	// Read each merge block in turn
 	for (childProcId = 0; childProcId < numChildProcesses; childProcId++) {
 		if (!ReadFile(childToParentReadPipes[childProcId], mergeBuffer + childProcId * pipeBufferSize, pipeBufferSize, &read, NULL)) {
-			printf("Failed to read merge message:%ld\n", GetLastError());
+			safePrintf("Failed to read merge message:%ld\n", GetLastError());
 		}
 		
 		u32 i;
@@ -194,7 +213,7 @@ void parentMergeCandidates(Candidate *survivors) {
 	writeSurvivorsToBuffer(survivors);
 	for (childProcId = 0; childProcId < numChildProcesses; childProcId++) {
 		if (!WriteFile(parentToChildWritePipes[childProcId], pipeBuffer, pipeBufferSize, &written, NULL)) {
-			printf("Failed to write merge result to child %d: %ld\n", childProcId, GetLastError());
+			safePrintf("Failed to write merge result to child %d: %ld\n", childProcId, GetLastError());
 		}
 	}
 }
@@ -215,11 +234,11 @@ void childUpdateMessages(Candidate *survivors) {
 			DWORD written, read;
 			writeSurvivorsToBuffer(survivors);
 			if (!WriteFile(childWritePipe, pipeBuffer, pipeBufferSize, &written, NULL)) {
-				printf("Failed to fulfil merge command: %ld", GetLastError());
+				safePrintf("Failed to fulfil merge command: %ld", GetLastError());
 			}
 
 			if (!ReadFile(childReadPipe, pipeBuffer, pipeBufferSize, &read, NULL)) {
-				printf("Failed to read merge message:%ld\n", GetLastError());
+				safePrintf("Failed to read merge message:%ld\n", GetLastError());
 			}
 			u32 i;
 			for (i = 0; i < bfStaticState.survivors_per_generation; i++) {
@@ -236,4 +255,18 @@ void childUpdateMessages(Candidate *survivors) {
 		ResetEvent(readOverlapped.hEvent);
 		pipeReadPending = FALSE;
 	}
+}
+
+void safePrintf(const char* fmt, ...) {
+	pthread_mutex_t *lock = shm_lock;
+	if (lock)
+		pthread_mutex_lock(lock);
+	else if (!isParentProcess())
+		return;
+	va_list argptr;
+	va_start(argptr,fmt);
+	vprintf(fmt, argptr);
+	va_end(argptr);
+	if (lock)
+		pthread_mutex_unlock(lock);
 }

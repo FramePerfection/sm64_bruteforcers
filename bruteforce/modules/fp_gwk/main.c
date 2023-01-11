@@ -44,9 +44,9 @@ void initGame(char* override_config_file) {
 	gMarioState->controller = &testController;
 	gMarioState->area = &area;
 	
-	printf("Loading configuration...\n");
+	safePrintf("Loading configuration...\n");
 	if (!bf_init_states()) {
-		printf("Failed to load configuration! Exiting...\n");
+		safePrintf("Failed to load configuration! Exiting...\n");
 		exit(-1);
 	}
 	
@@ -99,14 +99,11 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 
 		if (gMarioState->faceAngle[1] == (s16)(bfStaticState.gwk_angle + 0x8000))
 		{
-			printf("Found one: %d, %f", gMarioState->faceAngle[1], gMarioState->forwardVel);
+			safePrintf("Found one: %d, %f %s\n", gMarioState->faceAngle[1], gMarioState->forwardVel, best ? "\t(new best!)" : "");
 			if (best) {
-				printf("\t(new best!)\n");
 				output_input_sequence(candidate->sequence);
 				programState->bestScore = gMarioState->forwardVel;
 			}
-			else
-				printf("\n");
 		}
 		candidate->stats.hSpeed = gMarioStates->forwardVel;
 		candidate->score = score;
@@ -130,7 +127,7 @@ void bruteforceLoop() {
 			float seconds = (float)(curClock - lastClock) / CLOCKS_PER_SEC;
 			float fps = gen_mod * original_inputs->count * bfStaticState.runs_per_survivor * bfStaticState.survivors_per_generation / seconds;
 			lastClock = curClock;
-			printf("Generation %d starting... (bestSpeed %f, %f FPS)\n", gen, programState->bestScore, fps);
+			safePrintf("Generation %d starting... (bestSpeed %f, %f FPS)\n", gen, programState->bestScore, fps);
 		}
 
 		// perform all runs
@@ -172,7 +169,7 @@ void bruteforceLoop() {
 		if (isParentProcess()) {
 			if (gen % gen_mod == 0) 
 				for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++)
-					printf("%d:\t%a;\t%f\n", candidate_idx, survivors[candidate_idx].score, survivors[candidate_idx].stats.hSpeed);
+					safePrintf("%d:\t%a;\t%f\n", candidate_idx, survivors[candidate_idx].score, survivors[candidate_idx].stats.hSpeed);
 			
 			// We're the parent process. Send a merge request to all children and merge, then send the merged results back to the children.
 			if (gen % gen_merge_mod == 0) {
@@ -186,15 +183,15 @@ void bruteforceLoop() {
 
 void main(int argc, char *argv[]) {
 	parse_command_line_args(argc, argv);
-	printf("Running Bruteforcer...\n");
+	safePrintf("Running Bruteforcer...\n");
 	
-	printf("Initializing game state...\n");
+	safePrintf("Initializing game state...\n");
 	initGame(override_config_file);
 	
-	printf("Loading m64...\n");
+	safePrintf("Loading m64...\n");
 	if (!read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_count, &original_inputs))
 	{
-		printf("Failed to load m64! Exiting...\n");
+		safePrintf("Failed to load m64! Exiting...\n");
 		exit(-1);
 	}
 	initCandidates(original_inputs, &survivors);

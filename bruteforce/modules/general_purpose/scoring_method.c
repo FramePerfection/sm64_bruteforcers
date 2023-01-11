@@ -34,7 +34,7 @@ void read_ScoringMethods(Json *jsonNode, ScoringMethods *target) {
 				#undef SCORING_FUNC
 
 				if (currentReadMethod->func == NULL)
-					printf("Warning: Unknown scoring function '%s'\n", methodName);
+					safePrintf("Warning: Unknown scoring function '%s'\n", methodName);
 			}
 			else if (strcmp(innerNode->name, "params") == 0)
 				paramsNode = innerNode;
@@ -43,11 +43,9 @@ void read_ScoringMethods(Json *jsonNode, ScoringMethods *target) {
 		}
 
 		if (paramsNode) {
-			printf("hey %s\n", methodName);
 			#define SCORING_FUNC(NAME) \
 				if (strcmp(methodName, #NAME) == 0) { \
 					currentReadMethod->args = calloc(1, sizeof(struct NAME##Parameters_s)); \
-					printf("allocated %s (%d bytes) \n", methodName, sizeof(struct NAME##Parameters_s)); \
 					read_##NAME##Parameters(paramsNode, (NAME##Parameters*)&(currentReadMethod->args)); \
 				}
 			#include "scoring_funcs.inc.c"

@@ -37,12 +37,12 @@ void initGame() {
 	gMarioState->controller = &testController;
 	gMarioState->area = &area;
 	
-	printf("Loading configuration...\n");
+	safePrintf("Loading configuration...\n");
 	if (!bf_init_states()) {
-		printf("Failed to load configuration! Exiting...\n");
+		safePrintf("Failed to load configuration! Exiting...\n");
 		exit(-1);
 	}
-	printf("m64 path is %s, %p, loaded from %s \n", bfStaticState.m64_input, &bfStaticState.m64_input[0], override_config_file);
+	safePrintf("m64 path is %s, %p, loaded from %s \n", bfStaticState.m64_input, &bfStaticState.m64_input[0], override_config_file);
 	
 	clear_static_surfaces();
 	init_static_surfaces(bfStaticState.static_tris);
@@ -99,7 +99,7 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 	if (best) {
 		programState->bestScore = candidate->score;
 		output_input_sequence(candidate->sequence);
-		printf("New best: %f\n", candidate->score);
+		safePrintf("New best: %f\n", candidate->score);
 	}
 
 	return TRUE;
@@ -110,14 +110,14 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 void main(int argc, char *argv[]) {
 	parse_command_line_args(argc, argv);
 
-	printf("Running Bruteforcer...\n");
+	safePrintf("Running Bruteforcer...\n");
 	initGame();
 
-	printf("Loading m64...\n");
+	safePrintf("Loading m64...\n");
 	InputSequence *original_inputs;
 	if (!read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_count, &original_inputs))
 	{
-		printf("Failed to load m64! (%s) Exiting...\n", bfStaticState.m64_input);
+		safePrintf("Failed to load m64! (%s) Exiting...\n", bfStaticState.m64_input);
 		exit(-1);
 	}
 
