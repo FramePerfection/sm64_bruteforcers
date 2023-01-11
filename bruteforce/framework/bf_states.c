@@ -34,6 +34,7 @@ void read_state_json(Json *node) {
 		{ \
 			read_##type(node, &bfStaticState.struct_name); \
 			memcpy(&(target_expr), &bfStaticState.struct_name, sizeof bfStaticState.struct_name); \
+			return; \
 		}
 
 	#define BF_DYNAMIC_STATE(type, struct_name, target_expr) \
@@ -41,12 +42,15 @@ void read_state_json(Json *node) {
 		{ \
 			read_##type(node, &bfInitialDynamicState.struct_name); \
 			memcpy(&(target_expr), &bfInitialDynamicState.struct_name, sizeof bfInitialDynamicState.struct_name); \
+			return; \
 		}
 
 	#include STATE_DEFINITION_FILE
 
 	#undef BF_STATIC_STATE
 	#undef BF_DYNAMIC_STATE
+	
+	safePrintf("Warning: Undefined state \"%s\" set.\n", node->name);
 }
 
 u8 bf_init_states() {
