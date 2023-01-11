@@ -1,10 +1,11 @@
 #include <string.h>
-#include <pthread.h>
 
 #include <PR/ultratypes.h>
+
 #include "bruteforce/framework/bf_states.h"
 #include "bruteforce/framework/candidates.h"
 #include "bruteforce/framework/interface.h"
+#include "bruteforce/framework/interprocess.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -15,11 +16,11 @@ static OVERLAPPED readOverlapped;
 static BOOL pipeReadPending = FALSE;
 static HANDLE hMapFile;
 static void *pBuf;
+static HANDLE mutex;
 #endif
 
-#define BUF_SIZE (sizeof(ProgramState) + sizeof(pthread_mutex_t))
+#define BUF_SIZE sizeof(ProgramState)
 
-pthread_mutex_t *shm_lock = NULL;
 u32 transmissionCandidateSize;
 u32 sequenceSize;
 u32 pipeBufferSize;
@@ -33,6 +34,14 @@ extern BOOL APIENTRY MyCreatePipeEx(
     DWORD dwReadMode,
     DWORD dwWriteMode
     );
+
+static void createMutex() {
+	SECURITY_ATTRIBUTES saAttr;  
+	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
+	saAttr.bInheritHandle = TRUE; 
+	saAttr.lpSecurityDescriptor = NULL;
+	mutex = CreateMutex(&saAttr, FALSE, "bf_print_lock");
+}
 
 static void createPipe(HANDLE *readPipe, HANDLE *writePipe) {
 	SECURITY_ATTRIBUTES saAttr;  
@@ -142,7 +151,7 @@ void initializeMultiProcess(InputSequence *original_inputs) {
 		childWritePipe = (HANDLE)strtol(arg1, &end, 0x10);
 		hMapFile = (HANDLE)strtol(arg2, &end, 0x10);
 		createMapFileView();
-		shm_lock = pBuf;
+		createMutex();
 	}
 	else {
 		childReadPipe = NULL;
@@ -150,16 +159,10 @@ void initializeMultiProcess(InputSequence *original_inputs) {
 
 		createMapFile();
 		createMapFileView();
-		shm_lock = pBuf;
-		pthread_mutexattr_t attr;
-		pthread_mutexattr_init(&attr);
-		pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
-		pthread_mutex_init(shm_lock, &attr);
-		pthread_mutexattr_destroy(&attr);
-
+		createMutex();
 		createChildProcesses();
 	}
-	programState = pBuf + sizeof(pthread_mutex_t);
+	programState = pBuf;
 }
 
 static void writeSurvivorsToBuffer(Candidate *survivors) {
@@ -258,15 +261,14 @@ void childUpdateMessages(Candidate *survivors) {
 }
 
 void safePrintf(const char* fmt, ...) {
-	pthread_mutex_t *lock = shm_lock;
-	if (lock)
-		pthread_mutex_lock(lock);
+	if (mutex)
+		WaitForSingleObject(mutex, INFINITE);
 	else if (!isParentProcess())
 		return;
 	va_list argptr;
 	va_start(argptr,fmt);
 	vprintf(fmt, argptr);
 	va_end(argptr);
-	if (lock)
-		pthread_mutex_unlock(lock);
+	if (mutex)
+		ReleaseMutex(mutex);
 }
