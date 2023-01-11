@@ -1,3 +1,4 @@
+
 # Makefile to rebuild SM64 split image
 
 include util.mk
@@ -185,7 +186,6 @@ endef
 # Main Targets                                                                 #
 #==============================================================================#
 
-default: all
 force: 
 #used to force targets to be built
 
