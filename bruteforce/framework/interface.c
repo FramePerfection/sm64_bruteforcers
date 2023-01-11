@@ -31,7 +31,6 @@ void parse_command_line_args(int argc, char *argv[]) {
 		switch (c) {
 			case 'f':
 				CopyArg(override_config_file);
-				printf("launching from %s...\n", override_config_file);
 				break;
 			case 'c':
 				CopyArg(child_args);
@@ -42,6 +41,9 @@ void parse_command_line_args(int argc, char *argv[]) {
 		}
 	}
 #undef CopyArg
+
+	if (override_config_file)
+		safePrintf("launching from %s...\n", override_config_file);
 }
 
 u8 save_to_sequence_file(char *fileName, InputSequence *inputSequence) {
