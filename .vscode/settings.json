@@ -12,5 +12,6 @@
 	},
 	"C_Cpp.codeAnalysis.exclude": {
 		"**/*.inc.c": true
-	}
+	},
+	"terminal.integrated.defaultProfile.windows": "Git Bash"
 }
