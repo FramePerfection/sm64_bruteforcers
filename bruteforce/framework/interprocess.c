@@ -60,15 +60,14 @@ static void createProcess(HANDLE readPipe, HANDLE writePipe, HANDLE hJob) {
 	STARTUPINFO si;
 	memset(&si, 0, sizeof(STARTUPINFO));
 	PROCESS_INFORMATION pi;
-	memset(&si, 0, sizeof(PROCESS_INFORMATION));
+	memset(&pi, 0, sizeof(PROCESS_INFORMATION));
 	
-	TCHAR lpszClientPath[1024] = TEXT("main.exe");
 	TCHAR lpszArgs[1024];
-	sprintf(lpszArgs, " --child=%p;%p;%p", readPipe, writePipe, hMapFile);
+	sprintf(lpszArgs, "main.exe --child=%p;%p;%p", readPipe, writePipe, hMapFile);
 	if (override_config_file != NULL)
 		sprintf(lpszArgs + strlen(lpszArgs), " --file %s --outputmode %s", override_config_file, output_mode);
 
-	if (!CreateProcess(lpszClientPath, lpszArgs, NULL, NULL, TRUE, CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi)) {
+	if (!CreateProcess(NULL, lpszArgs, NULL, NULL, TRUE, CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi)) {
 		safePrintf("Failed to launch child process. Error code %ld\n", GetLastError());
 		return;
 	}
