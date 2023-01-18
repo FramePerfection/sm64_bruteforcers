@@ -1,4 +1,3 @@
-
 # Makefile to rebuild SM64 split image
 
 include util.mk
@@ -12,7 +11,7 @@ default: all
 DEFINES :=
 
 # Optimization flag
-OPT_FLAGS := -O3
+OPT_FLAGS := -O3 -g
 
 #==============================================================================#
 # Build Options                                                                #
