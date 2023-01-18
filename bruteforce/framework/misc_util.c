@@ -7,17 +7,24 @@ f32 randFloat() {
 	return ((float)rand()/(float)(RAND_MAX));
 }
 
-void init_static_surfaces(Triangles tris) {
+static void init_surfaces(Triangles tris, u8 dynamic) {
 	u32 i;
 	for (i = 0; i < tris.data_size; i++) {
 		Triangle t = tris.data[i];
 		struct Surface *surface = gen_surface(t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3, t.surf_type);
 		if (surface != NULL)
-			add_surface(surface, FALSE);
+			add_surface(surface, dynamic);
 		else
 			safePrintf("found degenerate triangle: (%d,%d,%d),(%d,%d,%d),(%d,%d,%d)\n", t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3);
 	}
+}
 
+void init_static_surfaces(Triangles tris) {
+    init_surfaces(tris, FALSE);
+}
+
+void init_dynamic_surfaces(Triangles tris) {
+    init_surfaces(tris, TRUE);
 }
 
 struct Surface *gen_surface(s16 x1, s16 y1, s16 z1, s16 x2, s16 y2, s16 z2, s16 x3, s16 y3, s16 z3, s16 surf_type) {

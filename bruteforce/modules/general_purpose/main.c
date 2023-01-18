@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
 #include "src/engine/surface_collision.h"
 #include "src/engine/surface_load.h"
 #include "src/game/mario.h"
@@ -12,9 +15,9 @@
 #include "bruteforce/framework/m64.h"
 #include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/interface.h"
-#include <stdlib.h>
-#include "time.h"
 #include "bruteforce/framework/candidates.h"
+
+#include "perturbator.h"
 
 struct GraphNodeCamera camera;
 struct Object marioObj;
@@ -36,6 +39,11 @@ void initGame() {
 
 	gMarioState->controller = &testController;
 	gMarioState->area = &area;
+	gPlayer1Controller = &testController;
+	
+	gCurrLevelNum = 4;
+	gCurrCourseNum = 4;
+	gCurrentArea->index = 1;
 	
 	safePrintf("Loading configuration...\n");
 	if (!bf_init_states()) {
@@ -45,10 +53,13 @@ void initGame() {
 	safePrintf("m64 path is %s, %p, loaded from %s \n", bfStaticState.m64_input, &bfStaticState.m64_input[0], override_config_file);
 	
 	clear_static_surfaces();
+	clear_dynamic_surfaces();
 	init_static_surfaces(bfStaticState.static_tris);
+	init_dynamic_surfaces(bfStaticState.dynamic_tris);
 
 	// srand(bfStaticState.rnd_seed);
 	
+	init_camera(gCamera);
 	// Still required to initialize something?
 	execute_mario_action(gMarioState->marioObj);
 	update_camera(gCurrentArea->camera);
@@ -68,13 +79,23 @@ void updateGame(OSContPad *input) {
 	}
 }
 
-void perturbInput(OSContPad *input) {
-	if (bfStaticState.max_perturbation > 0 && randFloat() < bfStaticState.perturbation_chance) {
-		u16 perturb = (u16)(bfStaticState.max_perturbation);
-		u8 perturbation_x = (rand() % (2 * perturb) - perturb);
-		u8 perturbation_y = (rand() % (2 * perturb) - perturb);
-		input->stick_x = (s8)(input->stick_x + perturbation_x);
-		input->stick_y = (s8)(input->stick_y + perturbation_y);
+void perturbInput(OSContPad *input, u32 frame_idx) {
+	if (!bfStaticState.relative_frame_numbers)
+		frame_idx += bfStaticState.m64_start;
+
+	u32 i;
+	for (i = 0; i < bfStaticState.perturbators.nPerturbators; i++) {
+		Perturbator *perturbator = &bfStaticState.perturbators.perturbators[i];
+		if (frame_idx < perturbator->min_frame || frame_idx > perturbator->max_frame)
+			continue;
+
+		if (perturbator->max_perturbation > 0 && randFloat() < perturbator->perturbation_chance) {
+			u16 perturb = (u16)(perturbator->max_perturbation);
+			u8 perturbation_x = (rand() % (2 * perturb) - perturb);
+			u8 perturbation_y = (rand() % (2 * perturb) - perturb);
+			input->stick_x = (s8)(input->stick_x + perturbation_x);
+			input->stick_y = (s8)(input->stick_y + perturbation_y);
+		}
 	}
 }
 
@@ -84,6 +105,9 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 
 	if (bfStaticState.score_on_last_frame && frame_idx + 1 != candidate->sequence->count)
 		success = FALSE;
+
+	if (!bfStaticState.relative_frame_numbers)
+		frame_idx += bfStaticState.m64_start;
 
 	candidate->stats.frame_index = frame_idx;
 	candidate->score = 0.0;

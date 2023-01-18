@@ -5,18 +5,28 @@
 
 #include "types.h"
 #include "scoring_method.h"
+#include "perturbator.h"
 extern struct MarioState *gMarioState;
 extern struct Controller testController;
 extern f32 minSpeed;
+extern s16 sSwimStrength;
+extern s16 gCurrLevelNum;
+extern s16 gCurrCourseNum;
 
 #else
 
 // scoring parameters
+BF_STATIC_STATE(Boolean, relative_frame_numbers, bfStaticState.relative_frame_numbers)
 BF_STATIC_STATE(Boolean, score_on_last_frame, bfStaticState.score_on_last_frame)
 BF_STATIC_STATE(ScoringMethods, scoring_methods, bfStaticState.scoring_methods)
+BF_STATIC_STATE(Perturbators, perturbators, bfStaticState.perturbators)
 __NL__
 
+BF_STATIC_STATE(s16, level_num, gCurrLevelNum)
+BF_STATIC_STATE(s16, course_num, gCurrCourseNum)
+
 // World triangles
+BF_STATIC_STATE(Triangles, dynamic_tris, bfStaticState.dynamic_tris)
 BF_STATIC_STATE(Triangles, static_tris, bfStaticState.static_tris)
 __NL__
 

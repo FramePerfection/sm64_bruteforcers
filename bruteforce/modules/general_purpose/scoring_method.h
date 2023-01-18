@@ -2,6 +2,7 @@
 #define SCORING_METHOD_H
 
 #include <PR/ultratypes.h>
+
 #include "bruteforce/framework/candidates.h"
 #include "bruteforce/framework/json.h"
 
@@ -22,7 +23,6 @@ typedef struct ScoringMethods_s {
 void read_ScoringMethods(Json *jsonNode, ScoringMethods *target);
 
 void applyMethod(ScoringMethod *method, Candidate *candidate, u8 *success, u8 *abort);
-
 
 #undef SCORING_FUNC_IMPL
 #define PARAM_MEMBER(TYPE, MEMBER_NAME, _) TYPE MEMBER_NAME;

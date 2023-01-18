@@ -49,7 +49,7 @@ void bruteforce_loop(InputSequence *original_inputs) {
 					frames++;
 					OSContPad *currentInput = &inputs->inputs[frame_idx];
 					if (!keepOriginal)
-						perturbInput(currentInput);
+						perturbInput(currentInput, frame_idx);
 					updateGame(currentInput);
 					if (!updateScore(candidate, frame_idx))
 						break;

@@ -64,6 +64,12 @@ BF_DYNAMIC_VEC3(camera_lakitu_goal_focus, gLakituState.goalFocus)
 BF_DYNAMIC_VEC3(camera_lakitu_goal_pos, gLakituState.goalPos)
 BF_DYNAMIC_STATE(u8, camera_lakitu_mode, gLakituState.mode)
 BF_DYNAMIC_STATE(u8, camera_lakitu_def_mode, gLakituState.defMode)
+BF_DYNAMIC_STATE(f32, camera_lakitu_foc_hspeed, gLakituState.focHSpeed)
+BF_DYNAMIC_STATE(f32, camera_lakitu_foc_vspeed, gLakituState.focVSpeed)
+BF_DYNAMIC_STATE(f32, camera_lakitu_pos_hspeed, gLakituState.posHSpeed)
+BF_DYNAMIC_STATE(f32, camera_lakitu_pos_vspeed, gLakituState.posVSpeed)
+BF_DYNAMIC_STATE(s16, camera_lakitu_yaw, gLakituState.yaw)
+BF_DYNAMIC_STATE(s16, camera_lakitu_next_yaw, gLakituState.nextYaw)
 __NL__
 
 BF_DYNAMIC_STATE(s16, camera_area_yaw, sAreaYaw)

@@ -73,7 +73,7 @@ void updateGame(OSContPad *input) {
 	}
 }
 
-void perturbInput(OSContPad *input) {
+void perturbInput(OSContPad *input, u32 frame_idx) {
 	if (bfStaticState.max_perturbation > 0 && randFloat() < bfStaticState.perturbation_chance) {
 		u16 perturb = (u16)(bfStaticState.max_perturbation);
 		u8 perturbation_x = (rand() % (2 * perturb) - perturb);
@@ -89,7 +89,7 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 		candidate->stats.hSpeed = INFINITY;
 		return FALSE;
 	}
-	if (frame_idx == bfStaticState.scoring_frame ) {
+	if (frame_idx + 1 == bfStaticState.scoring_frame ) {
 		f64 score = gMarioStates->forwardVel;
 		s16 dYaw = gMarioState->faceAngle[1] - bfStaticState.target_angle;
 		if (dYaw < 0)

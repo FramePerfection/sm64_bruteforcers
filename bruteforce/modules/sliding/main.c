@@ -67,7 +67,7 @@ void updateGame(OSContPad *input) {
 	}
 }
 
-void perturbInput(OSContPad *input) {
+void perturbInput(OSContPad *input, u32 frame_idx) {
 	if (bfStaticState.max_perturbation > 0 && randFloat() < bfStaticState.perturbation_chance) {
 		u16 perturb = (u16)(bfStaticState.max_perturbation);
 		u8 perturbation_x = (rand() % (2 * perturb) - perturb);

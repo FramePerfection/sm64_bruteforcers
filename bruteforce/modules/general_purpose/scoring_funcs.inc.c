@@ -23,6 +23,11 @@ SCORING_FUNC(MaximizeHSpeed)
 	PARAM_MEMBER(u32, action, "Mario's action to check against") 
 SCORING_FUNC(CheckAction)
 
+#define PARAM_MEMBERS_CheckWall \
+	PARAM_MEMBER(u32, wall, "Mario's wall reference to check against") \
+	PARAM_MEMBER(Boolean, invert, "Whether to invert result of this check")
+SCORING_FUNC(CheckWall)
+
 #define PARAM_MEMBERS_RestrictAngle \
 	PARAM_MEMBER(s16, angle, "Mario's angle to check against") \
 	PARAM_MEMBER(s16, margin, "The margin of error within which Mario's angle will be accepted")
@@ -56,6 +61,15 @@ f64 sm_CheckAction(CheckActionParameters args, Candidate *candidate, u8 *success
 	u8 matchAction = gMarioState->action == args->action;
 	*abort = !matchAction;
 	*success = matchAction;
+	if (!*success)
+		return -INFINITY;
+	return 0;
+}
+
+f64 sm_CheckWall(CheckWallParameters args, Candidate *candidate, u8 *success, u8 *abort) {
+	u8 matchWall = (gMarioState->wall == args->wall) ^ args->invert;
+	*abort = !matchWall;
+	*success = matchWall;
 	if (!*success)
 		return -INFINITY;
 	return 0;
