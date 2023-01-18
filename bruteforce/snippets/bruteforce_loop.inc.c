@@ -1,13 +1,14 @@
 #include <time.h>
 
 void bruteforce_loop(InputSequence *original_inputs) {
+	
 	Candidate *survivors;
 	Candidate *best;
 	initCandidates(original_inputs, &survivors);
 	initCandidates(original_inputs, &best);
 	
 	clock_t lastClock = clock();
-
+	printf("%f, %f, %f, %f, %i\n", gMarioState->pos[0], gMarioState->pos[1], gMarioState->pos[2], gMarioState->forwardVel, gMarioState->faceAngle[1]);
 	u32 gen_merge_mod = bfStaticState.merge_interval;
 	if (gen_merge_mod == 0)
 		gen_merge_mod = 20;
@@ -15,14 +16,20 @@ void bruteforce_loop(InputSequence *original_inputs) {
 	u32 frames = 0;
 	u32 gen;
 	for (gen = 0; gen < bfStaticState.max_generations; gen++) {
+
 		clock_t curClock = clock();
 		float seconds = (float)(curClock - lastClock) / CLOCKS_PER_SEC;
+		if (gen == 1) {
+			printf("%f, %f, %f, %f, %i\n", gMarioState->pos[0], gMarioState->pos[1], gMarioState->pos[2], gMarioState->forwardVel, gMarioState->faceAngle[1]);
+		}
 		if (seconds >= bfStaticState.print_interval)
 		{
 			float fps = frames / seconds;
 			lastClock = curClock;
 			safePrintf("Generation %d starting... (%f FPS) (Best score: %f)\n", gen, fps, programState->bestScore);
+			printf("%f, %f, %f, %f, %i\n", gMarioState->pos[0], gMarioState->pos[1], gMarioState->pos[2], gMarioState->forwardVel, gMarioState->faceAngle[1]);
 			frames = 0;
+			
 		}
 
 		// perform all runs
