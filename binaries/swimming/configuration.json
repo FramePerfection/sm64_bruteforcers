@@ -1,14 +1,14 @@
 {
-	"m64_start": 2198,
+	"m64_start": 2199,
 	"m64_input": "secret.m64",
 	"m64_output": "secret.a.m64",
-	"m64_count": 25,
-	"scoring_frame": 2278,
+	"m64_count": 400,
+	"scoring_frame": 400,
 	
 	"max_processes": 1,
 	"rnd_seed": 2141,
 	"max_perturbation": 4,
-	"perturbation_chance": 0.25,
+	"perturbation_chance": 0.0,
 	"runs_per_survivor": 400,
 	"survivors_per_generation": 25,
 	"max_generations": 1000000,
@@ -20,7 +20,7 @@
 	
 	"swimming_action": "0x380022C0",
 	"swimming_start_frame": 0,
-	"swim_strength": 280,
+	"swim_strength": 160,
 	"target_action": "0x300024D0",
 	"mario_health": "0x0880",
 	"target_angle": 19376,
@@ -28,7 +28,7 @@
 	"min_speed": 8,
 	
 	"mario_x": 0,
-	"mario_y": -1533,
+	"mario_y": -1535,
 	"mario_z": 0,
 	"mario_vel_x": 0,
 	"mario_vel_y": 0,
@@ -36,15 +36,12 @@
 	"mario_h_speed": 0,
 	"mario_action": "0x380022C0",
 	"mario_previous_action": "0x00001300",
+	"mario_action_arg": 0,
+	"mario_action_timer": 0,
 	"mario_yaw_facing": 16384,
-	
 	"yaw_velocity": 0,
 	"pitch": 0,
 	"pitch_velocity": 0,
-	"mario_slide_yaw": 0,
-	"mario_yaw_intended": 0,
-	"dyaw_intend-face": 0,
-	"dyaw_intend-back": 0,
 
 	"environment_regions": [1, 0, -3173, -3173, 3174, 3174, 102],
 	"static_tris": 
