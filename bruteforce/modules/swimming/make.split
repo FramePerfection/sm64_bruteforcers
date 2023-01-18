@@ -1,0 +1,8 @@
+NAME := swimming
+
+$(NAME)REQUIRED_OBJECTS := bruteforce/modules/$(NAME)/main.o
+$(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/,$(NAME)/candidates.o $(NAME)/bf_states.o $(NAME)/interprocess.o)
+$(NAME)REQUIRED_OBJECTS += $(addprefix src/engine/,math_util.o surface_collision.o surface_load_reduced.o)
+$(NAME)REQUIRED_OBJECTS += $(addprefix src/game/,camera_reduced.o $(MARIO_STEP_OBJECTS))
+
+$(eval $(call register-module))
