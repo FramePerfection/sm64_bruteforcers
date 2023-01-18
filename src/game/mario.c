@@ -1434,7 +1434,7 @@ void update_mario_inputs(struct MarioState *m) {
 /**
  * Set's the camera preset for submerged action behaviors.
  */
-void set_submerged_cam_preset_and_spawn_bubbles(struct MarioState *m) {
+__attribute__((weak)) void set_submerged_cam_preset_and_spawn_bubbles(struct MarioState *m) {
     f32 heightBelowWater;
     s16 camPreset;
 
@@ -1531,7 +1531,7 @@ void update_mario_health(struct MarioState *m) {
 /**
  * Updates some basic info for camera usage.
  */
-void update_mario_info_for_cam(struct MarioState *m) {
+__attribute__((weak)) void update_mario_info_for_cam(struct MarioState *m) {
     m->marioBodyState->action = m->action;
     m->statusForCamera->action = m->action;
 
