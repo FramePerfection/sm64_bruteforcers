@@ -25,13 +25,13 @@ BF_STATIC_STATE(s16, target_angle_margin, bfStaticState.target_angle_margin)
 BF_STATIC_STATE(s16, min_speed, minSpeed)
 __NL__
 
-// World triangles
+// World triangles and configuration
 BF_STATIC_STATE(Triangles, static_tris, bfStaticState.static_tris)
+BF_STATIC_STATE(Coins, coins, bfStaticState.coins)
 __NL__
 
 BF_DYNAMIC_STATE(u16, initial_button_state, testController.buttonDown)
 __NL__
-BF_STATIC_STATE(Coins, coins, bfStaticState.coins)
 // Mario
 BF_DYNAMIC_STATE(s16, mario_health, gMarioState->health)
 BF_DYNAMIC_STATE(s16, swim_strength, sSwimStrength)
