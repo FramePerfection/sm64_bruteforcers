@@ -7,7 +7,6 @@
 extern struct MarioState *gMarioState;
 extern s16 sSwimStrength;
 extern s16 *gEnvironmentRegions;
-extern struct Controller testController;
 extern f32 minSpeed;
 
 #else
@@ -25,9 +24,6 @@ __NL__
 
 // World triangles
 BF_STATIC_STATE(Triangles, static_tris, bfStaticState.static_tris)
-__NL__
-
-BF_DYNAMIC_STATE(u16, initial_button_state, testController.buttonDown)
 __NL__
 
 // Mario
