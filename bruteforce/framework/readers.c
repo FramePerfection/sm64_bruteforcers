@@ -96,3 +96,25 @@ void read_EnvironmentRegions(Json *jsonNode, EnvironmentRegions *target) {
 		n = n->next;
 	}
 }
+
+void read_Coins(Json *jsonNode, Coins *target) {
+	Json *triNode = jsonNode->child;
+	target->data_size = jsonNode->size;
+	target->data = calloc(target->data_size, sizeof(Triangle));
+	u32 i = 0;
+	while (triNode != NULL) {
+		Json *vertNode = triNode->child;
+		#define ADVANCE \
+			(s16)vertNode->valueInt; \
+			vertNode = vertNode->next;
+		
+		target->data[i].x = ADVANCE
+		target->data[i].y = ADVANCE
+		target->data[i].z = ADVANCE
+
+		i++;
+		triNode = triNode->next;
+
+		#undef ADVANCE
+	}
+}

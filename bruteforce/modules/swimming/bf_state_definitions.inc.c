@@ -13,6 +13,8 @@ extern f32 minSpeed;
 #else
 
 BF_STATIC_STATE(EnvironmentRegions, environment_regions, gEnvironmentRegions)
+
+
 // scoring parameters
 BF_STATIC_STATE(u32, swimming_action, bfStaticState.swimming_action)
 BF_STATIC_STATE(u32, swimming_start_frame, bfStaticState.swimming_start_frame)
@@ -29,7 +31,7 @@ __NL__
 
 BF_DYNAMIC_STATE(u16, initial_button_state, testController.buttonDown)
 __NL__
-
+BF_STATIC_STATE(Coins, coins, bfStaticState.coins)
 // Mario
 BF_DYNAMIC_STATE(s16, mario_health, gMarioState->health)
 BF_DYNAMIC_STATE(s16, swim_strength, sSwimStrength)
