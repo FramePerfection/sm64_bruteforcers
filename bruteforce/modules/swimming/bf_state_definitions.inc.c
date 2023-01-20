@@ -12,6 +12,8 @@ extern f32 minSpeed;
 #else
 
 BF_STATIC_STATE(EnvironmentRegions, environment_regions, gEnvironmentRegions)
+
+
 // scoring parameters
 BF_STATIC_STATE(u32, swimming_action, bfStaticState.swimming_action)
 BF_STATIC_STATE(u32, swimming_start_frame, bfStaticState.swimming_start_frame)
@@ -22,8 +24,9 @@ BF_STATIC_STATE(s16, target_angle_margin, bfStaticState.target_angle_margin)
 BF_STATIC_STATE(s16, min_speed, minSpeed)
 __NL__
 
-// World triangles
+// World triangles and configuration
 BF_STATIC_STATE(Triangles, static_tris, bfStaticState.static_tris)
+BF_STATIC_STATE(Coins, coins, bfStaticState.coins)
 __NL__
 
 // Mario
