@@ -21,7 +21,7 @@
 #define MIN_SWIM_SPEED 16.0f
 
 static s16 sWasAtSurface = FALSE;
-// _EDIT_ make global to access from BF_DYNAMIC_STATE
+// _EDIT_ make sSwimStrength global to access from BF_DYNAMIC_STATE
 s16 sSwimStrength = MIN_SWIM_STRENGTH;
 static s16 sWaterCurrentSpeeds[] = { 28, 12, 8, 4 };
 

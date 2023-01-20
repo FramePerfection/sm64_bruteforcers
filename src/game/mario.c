@@ -1738,7 +1738,7 @@ s32 execute_mario_action(UNUSED struct Object *o) {
         // The function can loop through many action shifts in one frame,
         // which can lead to unexpected sub-frame behavior. Could potentially hang
         // if a loop of actions were found, but there has not been a situation found.
-        // _EDIT_ implement only 3 action groups
+        // _EDIT_ disable mario_execute_cutscene_action, mario_execute_automatic_action, mario_execute_object_action
 #define NOT_IMPL desync("action group not implemented\n"); inLoop = FALSE; break;
 
         while (inLoop) {

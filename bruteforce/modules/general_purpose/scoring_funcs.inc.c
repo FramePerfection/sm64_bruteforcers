@@ -5,8 +5,8 @@
 	PARAM_MEMBER(<type_1>, <name_1>, <comment_1>) \
 	PARAM_MEMBER(<type_2>, <name_2>, <comment_2>) \
 	...
-	PARAM_MEMBER(<type_n>, <name_n>, <comment_n>) \
-SCORING_FUNC(<function name>)
+	PARAM_MEMBER(<type_n>, <name_n>, <comment_n>)
+SCORING_FUNC(<function_name>)
 
 implementation must look as follows:
 f64 sm_<function_name>(<function_name>Parameters args, Candidate *candidate, u8 *success, u8 *abort) { ... }
