@@ -29,8 +29,17 @@ typedef struct Triangles {
 	Triangle* data;
 } Triangles;
 
-void read_Triangles(Json*, Triangles*);
 
+typedef struct Coin {
+	s16 x, y, z;
+} Coin;
+typedef struct Coins {
+	u32 data_size;
+	Coin* data;
+} Coins;
+
+void read_Triangles(Json*, Triangles*);
+void read_Coins(Json*, Coins*);
 typedef s16* EnvironmentRegions;
 
 void read_EnvironmentRegions(Json*, EnvironmentRegions*);
