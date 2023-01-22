@@ -4,6 +4,7 @@
 #include "bruteforce/framework/readers.h"
 #include "bruteforce/framework/bf_states.h"
 #include "bruteforce/framework/json.h"
+#include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/interface.h"
 
 #define BF_STATE_INCLUDE
