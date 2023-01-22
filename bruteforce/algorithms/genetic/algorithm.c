@@ -44,9 +44,9 @@ void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc upda
 
 				u8 keepOriginal = run_idx == 0 && (randFloat() > bfStaticState.forget_rate);
 
-				testController.buttonDown = inputs->originalInput.button;
-				testController.rawStickX = inputs->originalInput.stick_x;
-				testController.rawStickY = inputs->originalInput.stick_y;
+				gPlayer1Controller->buttonDown = inputs->originalInput.button;
+				gPlayer1Controller->rawStickX = inputs->originalInput.stick_x;
+				gPlayer1Controller->rawStickY = inputs->originalInput.stick_y;
 				bf_load_dynamic_state(&bfInitialDynamicState);
 
 				u32 frame_idx;
