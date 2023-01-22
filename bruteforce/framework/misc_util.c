@@ -1,7 +1,13 @@
+#include <stdlib.h>
+
+#include "src/engine/math_util.h"
+#include "src/game/area.h"
+#include "src/game/camera.h"
+#include "src/game/game_init.h"
+#include "src/game/level_update.h"
+
 #include "bruteforce/framework/misc_util.h"
 #include "bruteforce/framework/interprocess.h"
-
-#include <stdlib.h>
 
 f32 randFloat() {
 	return ((float)rand()/(float)(RAND_MAX));
@@ -165,4 +171,32 @@ void adjust_analog_stick(struct Controller *controller) {
         controller->stickY *= 64 / controller->stickMag;
         controller->stickMag = 64;
     }
+}
+
+void initCamera() {
+	static struct GraphNodeCamera camera;
+	gCamera = &camera.config.camera;
+	create_camera(&camera, NULL);
+}
+
+void initArea() {
+	gCurrentArea = calloc(1, sizeof(struct Area));
+	gCurrentArea->camera = gCamera;
+	gCurrentArea->index = 1;
+}
+
+void initMario() {
+	gMarioState->marioObj = calloc(1, sizeof(struct Object));
+	init_graph_node_object(NULL, &gMarioState->marioObj, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
+	gMarioState->marioBodyState = calloc(1, sizeof(struct MarioBodyState));
+	gMarioState->statusForCamera = &gPlayerCameraState[0];
+	gMarioState->controller = gPlayer1Controller = calloc(1, sizeof(OSContPad));
+	gMarioState->area = gCurrentArea;
+}
+
+void updateController(OSContPad *input) {
+	gPlayer1Controller->rawStickX = input->stick_x;
+	gPlayer1Controller->rawStickY = input->stick_y;
+	gPlayer1Controller->buttonPressed = input->button & (input->button ^ gPlayer1Controller->buttonDown);
+	gPlayer1Controller->buttonDown = input->button;
 }

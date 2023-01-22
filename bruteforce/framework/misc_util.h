@@ -19,4 +19,9 @@ void init_dynamic_surfaces(Triangles tris);
 struct Surface *gen_surface(s16 x1, s16 y1, s16 z1, s16 x2, s16 y2, s16 z2, s16 x3, s16 y3, s16 z3, s16 surf_type);
 void adjust_analog_stick(struct Controller *controller);
 
+void intiCamera();
+void initArea();
+void initMario();
+void updateController(OSContPad *input);
+
 #endif // MISC_UTIL_H
