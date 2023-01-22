@@ -25,7 +25,7 @@ SCORING_FUNC(CheckAction)
 
 #define PARAM_MEMBERS_CheckWall \
 	PARAM_MEMBER(u32, wall, "Mario's wall reference to check against") \
-	PARAM_MEMBER(Boolean, invert, "Whether to invert result of this check")
+	PARAM_MEMBER(boolean, invert, "Whether to invert result of this check")
 SCORING_FUNC(CheckWall)
 
 #define PARAM_MEMBERS_RestrictAngle \
@@ -37,7 +37,7 @@ SCORING_FUNC(RestrictAngle)
 	PARAM_MEMBER(f64, nx, "The plane normal's x component") \
 	PARAM_MEMBER(f64, nz, "The plane normal's z component") \
 	PARAM_MEMBER(f64, d, "The plane's offset value") \
-	PARAM_MEMBER(Boolean, approach, "Determines whether a score should be computed for getting close to the restriction plane")
+	PARAM_MEMBER(boolean, approach, "Determines whether a score should be computed for getting close to the restriction plane")
 SCORING_FUNC(RestrictHPosition)
 
 #define PARAM_MEMBERS_RestrictHDist \

@@ -1,5 +1,6 @@
 #include "bruteforce/common_states/bf_state_definitions_camera.inc.c"
 #include "bruteforce/common_states/bf_state_definitions_common.inc.c"
+#include "bruteforce/algorithms/genetic/bf_state_definitions_genetic.inc.c"
 
 #ifdef BF_STATE_INCLUDE
 
@@ -16,8 +17,8 @@ extern s16 gCurrCourseNum;
 #else
 
 // scoring parameters
-BF_STATIC_STATE(Boolean, relative_frame_numbers, bfStaticState.relative_frame_numbers)
-BF_STATIC_STATE(Boolean, score_on_last_frame, bfStaticState.score_on_last_frame)
+BF_STATIC_STATE(boolean, relative_frame_numbers, bfStaticState.relative_frame_numbers)
+BF_STATIC_STATE(boolean, score_on_last_frame, bfStaticState.score_on_last_frame)
 BF_STATIC_STATE(ScoringMethods, scoring_methods, bfStaticState.scoring_methods)
 BF_STATIC_STATE(Perturbators, perturbators, bfStaticState.perturbators)
 __NL__

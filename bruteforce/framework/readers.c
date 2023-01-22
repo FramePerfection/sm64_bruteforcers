@@ -32,7 +32,7 @@ void read_string(Json *jsonNode, string *target) {
 	*target = strdup(jsonNode->valueString);
 }
 
-void read_Boolean(Json *jsonNode, Boolean *target) {
+void read_boolean(Json *jsonNode, boolean *target) {
 	if (jsonNode->type == Json_String) {
 		char *p = jsonNode->valueString;
 		for ( ; *p; ++p) *p = tolower(*p);

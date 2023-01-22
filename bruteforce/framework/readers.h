@@ -1,12 +1,13 @@
 #ifndef READERS_H
 #define READERS_H
 
-#include "bruteforce/framework/json.h"
 #include <PR/ultratypes.h>
-#include "types.h"
 
-typedef char* string;
-typedef u8 Boolean;
+#include "bruteforce/framework/types.h"
+#include "bruteforce/framework/json.h"
+
+#include "include/types.h"
+
 void read_s32(Json*, s32*);
 void read_s16(Json*, s16*);
 void read_u32(Json*, u32*);
@@ -15,7 +16,7 @@ void read_u8(Json*, u8*);
 void read_f32(Json*, f32*);
 void read_f64(Json*, f64*);
 void read_string(Json*, string*);
-void read_Boolean(Json*, Boolean*);
+void read_boolean(Json*, boolean*);
 
 typedef struct Triangle {
 	s16 x1, y1, z1;
