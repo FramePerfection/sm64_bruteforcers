@@ -21,8 +21,12 @@ endef
 # Returns the path to the command $(1) if exists. Otherwise returns an empty string.
 find-command = $(shell which $(1) 2>/dev/null)
 
+# List of bruteforcing algorithms
+ALGORITHMS := genetic
+
 # List of o files compiled from the same source, but into different module directories, and their dependencies, separated by <o-file>?<dependency>
-SPECIAL_O := bf_states?bf_state_definitions.inc.c candidates?state.h interprocess?state.h
+SPECIAL_O := $(addprefix framework/,bf_states?bf_state_definitions.inc.c candidates?state.h interprocess?state.h)
+SPECIAL_O += $(foreach a,$(ALGORITHMS),algorithms/$(a)/algorithm?state.h)
 
 MARIO_STEP_OBJECTS := mario_step.o mario.o mario_actions_airborne.o mario_actions_moving.o mario_actions_stationary.o mario_actions_submerged.o
 
@@ -32,9 +36,9 @@ word-dot = $(word $2,$(subst ?, ,$1))
 define special
 $(eval _2 := $(call word-dot,$2,1))
 $(eval _3 := $(call word-dot,$2,2))
-$(BUILD_DIR)/bruteforce/$(1)/$(_2).o: bruteforce/framework/$(_2).c bruteforce/modules/$(1)/$(_3)
-	$(call print,$(MODULE_PATH),,)
-	$(call print,Compiling:,$$<,$$@)
+$(shell mkdir -p $(dir $(BUILD_DIR)/bruteforce/$(1)/$(_2)))
+$(BUILD_DIR)/bruteforce/$(1)/$(_2).o: bruteforce/$(_2).c bruteforce/modules/$(1)/$(_3)
+	$(call print,Compiling special:,$$<,$$@)
 	$(CC_CHECK) $(CC_CHECK_CFLAGS) -DMODULE_PATH=$(1) -MMD -MP -MT $$@ -MF $(BUILD_DIR)/bruteforce/$(1)/$(_2).d $$<
 	$(V)$(CC) -c $(CFLAGS) -DMODULE_PATH=$(1) -o $$@ $$<
 endef

@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+
 #include "src/engine/surface_collision.h"
 #include "src/engine/surface_load.h"
 #include "src/game/mario.h"
@@ -7,14 +9,15 @@
 #include "src/game/area.h"
 #include "src/game/camera.h"
 #include "src/game/game_init.h"
+
 #include "bruteforce/framework/misc_util.h"
 #include "bruteforce/framework/bf_states.h"
 #include "bruteforce/framework/m64.h"
 #include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/interface.h"
-#include <stdlib.h>
-#include "time.h"
 #include "bruteforce/framework/candidates.h"
+
+#include "bruteforce/algorithms/genetic/algorithm.h"
 
 struct GraphNodeCamera camera;
 struct Object marioObj;
@@ -23,13 +26,11 @@ struct MarioBodyState marioBodyState;
 struct Controller testController;
 f32 minSpeed;
 
-void set_submerged_cam_preset_and_spawn_bubbles(struct MarioState *m64_output) {
-    //safePrintf("This is going to print instead!\n");
-}
-void update_mario_info_for_cam(struct MarioState *m64_output) {
-   // safePrintf("This is going to print instead!\n");
-}
-void initGame() {
+// Stubs that override __attribute__((weak)) functions to prevent null camera crashes
+void set_submerged_cam_preset_and_spawn_bubbles(struct MarioState *m) { }
+void update_mario_info_for_cam(struct MarioState *m) { }
+
+static void initGame() {
 	gCamera = &camera;
 	gCurrentArea = &area;
 	init_graph_node_object(NULL, &marioObj, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
@@ -59,7 +60,7 @@ void initGame() {
 	//update_camera(gCurrentArea->camera);
 }
 
-void updateGame(OSContPad *input) {
+static void updateGame(OSContPad *input) {
 	testController.rawStickX = input->stick_x;
 	testController.rawStickY = input->stick_y;
 	testController.buttonPressed = input->button
@@ -73,7 +74,7 @@ void updateGame(OSContPad *input) {
 	}
 }
 
-void perturbInput(OSContPad *input, u32 frame_idx) {
+static void perturbInput(OSContPad *input, u32 frame_idx) {
 	if (bfStaticState.max_perturbation > 0 && randFloat() < bfStaticState.perturbation_chance) {
 		u16 perturb = (u16)(bfStaticState.max_perturbation);
 		u8 perturbation_x = (rand() % (2 * perturb) - perturb);
@@ -83,11 +84,13 @@ void perturbInput(OSContPad *input, u32 frame_idx) {
 	}
 }
 
-u8 updateScore(Candidate *candidate, u32 frame_idx) {
+static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort) {
+	*abort = FALSE;
 	if (frame_idx == bfStaticState.swimming_start_frame && !(gMarioState->action & 0x0C0)) {
 		candidate->score = INFINITY;
 		candidate->stats.hSpeed = INFINITY;
-		return FALSE;
+		*abort = TRUE;
+		return;
 	}
 	if (frame_idx + 1 == bfStaticState.scoring_frame ) {
 		f64 score = gMarioStates->forwardVel;
@@ -110,10 +113,7 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 			safePrintf("New best: %f\n", gMarioState->forwardVel);
 		}
 	}
-	return TRUE;
 }
-
-#include "bruteforce/snippets/bruteforce_loop.inc.c"
 
 void main(int argc, char *argv[]) {
 	parse_command_line_args(argc, argv);
@@ -138,5 +138,5 @@ void main(int argc, char *argv[]) {
 	
 	programState->bestScore = minSpeed;
 	
-	bruteforce_loop(original_inputs);
+	bruteforce_loop_genetic(original_inputs, &updateGame, &perturbInput, &updateScore);
 }

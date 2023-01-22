@@ -10,12 +10,15 @@
 #include "src/game/area.h"
 #include "src/game/camera.h"
 #include "src/game/game_init.h"
+
 #include "bruteforce/framework/misc_util.h"
 #include "bruteforce/framework/bf_states.h"
 #include "bruteforce/framework/m64.h"
 #include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/interface.h"
 #include "bruteforce/framework/candidates.h"
+
+#include "bruteforce/algorithms/genetic/algorithm.h"
 
 #include "perturbator.h"
 
@@ -26,7 +29,7 @@ struct MarioBodyState marioBodyState;
 struct Controller testController;
 f32 minSpeed;
 
-void initGame() {
+static void initGame() {
 	gCamera = &camera;
 	gCurrentArea = &area;
 	init_graph_node_object(NULL, &marioObj, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
@@ -65,7 +68,7 @@ void initGame() {
 	update_camera(gCurrentArea->camera);
 }
 
-void updateGame(OSContPad *input) {
+static void updateGame(OSContPad *input) {
 	testController.rawStickX = input->stick_x;
 	testController.rawStickY = input->stick_y;
 	testController.buttonPressed = input->button
@@ -79,7 +82,7 @@ void updateGame(OSContPad *input) {
 	}
 }
 
-void perturbInput(OSContPad *input, u32 frame_idx) {
+static void perturbInput(OSContPad *input, u32 frame_idx) {
 	if (!bfStaticState.relative_frame_numbers)
 		frame_idx += bfStaticState.m64_start;
 
@@ -99,7 +102,8 @@ void perturbInput(OSContPad *input, u32 frame_idx) {
 	}
 }
 
-u8 updateScore(Candidate *candidate, u32 frame_idx) {
+static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort) {
+	*abort = FALSE;
 	u8 success = TRUE;
 	u32 i;
 
@@ -113,10 +117,8 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 	candidate->score = 0.0;
 	for (i = 0; i < bfStaticState.scoring_methods.n_methods; i++) 
 		if (bfStaticState.scoring_methods.methods[i].frame == frame_idx + 1) {
-			u8 abort = FALSE;
-			applyMethod(&bfStaticState.scoring_methods.methods[i], candidate, &success, &abort);
-			if (abort)
-				return FALSE;
+			applyMethod(&bfStaticState.scoring_methods.methods[i], candidate, &success, abort);
+			if (abort) return;
 		}
 
 	u8 best = success && candidate->score > programState->bestScore;
@@ -125,11 +127,7 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 		output_input_sequence(candidate->sequence);
 		safePrintf("New best: %f\n", candidate->score);
 	}
-
-	return TRUE;
 }
-
-#include "bruteforce/snippets/bruteforce_loop.inc.c"
 
 void main(int argc, char *argv[]) {
 	parse_command_line_args(argc, argv);
@@ -149,5 +147,5 @@ void main(int argc, char *argv[]) {
 	if (isParentProcess())
 		programState->bestScore = -INFINITY;
 
-	bruteforce_loop(original_inputs);
+	bruteforce_loop_genetic(original_inputs, &updateGame, &perturbInput, &updateScore);
 }
