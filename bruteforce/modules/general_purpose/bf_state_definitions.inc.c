@@ -8,7 +8,6 @@
 #include "scoring_method.h"
 #include "perturbator.h"
 extern struct MarioState *gMarioState;
-extern struct Controller testController;
 extern f32 minSpeed;
 extern s16 sSwimStrength;
 extern s16 gCurrLevelNum;

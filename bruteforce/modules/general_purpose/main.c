@@ -22,31 +22,10 @@
 
 #include "perturbator.h"
 
-struct GraphNodeCamera camera;
-struct Object marioObj;
-struct Area area;
-struct MarioBodyState marioBodyState;
-struct Controller testController;
-f32 minSpeed;
-
 static void initGame() {
-	gCamera = &camera;
-	gCurrentArea = &area;
-	init_graph_node_object(NULL, &marioObj, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
-	create_camera(&camera, NULL);
-	gCurrentArea->camera = camera.config.camera;
-
-	gMarioState->marioObj = &marioObj;
-	gMarioState->marioBodyState = &marioBodyState;
-	gMarioState->statusForCamera = &gPlayerCameraState[0];
-
-	gMarioState->controller = &testController;
-	gMarioState->area = &area;
-	gPlayer1Controller = &testController;
-	
-	gCurrLevelNum = 4;
-	gCurrCourseNum = 4;
-	gCurrentArea->index = 1;
+	initCamera();
+	initArea();
+	initMario();
 	
 	safePrintf("Loading configuration...\n");
 	if (!bf_init_states()) {
@@ -69,13 +48,8 @@ static void initGame() {
 }
 
 static void updateGame(OSContPad *input) {
-	testController.rawStickX = input->stick_x;
-	testController.rawStickY = input->stick_y;
-	testController.buttonPressed = input->button
-								& (input->button ^ testController.buttonDown);
-	testController.buttonDown = input->button;
-
-	adjust_analog_stick(&testController);
+	updateController(input);
+	adjust_analog_stick(gPlayer1Controller);
 	execute_mario_action(gMarioState->marioObj);
 	if (gCurrentArea != NULL) {
 		update_camera(gCurrentArea->camera);
