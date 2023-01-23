@@ -187,7 +187,7 @@ void initArea() {
 
 void initMario() {
 	gMarioState->marioObj = calloc(1, sizeof(struct Object));
-	init_graph_node_object(NULL, &gMarioState->marioObj, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
+	init_graph_node_object(NULL, gMarioState->marioObj, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
 	gMarioState->marioBodyState = calloc(1, sizeof(struct MarioBodyState));
 	gMarioState->statusForCamera = &gPlayerCameraState[0];
 	gMarioState->controller = gPlayer1Controller = calloc(1, sizeof(OSContPad));
