@@ -1,7 +1,6 @@
+#Makefile to build bruteforcer modules and configure build chain
+
 BUILD_CHAIN := .buildchain/
-
-
-# Makefile to rebuild SM64 split image
 
 include $(BUILD_CHAIN)util.mk
 
