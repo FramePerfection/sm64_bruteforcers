@@ -6,7 +6,6 @@
 
 #include "types.h"
 extern struct MarioState *gMarioState;
-extern struct Controller testController;
 extern f32 minSpeed;
 
 #else

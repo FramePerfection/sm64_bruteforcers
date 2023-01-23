@@ -1,4 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
 #include "src/engine/surface_collision.h"
 #include "src/engine/surface_load.h"
 #include "src/game/mario.h"
@@ -7,21 +11,14 @@
 #include "src/game/area.h"
 #include "src/game/camera.h"
 #include "src/game/game_init.h"
+
 #include "bruteforce/framework/misc_util.h"
 #include "bruteforce/framework/bf_states.h"
 #include "bruteforce/framework/m64.h"
 #include "bruteforce/framework/interface.h"
 #include "bruteforce/framework/interprocess.h"
-#include <stdlib.h>
-#include "time.h"
 #include "bruteforce/framework/candidates.h"
-#include <string.h>
 
-struct GraphNodeCamera camera;
-struct Object marioObj;
-struct Area area;
-struct MarioBodyState marioBodyState;
-struct Controller testController;
 f32 minSpeed;
 
 InputSequence *original_inputs;
@@ -31,18 +28,9 @@ Candidate *best;
 extern Vec3f last_q_step, last_q_step2;
 
 void initGame(char* override_config_file) {
-	gCamera = &camera;
-	gCurrentArea = &area;
-	init_graph_node_object(NULL, &marioObj, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
-	create_camera(&camera, NULL);
-	gCurrentArea->camera = camera.config.camera;
-
-	gMarioState->marioObj = &marioObj;
-	gMarioState->marioBodyState = &marioBodyState;
-	gMarioState->statusForCamera = &gPlayerCameraState[0];
-
-	gMarioState->controller = &testController;
-	gMarioState->area = &area;
+	initCamera();
+	initArea();
+	initMario();
 	
 	safePrintf("Loading configuration...\n");
 	if (!bf_init_states()) {
@@ -55,21 +43,11 @@ void initGame(char* override_config_file) {
 
 	time_t t;
 	srand((unsigned) time(&t));
-	//srand(bfStaticState.rnd_seed);
-	
-	// Still required to initialize something?
-	execute_mario_action(gMarioState->marioObj);
-	update_camera(gCurrentArea->camera);
 }
 
 void updateGame(OSContPad *input) {
-	testController.rawStickX = input->stick_x;
-	testController.rawStickY = input->stick_y;
-	testController.buttonPressed = input->button
-								& (input->button ^ testController.buttonDown);
-	testController.buttonDown = input->button;
-
-	adjust_analog_stick(&testController);
+	updateController(input);
+	adjust_analog_stick(gPlayer1Controller);
 	execute_mario_action(gMarioState->marioObj);
 	if (gCurrentArea != NULL) {
 		update_camera(gCurrentArea->camera);
@@ -144,9 +122,9 @@ void bruteforceLoop() {
 				u8 keepOriginal = run_idx == 0 && (randFloat() > bfStaticState.forget_rate);
 				
 				bf_load_dynamic_state(&bfInitialDynamicState);
-				testController.rawStickX = inputs->originalInput.stick_x;
-				testController.rawStickY = inputs->originalInput.stick_y;
-				testController.buttonDown = inputs->originalInput.button;
+				gPlayer1Controller->rawStickX = inputs->originalInput.stick_x;
+				gPlayer1Controller->rawStickY = inputs->originalInput.stick_y;
+				gPlayer1Controller->buttonDown = inputs->originalInput.button;
 
 				u32 frame_idx;
 				for (frame_idx = 0; frame_idx < inputs->count; frame_idx++) {
