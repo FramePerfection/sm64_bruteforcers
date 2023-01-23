@@ -2,6 +2,8 @@
 
 #include <time.h>
 
+#include "src/game/game_init.h"
+
 #include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/bf_states.h"
 
