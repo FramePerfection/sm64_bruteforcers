@@ -20,12 +20,12 @@ When building from Visual Studio Code, make sure to run your commands in a MinGW
 A configuration for Visual Studio Code is provided as well.  
 Adjust the MODULE_PATH define in c_cpp_properties.json for proper intellisense support on whichever module you are currently working on.  
 Each module has an associated launch configuration you can select in the "Run and Debug" view.  
-Note the "OPT_FLAGS := -O3" in line 12 in Makefile; Set to -g for debugging purposes.  
+Note the "OPT_FLAGS := -O3" in line 16 in Makefile; Replace with -g for debugging purposes.  
 
 ## Running
 
 After a successful build, each module will have its executable file located in binaries/<module_name>/.  
-The file "configuration.json" next to it defines the state and parameters with which the bruteforcer is to be run.  
+The file "configuration.json" next to it defines the state and parameters with which the bruteforcer is to be run, as defined in "state_definitions.txt". You may use the "state_definitions.txt" file to automatically generate the configuration with external tools.    
  (TODO) For further information, consult the readme files in their respective folders.  
 
 ## Module structure
@@ -46,7 +46,6 @@ Each module consists of 4 files:
 The main code file.  
 Defines how to initialize and update the game state, as well as how to perturb inputs and update scores.  
 It also runs the main bruteforcing loop.  
-Generalizing this file is TODO  
   
 ## Project Structure
   
@@ -57,8 +56,15 @@ Generalizing this file is TODO
 	│   └── demos: demo data
 	├── binaries: executable files of modules, along with their respective configuration and m64 files
 	├── bruteforce: files making up the bruteforcing framework
-	│   ├── common_states: required and optional common configuration definitions
-	│   ├── **/main.c: modules
+	│   ├── algorithms: bruteforcing algorithms along with their state definitions
+	│   ├── common_states: required and optional common state definitions
+	│   ├── framework: bruteforcing framework code
+	│   ├── modules: bruteforcing modules
+	│   │   ├── <module_name>: 
+	│   │   │   ├── bf_state_definitions.inc.c: this module's state definitions
+	│   │   │   ├── main.c: this module's entry point C module
+	│   │   │   ├── make.split: this module's build requirements and registration token
+	│   │   │   └── state.h: program state specific to this module
 	├── build: output directory for intermediate files
 	├── data: behavior scripts, misc. data
 	├── include: header files
