@@ -1,4 +1,3 @@
-#include "bruteforce/common_states/bf_state_definitions_camera.inc.c"
 #include "bruteforce/common_states/bf_state_definitions_common.inc.c"
 #include "bruteforce/algorithms/genetic/bf_state_definitions_genetic.inc.c"
 
@@ -8,7 +7,6 @@
 extern struct MarioState *gMarioState;
 extern s16 sSwimStrength;
 extern s16 *gEnvironmentRegions;
-extern f32 minSpeed;
 
 #else
 
@@ -22,7 +20,6 @@ BF_STATIC_STATE(u32, target_action, bfStaticState.target_action)
 BF_STATIC_STATE(u32, scoring_frame, bfStaticState.scoring_frame)
 BF_STATIC_STATE(s16, target_angle, bfStaticState.target_angle)
 BF_STATIC_STATE(s16, target_angle_margin, bfStaticState.target_angle_margin)
-BF_STATIC_STATE(s16, min_speed, minSpeed)
 __NL__
 
 // World triangles and configuration

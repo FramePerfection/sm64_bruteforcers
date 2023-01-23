@@ -19,30 +19,14 @@
 
 #include "bruteforce/algorithms/genetic/algorithm.h"
 
-struct GraphNodeCamera camera;
-struct Object marioObj;
-struct Area area;
-struct MarioBodyState marioBodyState;
-struct Controller testController;
-f32 minSpeed;
-
 // Stubs that override __attribute__((weak)) functions to prevent null camera crashes
 void set_submerged_cam_preset_and_spawn_bubbles(struct MarioState *m) { }
 void update_mario_info_for_cam(struct MarioState *m) { }
 
 static void initGame() {
-	gCamera = &camera;
-	gCurrentArea = &area;
-	init_graph_node_object(NULL, &marioObj, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
-	create_camera(&camera, NULL);
-	gCurrentArea->camera = camera.config.camera;
-
-	gMarioState->marioObj = &marioObj;
-	gMarioState->marioBodyState = &marioBodyState;
-	//gMarioState->statusForCamera = &gPlayerCameraState[0];
-
-	gMarioState->controller = &testController;
-	gMarioState->area = &area;
+	initCamera(); // Ideally this wouldn't be needed, but there are still functions that reference the camera currently
+	initArea();
+	initMario();
 	
 	safePrintf("Loading configuration...\n");
 	if (!bf_init_states()) {
@@ -52,26 +36,12 @@ static void initGame() {
 	
 	clear_static_surfaces();
 	init_static_surfaces(bfStaticState.static_tris);
-
-	// srand(bfStaticState.rnd_seed);
-	
-	// Still required to initialize something?
-	execute_mario_action(gMarioState->marioObj);
-	//update_camera(gCurrentArea->camera);
 }
 
 static void updateGame(OSContPad *input) {
-	testController.rawStickX = input->stick_x;
-	testController.rawStickY = input->stick_y;
-	testController.buttonPressed = input->button
-								& (input->button ^ testController.buttonDown);
-	testController.buttonDown = input->button;
-
-	adjust_analog_stick(&testController);
+	updateController(input);
+	adjust_analog_stick(gPlayer1Controller);
 	execute_mario_action(gMarioState->marioObj);
-	if (gCurrentArea != NULL) {
-		//update_camera(gCurrentArea->camera);
-	}
 }
 
 static void perturbInput(OSContPad *input, u32 frame_idx) {
@@ -135,8 +105,6 @@ void main(int argc, char *argv[]) {
 	initCandidates(original_inputs, &best);
 
 	initializeMultiProcess(original_inputs);
-	
-	programState->bestScore = minSpeed;
 	
 	bruteforce_loop_genetic(original_inputs, &updateGame, &perturbInput, &updateScore);
 }
