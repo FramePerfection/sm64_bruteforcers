@@ -1,7 +1,9 @@
+BUILD_CHAIN := .buildchain/
+
 
 # Makefile to rebuild SM64 split image
 
-include util.mk
+include $(BUILD_CHAIN)util.mk
 
 FIND := $(call find-command,find)
 
@@ -58,17 +60,12 @@ endif
 COLOR ?= 1
 
 # display selected options unless 'make clean' or 'make distclean' is run
-ifeq ($(filter clean,$(MAKECMDGOALS)),)
+ifeq ($(filter clean debug_config,$(MAKECMDGOALS)),)
   $(info ==== Build Options ====)
   $(info Version:        $(VERSION))
   $(info Target:         $(TARGET))
   $(info =======================)
 endif
-
-
-#==============================================================================#
-# Universal Dependencies                                                       #
-#==============================================================================#
 
 #==============================================================================#
 # Target Executable and Sources                                                #
@@ -191,6 +188,8 @@ force:
 
 include $(wildcard ./bruteforce/modules/**/make.split)
 
+include $(BUILD_CHAIN)generate_targets.mk
+
 all: $(ALL_TARGETS)
 
 clean:
@@ -225,7 +224,7 @@ $(BUILD_DIR)/%.o: $(BUILD_DIR)/%.c
 	@$(CC_CHECK) $(CC_CHECK_CFLAGS) -MMD -MP -MT $@ -MF $(BUILD_DIR)/$*.d $<
 	$(V)$(CC) -c $(CFLAGS) -o $@ $<
 
-.PHONY: all clean default diff test load libultra
+.PHONY: all clean default diff test load libultra force
 # with no prerequisites, .SECONDARY causes no intermediate target to be removed
 .SECONDARY:
 

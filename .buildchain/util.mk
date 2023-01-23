@@ -1,5 +1,16 @@
 # util.mk - Miscellaneous utility functions for use in Makefiles
 
+NEWLINE_TOKEN := __NL__
+
+# A literal space.
+space :=
+space +=
+
+# Joins elements of the list in arg 2 with the given separator.
+#   1. Element separator.
+#   2. The list.
+join-with = $(subst $(space),$1,$(strip $2))
+
 # Throws an error if the value of the variable named by $(1) is not in the list given by $(2)
 define validate-option
   # value must be part of the list
@@ -15,7 +26,7 @@ endef
 # Creates a text file documentation by running the preprocessor on a given source file
 define create-state-definition-file
 	$(CC) -E -CC -P $(foreach i,$(INCLUDE_DIRS),-I$(i)) -DMODULE_PATH=$(NAME) $1 \
-		| sed -e 's/__NL__ /\n/g' -e 's/__NL__//g' > $(BINARY_DIR)/$(NAME)/$2
+		| sed -e 's/$(NEWLINE_TOKEN) /\n/g' -e 's/$(NEWLINE_TOKEN)//g' > $(BINARY_DIR)/$(NAME)/$2
 endef
 
 # Returns the path to the command $(1) if exists. Otherwise returns an empty string.
