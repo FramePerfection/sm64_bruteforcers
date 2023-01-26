@@ -3,8 +3,8 @@
 NEWLINE_TOKEN := __NL__
 
 # A literal space.
-space :=
-space +=
+noop=
+space = $(noop) $(noop)
 
 # Joins elements of the list in arg 2 with the given separator.
 #   1. Element separator.
