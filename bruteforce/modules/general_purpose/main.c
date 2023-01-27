@@ -56,7 +56,7 @@ static void updateGame(OSContPad *input) {
 	}
 }
 
-static void perturbInput(OSContPad *input, u32 frame_idx) {
+static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, u32 frame_idx) {
 	if (!bfStaticState.relative_frame_numbers)
 		frame_idx += bfStaticState.m64_start;
 

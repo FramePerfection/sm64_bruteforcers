@@ -27,7 +27,7 @@ Candidate *best;
 
 extern Vec3f last_q_step, last_q_step2;
 
-void initGame(char* override_config_file) {
+void initGame() {
 	initCamera();
 	initArea();
 	initMario();
@@ -164,7 +164,7 @@ void main(int argc, char *argv[]) {
 	safePrintf("Running Bruteforcer...\n");
 	
 	safePrintf("Initializing game state...\n");
-	initGame(override_config_file);
+	initGame();
 	
 	safePrintf("Loading m64...\n");
 	if (!read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_count, &original_inputs))

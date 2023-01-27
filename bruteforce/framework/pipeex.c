@@ -72,7 +72,7 @@ Return Value:
 {
   HANDLE ReadPipeHandle, WritePipeHandle;
   DWORD dwError;
-  UCHAR PipeNameBuffer[ MAX_PATH ];
+  CHAR PipeNameBuffer[ MAX_PATH ];
 
   //
   // Only one valid OpenMode flag - FILE_FLAG_OVERLAPPED
@@ -92,7 +92,7 @@ Return Value:
   }
 
   sprintf( PipeNameBuffer,
-           "\\\\.\\Pipe\\RemoteExeAnon.%08x.%08x",
+           "\\\\.\\Pipe\\RemoteExeAnon.%08lx.%08lx",
            GetCurrentProcessId(),
            InterlockedIncrement(&PipeSerialNumber)
          );

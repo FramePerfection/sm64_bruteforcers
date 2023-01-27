@@ -67,7 +67,7 @@ f64 sm_CheckAction(CheckActionParameters args, Candidate *candidate, u8 *success
 }
 
 f64 sm_CheckWall(CheckWallParameters args, Candidate *candidate, u8 *success, u8 *abort) {
-	u8 matchWall = (gMarioState->wall == args->wall) ^ args->invert;
+	u8 matchWall = (gMarioState->wall == (struct Surface*)args->wall) ^ args->invert;
 	*abort = !matchWall;
 	*success = matchWall;
 	if (!*success)

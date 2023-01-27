@@ -1,6 +1,7 @@
 #include "sm64.h"
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "bruteforce/framework/json.h"
 #include "bruteforce/framework/readers.h"
 
@@ -34,7 +35,7 @@ void read_string(Json *jsonNode, string *target) {
 
 void read_boolean(Json *jsonNode, boolean *target) {
 	if (jsonNode->type == Json_String) {
-		char *p = jsonNode->valueString;
+		char *p = (char*)jsonNode->valueString;
 		for ( ; *p; ++p) *p = tolower(*p);
 		if (strcmp(jsonNode->valueString, "true") == 0)
 			*target = 1;
@@ -89,7 +90,7 @@ void read_Triangles(Json *jsonNode, Triangles *target) {
 
 void read_EnvironmentRegions(Json *jsonNode, EnvironmentRegions *target) {
 	*target = calloc(jsonNode->size, sizeof(s16));
-	u32 i;
+	s32 i;
 	Json *n = jsonNode->child;
 	for (i = 0; i < jsonNode->size; i++) {
 		(*target)[i] = n->valueInt;

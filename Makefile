@@ -214,6 +214,12 @@ DUMMY := $(shell mkdir -p $(ALL_DIRS))
 #==============================================================================#
 
 # Compile C code
+	
+$(BUILD_DIR)/bruteforce/%.o: bruteforce/%.c
+	$(call print,Compiling (warnings treated as errors):,$<,$@)
+	$(CC_CHECK) $(CC_CHECK_CFLAGS) -Werror -MMD -MP -MT $@ -MF $(BUILD_DIR)/bruteforce/$*.d $<
+	$(V)$(CC) -c $(CFLAGS) -o $@ $<
+
 $(BUILD_DIR)/%.o: %.c
 	$(call print,Compiling:,$<,$@)
 	$(CC_CHECK) $(CC_CHECK_CFLAGS) -MMD -MP -MT $@ -MF $(BUILD_DIR)/$*.d $<

@@ -1,6 +1,7 @@
 #include "perturbator.h"
 
 #include <memory.h>
+#include <stdlib.h>
 #include <string.h>
 
 void read_Perturbators(Json *jsonNode, Perturbators *target) {

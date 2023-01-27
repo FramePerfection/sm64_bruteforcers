@@ -83,8 +83,8 @@ void Json_dispose (Json *c) {
 	while (c) {
 		next = c->next;
 		if (c->child) Json_dispose(c->child);
-		if (c->valueString) free(c->valueString);
-		if (c->name) free(c->name);
+		if (c->valueString) free((void*)c->valueString);
+		if (c->name) free((void*)c->name);
 		free(c);
 		c = next;
 	}

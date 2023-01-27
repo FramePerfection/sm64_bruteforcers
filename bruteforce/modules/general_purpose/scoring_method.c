@@ -1,10 +1,14 @@
-#include "bruteforce/framework/bf_states.h"
-#include "bruteforce/framework/readers.h"
-#include "scoring_method.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "types.h"
+
+#include "bruteforce/framework/bf_states.h"
+#include "bruteforce/framework/interprocess.h"
+#include "bruteforce/framework/readers.h"
+
+#include "include/types.h"
+#include "scoring_method.h"
 
 void read_ScoringMethods(Json *jsonNode, ScoringMethods *target) {
 	target->n_methods = jsonNode->size;
@@ -16,7 +20,7 @@ void read_ScoringMethods(Json *jsonNode, ScoringMethods *target) {
 		currentReadMethod->weight = 1.0;
 		Json *innerNode = outerNode->child;
 		Json *paramsNode = NULL;
-		char *methodName = NULL;
+		const char *methodName = NULL;
 		while (innerNode != NULL) {
 			if (strcmp(innerNode->name, "weight") == 0) {
 				currentReadMethod->weight = innerNode->valueFloat;
@@ -29,7 +33,7 @@ void read_ScoringMethods(Json *jsonNode, ScoringMethods *target) {
 
 				#define SCORING_FUNC(NAME) \
 					if (strcmp(innerNode->valueString, #NAME) == 0) \
-						currentReadMethod->func = &sm_##NAME;
+						currentReadMethod->func = (scoringFunc)&sm_##NAME;
 				#include "scoring_funcs.inc.c"
 				#undef SCORING_FUNC
 
@@ -66,6 +70,9 @@ void applyMethod(ScoringMethod *method, Candidate *candidate, u8 *success, u8 *a
 	*success &= partialSuccess;
 }
 
+// scoringfuncs may not need to use their args field, so ignore the warning
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #define SCORING_FUNC_IMPL
 #include "scoring_funcs.inc.c"
 #undef SCORING_FUNC_IMPL
@@ -73,7 +80,7 @@ void applyMethod(ScoringMethod *method, Candidate *candidate, u8 *success, u8 *a
 #define PARAM_MEMBER(type, MEMBER_NAME, _) \
 	if (strcmp(#MEMBER_NAME, innerNode->name) == 0) \
 	{ \
-		read_##type(innerNode, &((*target)->MEMBER_NAME)); \
+		read_##type(innerNode, (type*)&((*target)->MEMBER_NAME)); \
 	}
 
 #define SCORING_FUNC(NAME) \
@@ -88,3 +95,4 @@ void read_##NAME##Parameters(Json *json, NAME##Parameters *target) { \
 
 #undef SCORING_FUNC
 #undef PARAM_MEMBER
+#pragma GCC diagnostic pop

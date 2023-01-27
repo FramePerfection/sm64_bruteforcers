@@ -20,8 +20,8 @@
 #include "bruteforce/algorithms/genetic/algorithm.h"
 
 // Stubs that override __attribute__((weak)) functions to prevent null camera crashes
-void set_submerged_cam_preset_and_spawn_bubbles(struct MarioState *m) { }
-void update_mario_info_for_cam(struct MarioState *m) { }
+void set_submerged_cam_preset_and_spawn_bubbles(UNUSED struct MarioState *m) { }
+void update_mario_info_for_cam(UNUSED struct MarioState *m) { }
 
 static void initGame() {
 	initCamera(); // Ideally this wouldn't be needed, but there are still functions that reference the camera currently
@@ -44,7 +44,7 @@ static void updateGame(OSContPad *input) {
 	execute_mario_action(gMarioState->marioObj);
 }
 
-static void perturbInput(OSContPad *input, u32 frame_idx) {
+static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, UNUSED u32 frame_idx) {
 	if (bfStaticState.max_perturbation > 0 && randFloat() < bfStaticState.perturbation_chance) {
 		u16 perturb = (u16)(bfStaticState.max_perturbation);
 		u8 perturbation_x = (rand() % (2 * perturb) - perturb);

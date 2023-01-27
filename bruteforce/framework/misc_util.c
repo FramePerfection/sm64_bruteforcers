@@ -110,7 +110,7 @@ void init_scene_graph_node_links(struct GraphNode *graphNode, s32 type) {
 /**
  * Allocates and returns a newly created object node
  */
-struct GraphNodeObject *init_graph_node_object(struct AllocOnlyPool *pool,
+struct GraphNodeObject *init_graph_node_object(UNUSED struct AllocOnlyPool *pool,
                                                struct GraphNodeObject *graphNode,
                                                struct GraphNode *sharedChild, Vec3f pos, Vec3s angle,
                                                Vec3f scale) {
@@ -175,7 +175,7 @@ void adjust_analog_stick(struct Controller *controller) {
 
 void initCamera() {
 	static struct GraphNodeCamera camera;
-	gCamera = &camera.config.camera;
+	gCamera = (struct Camera*)&camera.config.camera;
 	create_camera(&camera, NULL);
 }
 
@@ -187,7 +187,7 @@ void initArea() {
 
 void initMario() {
 	gMarioState->marioObj = calloc(1, sizeof(struct Object));
-	init_graph_node_object(NULL, gMarioState->marioObj, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
+	init_graph_node_object(NULL, (struct GraphNodeObject*)gMarioState->marioObj, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
 	gMarioState->marioBodyState = calloc(1, sizeof(struct MarioBodyState));
 	gMarioState->statusForCamera = &gPlayerCameraState[0];
 	gMarioState->controller = gPlayer1Controller = calloc(1, sizeof(OSContPad));
