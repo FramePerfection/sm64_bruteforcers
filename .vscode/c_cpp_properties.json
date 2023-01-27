@@ -16,7 +16,8 @@
                 "${workspaceFolder}/src",
                 "${workspaceFolder}/levels/**",
                 "${workspaceFolder}"
-            ]
+            ],
+            "configurationProvider": "ms-vscode.makefile-tools"
         }
     ],
     "version": 4
