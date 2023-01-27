@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 char *override_config_file = NULL;
@@ -62,12 +63,15 @@ u8 save_to_sequence_file(char *fileName, InputSequence *inputSequence) {
 			safePrintf("Failed to write result to file!\n"); \
 			return FALSE; \
 		} \
-		usleep(1000000); \
+		nanosleep(&ts, &ts); \
 	} \
 	return TRUE;
 
 u8 output_input_sequence(InputSequence *inputSequence) {
 	u32 fail_counter = 0;
+	struct timespec ts;
+	ts.tv_sec = 1;
+	ts.tv_nsec = 0;
 
 	if (strcmp(output_mode, "m64") == 0)
 	{
