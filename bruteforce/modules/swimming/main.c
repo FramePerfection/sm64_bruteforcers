@@ -62,25 +62,26 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort) {
 		*abort = TRUE;
 		return;
 	}
-	if (frame_idx + 1 == bfStaticState.scoring_frame ) {
-		f64 score = gMarioStates->forwardVel;
-		s16 dYaw = gMarioState->faceAngle[1] - bfStaticState.target_angle;
-		if (dYaw < 0)
-			dYaw = -dYaw;
-		if (dYaw > bfStaticState.target_angle_margin)
-			score = -dYaw;
+	if (frame_idx + 1 == bfStaticState.scoring_frame) {
+		f32 distance_to_coin1 = powf(powf((gMarioState->pos[0] - bfStaticState.hitboxes.data[0].x), 2.0) + powf((gMarioState->pos[2] - bfStaticState.hitboxes.data[0].z), 2.0), 0.5);
+		f32 score = distance_to_coin1 + 1000.0 + 2*-1*gMarioState->angleVel[1] - 0.1*gMarioState->faceAngle[1];
+		
 		candidate->stats.hSpeed = gMarioState->forwardVel;
 		candidate->stats.angle = gMarioState->faceAngle[1];
+		candidate->stats.pitch = gMarioState->faceAngle[0];
 		candidate->stats.x = gMarioState->pos[0];
 		candidate->stats.y = gMarioState->pos[1];
 		candidate->stats.z = gMarioState->pos[2];
 		candidate->score = score;
-
-		u8 best = gMarioStates->forwardVel > programState->bestScore;
-		if (score > 0 && best) {
-			programState->bestScore = gMarioState->forwardVel;
+		u8 best = candidate->score > programState->bestScore;
+		//safePrintf("x: %f y: %f z: %f yaw: %i yawvel: %i\n", gMarioState->pos[0], gMarioState->pos[1], gMarioState->pos[2], gMarioState->faceAngle[1], gMarioState->angleVel[1]);
+		if (score > programState->bestScore && best && 
+				(gMarioState->pos[1] < bfStaticState.hitboxes.data[0].above + bfStaticState.hitboxes.data[0].y)
+				&& (distance_to_coin1 < (bfStaticState.hitboxes.data[0].radius + 37)) && (gMarioState->angleVel[1] > -630)) {
+			programState->bestScore = score;
 			output_input_sequence(candidate->sequence);
-			safePrintf("New best: %f\n", gMarioState->forwardVel);
+			safePrintf("x: %f y: %f z: %f yaw: %i yawvel: %i\n", gMarioState->pos[0], gMarioState->pos[1], gMarioState->pos[2], gMarioState->faceAngle[1], gMarioState->angleVel[1]);
+			safePrintf("New best: %f\n", score);
 		}
 	}
 }

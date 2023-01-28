@@ -24,7 +24,7 @@ __NL__
 
 // World triangles and configuration
 BF_STATIC_STATE(Triangles, static_tris, bfStaticState.static_tris)
-BF_STATIC_STATE(Coins, coins, bfStaticState.coins)
+BF_STATIC_STATE(HitBoxes, hitboxes, bfStaticState.hitboxes)
 __NL__
 
 // Mario

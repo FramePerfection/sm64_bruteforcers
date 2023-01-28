@@ -10,6 +10,7 @@ typedef struct {
 typedef struct {
 	f32 hSpeed;
 	s16 angle;
+	s16 pitch;
 	f32 x;
 	f32 y;
 	f32 z;
