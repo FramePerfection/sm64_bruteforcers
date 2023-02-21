@@ -2,6 +2,8 @@
 
 BUILD_CHAIN := .buildchain/
 
+SKIP_LAUNCH_JSON := 0
+
 include $(BUILD_CHAIN)util.mk
 
 FIND := $(call find-command,find)
