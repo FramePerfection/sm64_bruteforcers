@@ -50,6 +50,7 @@ void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc upda
 				gPlayer1Controller->rawStickX = inputs->originalInput.stick_x;
 				gPlayer1Controller->rawStickY = inputs->originalInput.stick_y;
 				bf_load_dynamic_state(&bfInitialDynamicState);
+				desynced = FALSE;
 
 				u32 frame_idx;
 				for (frame_idx = 0; frame_idx < inputs->count; frame_idx++) {
@@ -58,7 +59,7 @@ void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc upda
 					if (!keepOriginal)
 						perturbInput(candidate, currentInput, frame_idx);
 					updateGame(currentInput);
-					boolean abort = FALSE;
+					boolean abort = desynced;
 					updateScore(candidate, frame_idx, &abort);
 					if (abort) break;
 				}
