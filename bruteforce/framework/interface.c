@@ -16,6 +16,19 @@ char *m64_input = NULL;
 char *m64_output = NULL;
 u32 max_write_fails = 10;
 
+const char *read_file(const char *fileName) {
+	FILE *file = fopen(fileName, "r");
+	if (!file)
+		return NULL;
+	fseek(file, 0, SEEK_END);
+	long size = ftell(file);
+	fseek(file, 0, SEEK_SET);
+	const char *fileContents = calloc(size, sizeof(char));
+	fread((char*)fileContents, sizeof(char), size, file);
+	fclose(file);
+	return fileContents;
+}
+
 void parse_command_line_args(int argc, char *argv[]) {
 	int c, long_opt_idx = 0;
 	static struct option long_opts[] = {
@@ -64,22 +77,22 @@ u8 save_to_sequence_file(char *fileName, InputSequence *inputSequence) {
 			return FALSE; \
 		} \
 		nanosleep(&ts, &ts); \
-	} \
-	return TRUE;
+	}
 
 u8 output_input_sequence(InputSequence *inputSequence) {
 	u32 fail_counter = 0;
 	struct timespec ts;
 	ts.tv_sec = 1;
 	ts.tv_nsec = 0;
-
-	if (strcmp(output_mode, "m64") == 0)
+	
+	if (strcmp(output_mode, "m64") == 0 || strcmp(output_mode, "m64_and_sequence") == 0)
 	{
 		TRY_WRITE(save_to_m64_file(m64_input, m64_output, inputSequence))
 	}
-	else if (strcmp(output_mode, "sequence") == 0)
+	if (strcmp(output_mode, "sequence") == 0 || strcmp(output_mode, "m64_and_sequence") == 0)
 	{
 		TRY_WRITE(save_to_sequence_file("tmp.m64.part", inputSequence))
 	}
+	return TRUE;
 }
 #undef TRY_WRITE

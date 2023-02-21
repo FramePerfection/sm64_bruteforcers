@@ -21,6 +21,7 @@ __TAB__ __TAB__ __TAB__	"cwd": __QUOTE__${workspaceFolder}/binaries/NAME##__QUOT
 __TAB__ __TAB__ __TAB__	"environment": [], __NL__ \
 __TAB__ __TAB__ __TAB__	"externalConsole": false, __NL__ \
 __TAB__ __TAB__ __TAB__	"MIMode": "gdb", __NL__ \
+__TAB__ __TAB__ __TAB__ "MIDebuggerPath": "C:\\msys64\\mingw64\\bin\\gdb.exe", __NL__ \
 __TAB__ __TAB__ __TAB__	"setupCommands": [ __NL__ \
 __TAB__ __TAB__ __TAB__	{ __NL__ \
 __TAB__ __TAB__ __TAB__ __TAB__		"description": "Enable pretty-printing for gdb", __NL__ \

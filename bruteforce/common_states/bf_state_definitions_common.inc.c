@@ -15,7 +15,7 @@ __NL__
 BF_STATIC_STATE(string, m64_input, m64_input)
 BF_STATIC_STATE(string, m64_output, m64_output)
 BF_STATIC_STATE(u32, m64_start, bfStaticState.m64_start)
-BF_STATIC_STATE(u32, m64_count, bfStaticState.m64_count)
+BF_STATIC_STATE(u32, m64_end, bfStaticState.m64_end)
 __NL__
 __NL__
 

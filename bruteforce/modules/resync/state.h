@@ -4,16 +4,12 @@
 #include <PR/ultratypes.h>
 
 typedef struct {
-	f32 bestScore;
+	f64 bestScore;
 } ProgramState;
 
 typedef struct {
-	f32 hSpeed;
-	s16 angle;
-	s16 pitch;
-	f32 x;
-	f32 y;
-	f32 z;
+	u32 frame_index;
+	f64 lastScore;
 } CandidateStats;
 
 #endif // STATE_H

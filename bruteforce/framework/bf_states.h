@@ -48,5 +48,6 @@ extern ProgramState *programState;
 void read_state_json(Json*);
 u8 bf_init_states();
 void bf_load_dynamic_state(BFDynamicState*);
+void bf_save_dynamic_state(BFDynamicState*);
 
 #endif // BF_STATES_H

@@ -840,8 +840,6 @@ s32 act_walking(struct MarioState *m) {
     return FALSE;
 }
 
-#include <signal.h>
-#include <stdio.h>
 s32 act_move_punching(struct MarioState *m) {
     if (should_begin_sliding(m)) {
         return set_mario_action(m, ACT_BEGIN_SLIDING, 0);
@@ -853,9 +851,8 @@ s32 act_move_punching(struct MarioState *m) {
 
     m->actionState = 1;
 
-    // _EDIT_ break in mario_update_punch_sequence
-    printf("mario_update_punch_sequence not implemented\n");
-    raise(5 /*SIGTRAP*/);
+    // _EDIT_ desync in mario_update_punch_sequence
+    desync("mario_update_punch_sequence not implemented\n");
     //mario_update_punch_sequence(m);
 
     if (m->forwardVel >= 0.0f) {

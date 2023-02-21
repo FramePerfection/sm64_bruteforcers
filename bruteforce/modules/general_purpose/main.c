@@ -111,7 +111,7 @@ void main(int argc, char *argv[]) {
 
 	safePrintf("Loading m64...\n");
 	InputSequence *original_inputs;
-	if (!read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_count, &original_inputs))
+	if (!read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_end, &original_inputs))
 	{
 		safePrintf("Failed to load m64! (%s) Exiting...\n", bfStaticState.m64_input);
 		exit(-1);

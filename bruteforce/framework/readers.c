@@ -98,23 +98,26 @@ void read_EnvironmentRegions(Json *jsonNode, EnvironmentRegions *target) {
 	}
 }
 
-void read_Coins(Json *jsonNode, Coins *target) {
-	Json *triNode = jsonNode->child;
+void read_HitBoxes(Json *jsonNode, HitBoxes *target) {
+	Json *n = jsonNode->child;
 	target->data_size = jsonNode->size;
-	target->data = calloc(target->data_size, sizeof(Triangle));
+	target->data = calloc(target->data_size, sizeof(HitBox));
 	u32 i = 0;
-	while (triNode != NULL) {
-		Json *vertNode = triNode->child;
+	while (n != NULL) {
+		Json *hitbox = n->child;
 		#define ADVANCE \
-			(s16)vertNode->valueInt; \
-			vertNode = vertNode->next;
+			(s16)hitbox->valueInt; \
+			hitbox = hitbox->next;
 		
 		target->data[i].x = ADVANCE
 		target->data[i].y = ADVANCE
 		target->data[i].z = ADVANCE
+		target->data[i].radius = ADVANCE
+		target->data[i].above = ADVANCE
+		target->data[i].below = ADVANCE
 
 		i++;
-		triNode = triNode->next;
+		n = n->next;
 
 		#undef ADVANCE
 	}

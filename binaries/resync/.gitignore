@@ -1,0 +1,6 @@
+*
+!.gitignore
+!configuration.json
+!test.m64
+!reference_run.json
+!RecordReference.lua

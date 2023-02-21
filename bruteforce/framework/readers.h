@@ -31,16 +31,16 @@ typedef struct Triangles {
 } Triangles;
 
 
-typedef struct Coin {
-	s16 x, y, z;
-} Coin;
-typedef struct Coins {
+typedef struct HitBox {
+	f32 x, y, z, radius, above, below;
+} HitBox;
+typedef struct HitBoxes {
 	u32 data_size;
-	Coin* data;
-} Coins;
+	HitBox* data;
+} HitBoxes;
 
 void read_Triangles(Json*, Triangles*);
-void read_Coins(Json*, Coins*);
+void read_HitBoxes(Json*, HitBoxes*);
 typedef s16* EnvironmentRegions;
 
 void read_EnvironmentRegions(Json*, EnvironmentRegions*);

@@ -16,19 +16,6 @@ BFStaticState bfStaticState;
 BFDynamicState bfInitialDynamicState;
 ProgramState *programState;
 
-const char *read_file(const char *fileName) {
-	FILE *file = fopen(fileName, "r");
-	if (!file)
-		return NULL;
-	fseek(file, 0, SEEK_END);
-	long size = ftell(file);
-	fseek(file, 0, SEEK_SET);
-	const char *fileContents = calloc(size, sizeof(char));
-	fread(fileContents, sizeof(char), size, file);
-	fclose(file);
-	return fileContents;
-}
-
 void read_state_json(Json *node) {
 	#define BF_STATIC_STATE(type, struct_name, target_expr) \
 		if (strcmp(#struct_name, node->name) == 0) \
@@ -76,6 +63,17 @@ void bf_load_dynamic_state(BFDynamicState *state) {
 	#define BF_STATIC_STATE(_0, _1, _2)
 	#define BF_DYNAMIC_STATE(type, struct_name, target_expr) \
 		memcpy(&(target_expr), &state->struct_name, sizeof state->struct_name);
+	
+	#include STATE_DEFINITION_FILE
+
+	#undef BF_STATIC_STATE
+	#undef BF_DYNAMIC_STATE
+}
+
+void bf_save_dynamic_state(BFDynamicState *state) {
+	#define BF_STATIC_STATE(_0, _1, _2)
+	#define BF_DYNAMIC_STATE(type, struct_name, target_expr) \
+		memcpy(&state->struct_name, &(target_expr), sizeof state->struct_name);
 	
 	#include STATE_DEFINITION_FILE
 
