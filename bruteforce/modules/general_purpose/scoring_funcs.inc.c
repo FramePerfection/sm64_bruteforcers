@@ -46,6 +46,15 @@ SCORING_FUNC(RestrictHPosition)
 	PARAM_MEMBER(f32, dist, "The maximum distance of Mario from the cylinder that will be accepted")
 SCORING_FUNC(RestrictHDist)
 
+#define PARAM_MEMBERS_MatchHPosition \
+	PARAM_MEMBER(f32, x, "The x coordinate to match") \
+	PARAM_MEMBER(f32, z, "The z coordinate to match")
+SCORING_FUNC(MatchHPosition)
+
+#define PARAM_MEMBERS_MatchHSpeed \
+	PARAM_MEMBER(f32, hspeed, "The hspeed to match")
+SCORING_FUNC(MatchHSpeed)
+
 #else
 
 // not necessary for compilation, but allows intellisense to find struct definitions
@@ -106,6 +115,18 @@ f64 sm_RestrictHDist(RestrictHDistParameters args, Candidate *candidate, u8 *suc
 		*abort = TRUE;
 		*success = FALSE;
 	}
+	return 0.0;
+}
+
+f64 sm_MatchHPosition(MatchHPositionParameters args, Candidate *candidate, u8 *success, u8 *abort) {
+	f64 diff_x = args->x - gMarioState->pos[0];
+	f64 diff_z = args->z - gMarioState->pos[2];
+	return -((diff_x * diff_x) + (diff_z * diff_z)); 
+}
+
+f64 sm_MatchHSpeed(MatchHSpeedParameters args, Candidate *candidate, u8 *success, u8 *abort) {
+	f64 diff = args->hspeed - gMarioState->forwardVel;
+	return -(diff * diff);
 }
 
 #endif
