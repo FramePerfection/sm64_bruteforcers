@@ -2,7 +2,7 @@
 	"m64_start": 2199,
 	"m64_input": "secret.m64",
 	"m64_output": "secret.a.m64",
-	"m64_count": 95,
+	"m64_end": 2294,
 	"scoring_frame": 95,
 	
 	"max_processes": 1,

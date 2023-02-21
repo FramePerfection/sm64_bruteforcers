@@ -2,16 +2,24 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "bruteforce/framework/interprocess.h" 
+
 u32 MIN(u32 x, u32 y) {
 	return ((x) < (y)) ? (x) : (y);
 }
 
-u8 read_m64_from_file(char *fileName, u32 offset, u32 count, InputSequence **inputs) {
+u8 read_m64_from_file(char *fileName, u32 offset, u32 end, InputSequence **inputs) {
 	FILE *file = fopen(fileName, "rb");
 	if (!file)
 		return FALSE;
 	fseek(file, 0, SEEK_END);
 	long size = ftell(file);
+
+	s32 count = end - offset;
+	if (count <= 0) {
+		safePrintf("End frame [%d] is less than or equal to start frame [%d]!\n", end, offset);
+		return FALSE;
+	}
 	
 	u32 buffersize = sizeof(InputSequence) + count * sizeof(OSContPad);
 	*inputs = calloc(buffersize, sizeof(char));
@@ -30,7 +38,7 @@ u8 read_m64_from_file(char *fileName, u32 offset, u32 count, InputSequence **inp
 	fread(inputBuffer, sizeof(u32), count, file);
 	fclose(file);
 
-	u32 i;
+	s32 i;
 	for (i = 0; i < count; i++) {
 		u32 base = i * 4;
 		s8 stick_y = inputBuffer[base + 3];

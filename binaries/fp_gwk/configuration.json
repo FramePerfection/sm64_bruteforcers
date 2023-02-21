@@ -2,7 +2,7 @@
 	"m64_start": 442,
 	"m64_input": "test.m64",
 	"m64_output": "sm74b3textbox.behindthetower.bruteforce.m64",
-	"m64_count": 10,
+	"m64_end": 452,
 	
 	"max_processes": 3,
 	"rnd_seed": 2143,

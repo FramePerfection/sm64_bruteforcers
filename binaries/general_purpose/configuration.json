@@ -34,7 +34,7 @@
 	"m64_input": "tmp.m64", 
 	"m64_output": "sm74b3.secrethole.bf.m64", 
 	"m64_start": 186, 
-	"m64_count": 61, 
+	"m64_end": 247, 
 	"area_terrain_type": 0, 
 
 	"static_tris": 
