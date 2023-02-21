@@ -945,7 +945,8 @@ s32 act_ground_pound(struct MarioState *m) {
         }
 
         m->actionTimer++;
-        if (m->actionTimer >= m->marioObj->header.gfx.animInfo.curAnim->loopEnd + 4) {
+        // _EDIT_ uuuh this is TODO I guess
+        if (m->actionTimer >= /*m->marioObj->header.gfx.animInfo.curAnim->loopEnd + 4*/ 15) {
             play_sound(SOUND_MARIO_GROUND_POUND_WAH, m->marioObj->header.gfx.cameraToObject);
             m->actionState = 1;
         }
@@ -1393,7 +1394,8 @@ s32 act_forward_rollout(struct MarioState *m) {
             break;
     }
 
-    if (m->actionState == 1 && is_anim_past_end(m)) {
+    // _EDIT_ ignore end of rollout animation
+    if (m->actionState == 1 && FALSE /*is_anim_past_end(m)*/) {
         m->actionState = 2;
     }
     return FALSE;
