@@ -92,7 +92,7 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort) {
 	for (i = 0; i < bfStaticState.scoring_methods.n_methods; i++) 
 		if (bfStaticState.scoring_methods.methods[i].frame == frame_idx + 1) {
 			applyMethod(&bfStaticState.scoring_methods.methods[i], candidate, &success, abort);
-			if (abort) return;
+			if (*abort) return;
 		}
 
 	u8 best = success && candidate->score > programState->bestScore;
