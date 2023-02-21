@@ -64,22 +64,22 @@ u8 save_to_sequence_file(char *fileName, InputSequence *inputSequence) {
 			return FALSE; \
 		} \
 		nanosleep(&ts, &ts); \
-	} \
-	return TRUE;
+	}
 
 u8 output_input_sequence(InputSequence *inputSequence) {
 	u32 fail_counter = 0;
 	struct timespec ts;
 	ts.tv_sec = 1;
 	ts.tv_nsec = 0;
-
-	if (strcmp(output_mode, "m64") == 0)
+	
+	if (strcmp(output_mode, "m64") == 0 || strcmp(output_mode, "m64_and_sequence") == 0)
 	{
 		TRY_WRITE(save_to_m64_file(m64_input, m64_output, inputSequence))
 	}
-	else if (strcmp(output_mode, "sequence") == 0)
+	if (strcmp(output_mode, "sequence") == 0 || strcmp(output_mode, "m64_and_sequence") == 0)
 	{
 		TRY_WRITE(save_to_sequence_file("tmp.m64.part", inputSequence))
 	}
+	return TRUE;
 }
 #undef TRY_WRITE
