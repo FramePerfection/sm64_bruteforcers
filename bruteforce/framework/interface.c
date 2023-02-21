@@ -16,6 +16,19 @@ char *m64_input = NULL;
 char *m64_output = NULL;
 u32 max_write_fails = 10;
 
+const char *read_file(const char *fileName) {
+	FILE *file = fopen(fileName, "r");
+	if (!file)
+		return NULL;
+	fseek(file, 0, SEEK_END);
+	long size = ftell(file);
+	fseek(file, 0, SEEK_SET);
+	const char *fileContents = calloc(size, sizeof(char));
+	fread((char*)fileContents, sizeof(char), size, file);
+	fclose(file);
+	return fileContents;
+}
+
 void parse_command_line_args(int argc, char *argv[]) {
 	int c, long_opt_idx = 0;
 	static struct option long_opts[] = {
