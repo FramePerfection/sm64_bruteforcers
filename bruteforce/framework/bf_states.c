@@ -69,3 +69,14 @@ void bf_load_dynamic_state(BFDynamicState *state) {
 	#undef BF_STATIC_STATE
 	#undef BF_DYNAMIC_STATE
 }
+
+void bf_save_dynamic_state(BFDynamicState *state) {
+	#define BF_STATIC_STATE(_0, _1, _2)
+	#define BF_DYNAMIC_STATE(type, struct_name, target_expr) \
+		memcpy(&state->struct_name, &(target_expr), sizeof state->struct_name);
+	
+	#include STATE_DEFINITION_FILE
+
+	#undef BF_STATIC_STATE
+	#undef BF_DYNAMIC_STATE
+}
