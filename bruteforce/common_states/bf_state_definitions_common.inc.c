@@ -6,8 +6,6 @@ extern char *m64_output;
 // general bruteforcing parameters
 BF_STATIC_STATE(s32, max_processes, bfStaticState.max_processes)
 BF_STATIC_STATE(u32, rnd_seed, bfStaticState.rnd_seed)
-BF_STATIC_STATE(u32, max_perturbation, bfStaticState.max_perturbation)
-BF_STATIC_STATE(f32, perturbation_chance, bfStaticState.perturbation_chance)
 BF_STATIC_STATE(u32, display_desync_messages, bfStaticState.display_desync_messages)
 __NL__
 

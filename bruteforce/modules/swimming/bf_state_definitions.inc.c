@@ -1,4 +1,5 @@
 #include "bruteforce/common_states/bf_state_definitions_common.inc.c"
+#include "bruteforce/common_states/bf_state_definitions_simple_perturbate.inc.c"
 #include "bruteforce/algorithms/genetic/bf_state_definitions_genetic.inc.c"
 
 #ifdef BF_STATE_INCLUDE
