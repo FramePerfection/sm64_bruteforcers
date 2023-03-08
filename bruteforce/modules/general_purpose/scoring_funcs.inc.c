@@ -113,10 +113,10 @@ f64 sm_XZRadialLimit(XZRadialLimitParameters args, Candidate *candidate, u8 *suc
 	f32 distSq = (dx * dx + dz * dz);
 	if (distSq >= args->dist * args->dist) {
 		*abort = args->abort_on_failure;
-		*success = FALSE;
+		*success = !*abort;
 		if (args->approach) {
 			double mismatch = sqrt(distSq) - args->dist;
-			return mismatch * mismatch;
+			return -mismatch * mismatch;
 		}
 	}
 	return 0.0;
