@@ -9,6 +9,10 @@
 #include "interaction.h"
 #include "mario_step.h"
 
+// _EDIT_ track quarter-steps
+#include "bruteforce/framework/quarter_steps.h"
+static int quarterStepCounter = 0;
+
 static s16 sMovingSandSpeeds[] = { 12, 8, 4, 0 };
 
 struct Surface gWaterSurfacePseudoFloor = {
@@ -255,6 +259,7 @@ s32 stationary_ground_step(struct MarioState *m) {
     return stepResult;
 }
 
+// _EDIT_ track quartersteps
 static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     UNUSED struct Surface *lowerWall;
     struct Surface *upperWall;
@@ -263,9 +268,12 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     f32 ceilHeight;
     f32 floorHeight;
     f32 waterLevel;
+    SetQuarterstep(quarterStepCounter, 0, nextPos);
 
     lowerWall = resolve_and_return_wall_collisions(nextPos, 30.0f, 24.0f);
+    SetQuarterstep(quarterStepCounter, 1, nextPos);
     upperWall = resolve_and_return_wall_collisions(nextPos, 60.0f, 50.0f);
+    SetQuarterstep(quarterStepCounter, 2, nextPos);
 
     floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     ceilHeight = vec3f_find_ceil(nextPos, floorHeight, &ceil);
@@ -300,6 +308,8 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     }
 
     vec3f_set(m->pos, nextPos[0], floorHeight, nextPos[2]);
+    SetQuarterstep(quarterStepCounter, 3, m->pos);
+
     m->floor = floor;
     m->floorHeight = floorHeight;
 
@@ -319,17 +329,21 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     return GROUND_STEP_NONE;
 }
 
+// _EDIT_ track quartersteps
 s32 perform_ground_step(struct MarioState *m) {
     s32 i;
     u32 stepResult;
     Vec3f intendedPos;
 
+    quarterStepCounter = 0;
     for (i = 0; i < 4; i++) {
         intendedPos[0] = m->pos[0] + m->floor->normal.y * (m->vel[0] / 4.0f);
         intendedPos[2] = m->pos[2] + m->floor->normal.y * (m->vel[2] / 4.0f);
         intendedPos[1] = m->pos[1];
 
         stepResult = perform_ground_quarter_step(m, intendedPos);
+        SetQuarterstep(quarterStepCounter, 3, m->pos);
+        quarterStepCounter++;
         if (stepResult == GROUND_STEP_LEFT_GROUND || stepResult == GROUND_STEP_HIT_WALL_STOP_QSTEPS) {
             break;
         }
@@ -397,9 +411,12 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
     f32 waterLevel;
 
     vec3f_copy(nextPos, intendedPos);
+    SetQuarterstep(quarterStepCounter, 0, nextPos);
 
     upperWall = resolve_and_return_wall_collisions(nextPos, 150.0f, 50.0f);
+    SetQuarterstep(quarterStepCounter, 1, nextPos);
     lowerWall = resolve_and_return_wall_collisions(nextPos, 30.0f, 50.0f);
+    SetQuarterstep(quarterStepCounter, 2, nextPos);
 
     floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     ceilHeight = vec3f_find_ceil(nextPos, floorHeight, &ceil);
@@ -607,8 +624,7 @@ void apply_vertical_wind(struct MarioState *m) {
     }
 }
 
-Vec3f last_q_step;
-Vec3f last_q_step2;
+// _EDIT_ track quartersteps
 s32 perform_air_step(struct MarioState *m, u32 stepArg) {
     Vec3f intendedPos;
     s32 i;
@@ -617,15 +633,15 @@ s32 perform_air_step(struct MarioState *m, u32 stepArg) {
 
     m->wall = NULL;
 
+    quarterStepCounter = 0;
     for (i = 0; i < 4; i++) {
         intendedPos[0] = m->pos[0] + m->vel[0] / 4.0f;
         intendedPos[1] = m->pos[1] + m->vel[1] / 4.0f;
         intendedPos[2] = m->pos[2] + m->vel[2] / 4.0f;
 
-        vec3f_copy(last_q_step2, last_q_step);
-        vec3f_copy(last_q_step, intendedPos);
-
         quarterStepResult = perform_air_quarter_step(m, intendedPos, stepArg);
+        SetQuarterstep(quarterStepCounter, 3, m->pos);
+        quarterStepCounter++;
 
         //! On one qf, hit OOB/ceil/wall to store the 2 return value, and continue
         // getting 0s until your last qf. Graze a wall on your last qf, and it will

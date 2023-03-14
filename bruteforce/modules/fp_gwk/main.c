@@ -18,6 +18,7 @@
 #include "bruteforce/framework/interface.h"
 #include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/candidates.h"
+#include "bruteforce/framework/quarter_steps.h"
 
 f32 minSpeed;
 
@@ -66,8 +67,10 @@ void perturbInput(OSContPad *input) {
 
 u8 updateScore(Candidate *candidate, u32 frame_idx) {
 	if (frame_idx == bfStaticState.scoring_frame - 1) {
-		f64 dist = last_q_step[0] * bfStaticState.plane_nx + last_q_step[2] * bfStaticState.plane_nz + bfStaticState.plane_d - 50.0;
-		f64 dist2 = last_q_step2[0] * bfStaticState.plane_nx + last_q_step2[2] * bfStaticState.plane_nz + bfStaticState.plane_d - 50.0;
+		Vec3f *last_q_step = GetQuarterstep(2, 0);
+		Vec3f *last_q_step2 = GetQuarterstep(3, 0);
+		f64 dist = (*last_q_step)[0] * bfStaticState.plane_nx + (*last_q_step)[2] * bfStaticState.plane_nz + bfStaticState.plane_d - 50.0;
+		f64 dist2 = (*last_q_step2)[0] * bfStaticState.plane_nx + (*last_q_step2)[2] * bfStaticState.plane_nz + bfStaticState.plane_d - 50.0;
 		f64 score = -(dist * dist + dist2 * dist2);
 		u8 best = gMarioStates->forwardVel > programState->bestScore;
 		if (!best)
