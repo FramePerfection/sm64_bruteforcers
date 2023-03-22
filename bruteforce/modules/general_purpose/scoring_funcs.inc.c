@@ -34,22 +34,21 @@ SCORING_FUNC(CheckWall)
 SCORING_FUNC(RestrictAngle)
 
 #define PARAM_MEMBERS_RestrictHPosition \
+	PARAM_MEMBER(quarterstep, quarterstep, "The quarter-step on which to apply the function") \
 	PARAM_MEMBER(f64, nx, "The plane normal's x component") \
 	PARAM_MEMBER(f64, nz, "The plane normal's z component") \
 	PARAM_MEMBER(f64, d, "The plane's offset value") \
 	PARAM_MEMBER(boolean, approach, "Determines whether a score should be computed for getting close to the restriction plane")
 SCORING_FUNC(RestrictHPosition)
 
-#define PARAM_MEMBERS_RestrictHDist \
+#define PARAM_MEMBERS_XZRadialLimit \
+	PARAM_MEMBER(quarterstep, quarterstep, "The quarter-step on which to apply the function") \
 	PARAM_MEMBER(f32, x, "The cylinder's x position") \
 	PARAM_MEMBER(f32, z, "The cylinder's z position") \
-	PARAM_MEMBER(f32, dist, "The maximum distance of Mario from the cylinder that will be accepted")
-SCORING_FUNC(RestrictHDist)
-
-#define PARAM_MEMBERS_MatchHPosition \
-	PARAM_MEMBER(f32, x, "The x coordinate to match") \
-	PARAM_MEMBER(f32, z, "The z coordinate to match")
-SCORING_FUNC(MatchHPosition)
+	PARAM_MEMBER(f32, dist, "The maximum distance of Mario from the cylinder that will be accepted") \
+	PARAM_MEMBER(boolean, approach, "if set, a negative score will be applied when the tested position is outside of the accepted radius") \
+	PARAM_MEMBER(boolean, abort_on_failure, "If set, attempts will abort on this frame if the distance is not accepted.")
+SCORING_FUNC(XZRadialLimit)
 
 #define PARAM_MEMBERS_MatchHSpeed \
 	PARAM_MEMBER(f32, hspeed, "The hspeed to match")
@@ -59,8 +58,14 @@ SCORING_FUNC(MatchHSpeed)
 
 // not necessary for compilation, but allows intellisense to find struct definitions
 #include "bruteforce/modules/general_purpose/scoring_method.h"
+#include "bruteforce/framework/types.h"
+#include "bruteforce/framework/quarter_steps.h"
+
+#include <math.h>
 
 extern struct MarioState *gMarioState;
+extern 
+
 f64 sm_MaximizeHSpeed(MaximizeHSpeedParameters args, Candidate *candidate, u8 *success, u8 *abort) {
 	*success = TRUE;
 	return gMarioState->forwardVel;
@@ -97,7 +102,8 @@ f64 sm_RestrictAngle(RestrictAngleParameters args, Candidate *candidate, u8 *suc
 }
 
 f64 sm_RestrictHPosition(RestrictHPositionParameters args, Candidate *candidate, u8 *success, u8 *abort) {
-	f64 diff = (gMarioState->pos[0] * args->nx + gMarioState->pos[2] * args->nz) - args->d;
+	Vec3f *srcPos = GetQuarterstep(args->quarterstep / 4, args->quarterstep % 4);
+	f64 diff = ((*srcPos)[0] * args->nx + (*srcPos)[2] * args->nz) - args->d;
 	if (diff > 0) {
 		*success = FALSE;
 		*abort = TRUE;
@@ -107,21 +113,20 @@ f64 sm_RestrictHPosition(RestrictHPositionParameters args, Candidate *candidate,
 	return 0;
 }
 
-f64 sm_RestrictHDist(RestrictHDistParameters args, Candidate *candidate, u8 *success, u8 *abort) {
-	f32 dx = gMarioState->pos[0] - args->x;
-	f32 dz = gMarioState->pos[2] - args->z;
+f64 sm_XZRadialLimit(XZRadialLimitParameters args, Candidate *candidate, u8 *success, u8 *abort) {
+	Vec3f *srcPos = GetQuarterstep(args->quarterstep / 4, args->quarterstep % 4);
+	f32 dx = (*srcPos)[0] - args->x;
+	f32 dz = (*srcPos)[2] - args->z;
 	f32 distSq = (dx * dx + dz * dz);
 	if (distSq >= args->dist * args->dist) {
-		*abort = TRUE;
-		*success = FALSE;
+		*abort = args->abort_on_failure;
+		*success = !*abort;
+		if (args->approach) {
+			double mismatch = sqrt(distSq) - args->dist;
+			return -mismatch * mismatch;
+		}
 	}
 	return 0.0;
-}
-
-f64 sm_MatchHPosition(MatchHPositionParameters args, Candidate *candidate, u8 *success, u8 *abort) {
-	f64 diff_x = args->x - gMarioState->pos[0];
-	f64 diff_z = args->z - gMarioState->pos[2];
-	return -((diff_x * diff_x) + (diff_z * diff_z)); 
 }
 
 f64 sm_MatchHSpeed(MatchHSpeedParameters args, Candidate *candidate, u8 *success, u8 *abort) {

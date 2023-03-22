@@ -5,6 +5,7 @@
 
 #include "bruteforce/framework/candidates.h"
 #include "bruteforce/framework/json.h"
+#include "bruteforce/framework/quarter_steps.h"
 
 typedef f64 (*scoringFunc)(void*, Candidate*, u8*, u8*);
 
