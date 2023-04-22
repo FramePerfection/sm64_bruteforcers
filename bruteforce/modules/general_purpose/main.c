@@ -80,15 +80,15 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort) {
 	*abort = FALSE;
 	u8 success = TRUE;
 	u32 i;
+	u8 lastFrame = frame_idx + 1 == candidate->sequence->count;
 
-	if (bfStaticState.score_on_last_frame && frame_idx + 1 != candidate->sequence->count)
-		success = FALSE;
+	if (bfStaticState.score_on_last_frame || frame_idx == 0)
+		candidate->score = 0.0;
 
 	if (!bfStaticState.relative_frame_numbers)
 		frame_idx += bfStaticState.m64_start;
 
 	candidate->stats.frame_index = frame_idx;
-	candidate->score = 0.0;
 	for (i = 0; i < bfStaticState.scoring_methods.n_methods; i++) 
 		if (bfStaticState.scoring_methods.methods[i].frame == frame_idx + 1) {
 			applyMethod(&bfStaticState.scoring_methods.methods[i], candidate, &success, abort);
@@ -96,9 +96,9 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort) {
 		}
 
 	u8 best = success && candidate->score > programState->bestScore;
-	if (best) {
+	if (best && lastFrame) {
 		programState->bestScore = candidate->score;
-		output_input_sequence(candidate->sequence);
+		output_input_sequence(bfInitialDynamicState.global_timer, candidate->sequence);
 		safePrintf("New best: %f\n", candidate->score);
 	}
 }

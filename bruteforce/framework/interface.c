@@ -60,11 +60,12 @@ void parse_command_line_args(int argc, char *argv[]) {
 		safePrintf("launching from %s...\n", override_config_file);
 }
 
-u8 save_to_sequence_file(char *fileName, InputSequence *inputSequence) {
+u8 save_to_sequence_file(char *fileName, u32 globalTimerAtStart, InputSequence *inputSequence) {
 	FILE *dst_file = fopen(fileName, "w");
 	if (dst_file == NULL)
 		return FALSE;
-	
+	u8 globalTimerBytes[4] = {globalTimerAtStart >> 0x18, globalTimerAtStart >> 0x10, globalTimerAtStart >> 0x8, globalTimerAtStart};
+	fwrite_hex32string(dst_file, globalTimerBytes);
 	fwrite_input_sequence(dst_file, inputSequence);
 	fclose(dst_file);
 	return TRUE;
@@ -79,7 +80,7 @@ u8 save_to_sequence_file(char *fileName, InputSequence *inputSequence) {
 		nanosleep(&ts, &ts); \
 	}
 
-u8 output_input_sequence(InputSequence *inputSequence) {
+u8 output_input_sequence(u32 globalTimerAtStart, InputSequence *inputSequence) {
 	u32 fail_counter = 0;
 	struct timespec ts;
 	ts.tv_sec = 1;
@@ -91,7 +92,7 @@ u8 output_input_sequence(InputSequence *inputSequence) {
 	}
 	if (strcmp(output_mode, "sequence") == 0 || strcmp(output_mode, "m64_and_sequence") == 0)
 	{
-		TRY_WRITE(save_to_sequence_file("tmp.m64.part", inputSequence))
+		TRY_WRITE(save_to_sequence_file("tmp.m64.part", globalTimerAtStart, inputSequence))
 	}
 	return TRUE;
 }

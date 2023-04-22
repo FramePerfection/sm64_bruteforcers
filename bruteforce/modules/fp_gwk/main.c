@@ -82,7 +82,7 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 		{
 			safePrintf("Found one: %d, %f %s\n", gMarioState->faceAngle[1], gMarioState->forwardVel, best ? "\t(new best!)" : "");
 			if (best) {
-				output_input_sequence(candidate->sequence);
+				output_input_sequence(bfInitialDynamicState.global_timer, candidate->sequence);
 				programState->bestScore = gMarioState->forwardVel;
 			}
 		}
