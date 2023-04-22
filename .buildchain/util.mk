@@ -26,7 +26,7 @@ endef
 # Creates a text file documentation by running the preprocessor on a given source file
 define create-state-definition-file
 	$(CC) -E -CC -P $(foreach i,$(INCLUDE_DIRS),-I$(i)) -DMODULE_PATH=$(NAME) $1 \
-		| sed -e 's/$(NEWLINE_TOKEN) /\n/g' -e 's/$(NEWLINE_TOKEN)//g' > $(BINARY_DIR)/$(NAME)/$2
+		| sed -e 's/$(NEWLINE_TOKEN) /\n/g' -e 's/$(NEWLINE_TOKEN)//g' -e 's/""//g' > $(BINARY_DIR)/$(NAME)/$2
 endef
 
 # Returns the path to the command $(1) if exists. Otherwise returns an empty string.
