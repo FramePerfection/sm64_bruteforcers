@@ -66,7 +66,7 @@ typedef struct BFStaticState_s {
 #undef BF_CONTROL_STATE
 
 
-extern BFControlState bfControlState;
+extern BFControlState *bfControlState;
 extern BFDynamicState bfInitialDynamicState;
 extern BFStaticState bfStaticState;
 
@@ -76,5 +76,6 @@ void read_state_json(Json*);
 u8 bf_init_states();
 void bf_load_dynamic_state(BFDynamicState*);
 void bf_save_dynamic_state(BFDynamicState*);
+void bf_update_control_state(char*);
 
 #endif // BF_STATES_H

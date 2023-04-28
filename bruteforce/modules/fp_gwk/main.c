@@ -95,8 +95,8 @@ u8 updateScore(Candidate *candidate, u32 frame_idx) {
 
 void bruteforceLoop() {
 	clock_t lastClock = clock();
-	u32 gen_mod = bfStaticState.print_interval;
-	u32 gen_merge_mod = bfStaticState.merge_interval;
+	u32 gen_mod = bfControlState->print_interval;
+	u32 gen_merge_mod = bfControlState->merge_interval;
 	if (gen_mod == 0)
 		gen_mod = 100;
 
@@ -122,7 +122,7 @@ void bruteforceLoop() {
 				InputSequence *inputs = candidate->sequence;
 				clone_m64_inputs(inputs, original->sequence);
 
-				u8 keepOriginal = run_idx == 0 && (randFloat() > bfStaticState.forget_rate);
+				u8 keepOriginal = run_idx == 0 && (randFloat() > bfControlState->forget_rate);
 				
 				bf_load_dynamic_state(&bfInitialDynamicState);
 				gPlayer1Controller->rawStickX = inputs->originalInput.stick_x;
@@ -138,7 +138,7 @@ void bruteforceLoop() {
 					updateScore(candidate, frame_idx);
 				}
 
-				if (candidate->stats.hSpeed < programState->bestScore - bfStaticState.score_leniency)
+				if (candidate->stats.hSpeed < programState->bestScore - bfControlState->score_leniency)
 					clone_m64_inputs(inputs, original->sequence);
 			}
 		}

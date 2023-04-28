@@ -9,6 +9,13 @@
 #include <time.h>
 #include <unistd.h>
 
+#define MAX_CONTROL_STATE_JSON_BUFFER 4096
+
+#ifdef _WIN32
+#include <windows.h>
+DWORD threadIdInputListener;
+#endif
+
 char *override_config_file = NULL;
 char *child_args = NULL;
 char *output_mode = "m64";
@@ -58,6 +65,33 @@ void parse_command_line_args(int argc, char *argv[]) {
 
 	if (override_config_file)
 		safePrintf("launching from %s...\n", override_config_file);
+}
+
+#ifdef _WIN32
+DWORD WINAPI listen_to_input_func( __attribute__((unused)) LPVOID lpParam ) {
+#else
+void *listen_to_input_func() {
+#endif
+	// loop indefinitely
+	while (1) {
+		// TODO(Important): Read strings of indefinite length
+		char blub[MAX_CONTROL_STATE_JSON_BUFFER];
+		fgets(blub, MAX_CONTROL_STATE_JSON_BUFFER, stdin);
+		safePrintf("Updating control state!\n");
+		bf_update_control_state(blub);
+
+		// sleep to not hog the processor		
+		struct timespec ts;
+		ts.tv_sec = 1;
+		ts.tv_nsec = 0;
+		nanosleep(&ts, &ts);
+	}
+}
+
+void listen_to_inputs() {
+#ifdef _WIN32
+	CreateThread(NULL, 0, listen_to_input_func, NULL, 0, &threadIdInputListener);
+#endif
 }
 
 u8 save_to_sequence_file(char *fileName, u32 globalTimerAtStart, InputSequence *inputSequence) {
