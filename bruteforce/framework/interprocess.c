@@ -267,6 +267,7 @@ void safePrintf(const char* fmt, ...) {
 	va_list argptr;
 	va_start(argptr,fmt);
 	vprintf(fmt, argptr);
+	fflush(stdout);
 	va_end(argptr);
 	if (mutex)
 		ReleaseMutex(mutex);
