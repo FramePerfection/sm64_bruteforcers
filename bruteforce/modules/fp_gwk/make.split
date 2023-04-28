@@ -1,7 +1,6 @@
 NAME := fp_gwk
 
 $(NAME)REQUIRED_OBJECTS := bruteforce/modules/$(NAME)/main.o
-$(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/$(NAME)/framework/, candidates.o bf_states.o interprocess.o)
 $(NAME)REQUIRED_OBJECTS += $(addprefix src/engine/,math_util.o surface_collision.o surface_load_reduced.o)
 $(NAME)REQUIRED_OBJECTS += $(addprefix src/game/,camera_reduced.o $(MARIO_STEP_OBJECTS))
 
