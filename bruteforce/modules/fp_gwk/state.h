@@ -4,7 +4,7 @@
 #include <PR/ultratypes.h>
 
 typedef struct {
-	f32 bestScore;
+	f64 bestScore;
 } ProgramState;
 
 typedef struct {
