@@ -79,7 +79,7 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort) {
 				(gMarioState->pos[1] < bfStaticState.hitboxes.data[0].above + bfStaticState.hitboxes.data[0].y)
 				&& (distance_to_coin1 < (bfStaticState.hitboxes.data[0].radius + 37)) && (gMarioState->angleVel[1] > -630)) {
 			programState->bestScore = score;
-			output_input_sequence(candidate->sequence);
+			output_input_sequence(bfInitialDynamicState.global_timer, candidate->sequence);
 			safePrintf("x: %f y: %f z: %f yaw: %i yawvel: %i\n", gMarioState->pos[0], gMarioState->pos[1], gMarioState->pos[2], gMarioState->faceAngle[1], gMarioState->angleVel[1]);
 			safePrintf("New best: %f\n", score);
 		}

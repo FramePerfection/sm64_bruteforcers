@@ -162,7 +162,7 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort) {
 	if (hasbest && newClock - lastSaveTime > 1000) {
 		hasbest = FALSE;
 		lastSaveTime = newClock;
-		output_input_sequence(bestInputs);
+		output_input_sequence(bfInitialDynamicState.global_timer, bestInputs);
 		safePrintf("New best: %f\n", programState->bestScore);
 	}
 }
@@ -230,7 +230,7 @@ void main(int argc, char *argv[]) {
 
 	bestInputs = clone_m64(original_inputs);
 
-	output_input_sequence(original_inputs);
+	output_input_sequence(bfInitialDynamicState.global_timer, original_inputs);
 
 	// 2nd phase: optimize inputs to reduce overall error across frames
 	initializeMultiProcess(original_inputs);

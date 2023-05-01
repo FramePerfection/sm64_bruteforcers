@@ -12,20 +12,22 @@
 #undef BF_STATE_INCLUDE
 
 
+static BFControlState bfInitialControlState;
 BFStaticState bfStaticState;
 BFDynamicState bfInitialDynamicState;
+BFControlState *bfControlState;
 ProgramState *programState;
 
 void read_state_json(Json *node) {
-	#define BF_STATIC_STATE(type, struct_name, target_expr) \
+	
+	#define BF_CONTROL_STATE(type, struct_name, documentation) \
 		if (strcmp(#struct_name, node->name) == 0) \
 		{ \
-			read_##type(node, &bfStaticState.struct_name); \
-			memcpy(&(target_expr), &bfStaticState.struct_name, sizeof bfStaticState.struct_name); \
+			read_##type(node, &bfInitialControlState.struct_name); \
 			return; \
 		}
 
-	#define BF_DYNAMIC_STATE(type, struct_name, target_expr) \
+	#define BF_DYNAMIC_STATE(type, struct_name, target_expr, documentation) \
 		if (strcmp(#struct_name, node->name) == 0) \
 		{ \
 			read_##type(node, &bfInitialDynamicState.struct_name); \
@@ -33,15 +35,25 @@ void read_state_json(Json *node) {
 			return; \
 		}
 
+	#define BF_STATIC_STATE(type, struct_name, target_expr, documentation) \
+		if (strcmp(#struct_name, node->name) == 0) \
+		{ \
+			read_##type(node, &bfStaticState.struct_name); \
+			memcpy(&(target_expr), &bfStaticState.struct_name, sizeof bfStaticState.struct_name); \
+			return; \
+		}
+
 	#include STATE_DEFINITION_FILE
 
-	#undef BF_STATIC_STATE
+	#undef BF_CONTROL_STATE
 	#undef BF_DYNAMIC_STATE
+	#undef BF_STATIC_STATE
 	
 	safePrintf("Warning: Undefined state \"%s\" set.\n", node->name);
 }
 
 u8 bf_init_states() {
+	bfControlState = &bfInitialControlState;
 	const char* fileContents = read_file(override_config_file != NULL ? override_config_file : "configuration.json");
 	Json *root = Json_create(fileContents);
 	if (!root) {
@@ -60,23 +72,53 @@ u8 bf_init_states() {
 }
 
 void bf_load_dynamic_state(BFDynamicState *state) {
-	#define BF_STATIC_STATE(_0, _1, _2)
-	#define BF_DYNAMIC_STATE(type, struct_name, target_expr) \
+	#define BF_CONTROL_STATE(_0, _1, _2)
+	#define BF_DYNAMIC_STATE(type, struct_name, target_expr, documentation) \
 		memcpy(&(target_expr), &state->struct_name, sizeof state->struct_name);
+	#define BF_STATIC_STATE(_0, _1, _2, _3)
 	
 	#include STATE_DEFINITION_FILE
 
-	#undef BF_STATIC_STATE
+	#undef BF_CONTROL_STATE
 	#undef BF_DYNAMIC_STATE
+	#undef BF_STATIC_STATE
 }
 
 void bf_save_dynamic_state(BFDynamicState *state) {
-	#define BF_STATIC_STATE(_0, _1, _2)
-	#define BF_DYNAMIC_STATE(type, struct_name, target_expr) \
+	#define BF_CONTROL_STATE(_0, _1, _2)
+	#define BF_DYNAMIC_STATE(type, struct_name, target_expr, documentation) \
 		memcpy(&state->struct_name, &(target_expr), sizeof state->struct_name);
+	#define BF_STATIC_STATE(_0, _1, _2, _3)
 	
 	#include STATE_DEFINITION_FILE
 
-	#undef BF_STATIC_STATE
+	#undef BF_CONTROL_STATE
 	#undef BF_DYNAMIC_STATE
+	#undef BF_STATIC_STATE
+}
+
+void bf_update_control_state(char *input) {
+	Json *root = Json_create(input);
+	if (!root) {
+		safePrintf("Invalid conrol state json starting at:\n%s\n", Json_getError());
+		return FALSE;
+	}
+	Json *node = root->child;
+	// TODO(Important): lock a mutex to prevent "torn reads" in running processes
+	while (node != NULL) {
+		#define BF_CONTROL_STATE(type, struct_name, documentation) \
+			if (strcmp(#struct_name, node->name) == 0) \
+				read_##type(node, &bfControlState->struct_name);
+		#define BF_DYNAMIC_STATE(_0, _1, _2, _3)
+		#define BF_STATIC_STATE(_0, _1, _2, _3)
+
+		#include STATE_DEFINITION_FILE
+
+		#undef BF_CONTROL_STATE
+		#undef BF_DYNAMIC_STATE
+		#undef BF_STATIC_STATE
+
+		node = node->next;
+	}
+	Json_dispose(root);
 }

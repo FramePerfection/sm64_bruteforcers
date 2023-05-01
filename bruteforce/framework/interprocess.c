@@ -19,7 +19,7 @@ static void *pBuf;
 static HANDLE mutex;
 #endif
 
-#define BUF_SIZE sizeof(ProgramState)
+#define BUF_SIZE (sizeof(ProgramState) + sizeof(BFControlState))
 
 u32 transmissionCandidateSize;
 u32 sequenceSize;
@@ -160,8 +160,12 @@ void initializeMultiProcess(InputSequence *original_inputs) {
 		createMapFileView();
 		createMutex();
 		createChildProcesses();
+		listen_to_inputs();
 	}
 	programState = pBuf;
+	BFControlState *initialState = bfControlState;
+	bfControlState = (BFControlState *)(pBuf + sizeof(ProgramState));
+	memcpy(bfControlState, initialState, sizeof(BFControlState));
 }
 
 static void writeSurvivorsToBuffer(Candidate *survivors) {
@@ -267,6 +271,7 @@ void safePrintf(const char* fmt, ...) {
 	va_list argptr;
 	va_start(argptr,fmt);
 	vprintf(fmt, argptr);
+	fflush(stdout);
 	va_end(argptr);
 	if (mutex)
 		ReleaseMutex(mutex);

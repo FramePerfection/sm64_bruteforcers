@@ -15,7 +15,7 @@ void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc upda
 	
 	clock_t lastClock = clock();
 
-	u32 gen_merge_mod = bfStaticState.merge_interval;
+	u32 gen_merge_mod = bfControlState->merge_interval;
 	if (gen_merge_mod == 0)
 		gen_merge_mod = 20;
 
@@ -24,11 +24,11 @@ void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc upda
 	for (gen = 0; gen < bfStaticState.max_generations; gen++) {
 		clock_t curClock = clock();
 		float seconds = (float)(curClock - lastClock) / CLOCKS_PER_SEC;
-		if (seconds >= bfStaticState.print_interval)
+		if (seconds >= bfControlState->print_interval)
 		{
 			float fps = frames / seconds;
 			lastClock = curClock;
-			safePrintf("Generation %d starting... (%f FPS) (Best score: %f)\n", gen, fps, programState->bestScore);
+			safePrintf("Generation %d starting... (%f FPS) (Best score: %f) (%d)\n", gen, fps, programState->bestScore, bfControlState->print_interval);
 			frames = 0;
 		}
 
@@ -44,7 +44,7 @@ void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc upda
 				InputSequence *inputs = candidate->sequence;
 				clone_m64_inputs(inputs, original->sequence);
 
-				u8 keepOriginal = run_idx == 0 && (randFloat() > bfStaticState.forget_rate);
+				u8 keepOriginal = run_idx == 0 && (randFloat() > bfControlState->forget_rate);
 
 				gPlayer1Controller->buttonDown = inputs->originalInput.button;
 				gPlayer1Controller->rawStickX = inputs->originalInput.stick_x;
