@@ -7,6 +7,6 @@ u8 isParentProcess();
 void initializeMultiProcess(InputSequence *original_inputs);
 void childUpdateMessages(Candidate *survivors);
 void parentMergeCandidates(Candidate *survivors);
-void safePrintf(const char* fmt, ...);
+void safePrintf(const char *fmt, ...);
 
 #endif // INTERPROCESS_H

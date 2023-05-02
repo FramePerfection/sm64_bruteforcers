@@ -13,7 +13,7 @@
 #include "src/game/game_init.h"
 
 #include "bruteforce/framework/misc_util.h"
-#include "bruteforce/framework/bf_states.h"
+#include "bruteforce/framework/states.h"
 #include "bruteforce/framework/m64.h"
 #include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/interface.h"
@@ -21,7 +21,8 @@
 
 #include "bruteforce/algorithms/genetic/algorithm.h"
 
-typedef struct ReferenceFrame_s {
+typedef struct ReferenceFrame_s
+{
 	f32 x;
 	f32 y;
 	f32 z;
@@ -38,23 +39,30 @@ static InputSequence *bestInputs;
 static u8 hasbest;
 static clock_t lastSaveTime;
 
-static boolean readReference() {
-	const char* fileContents = read_file("reference_run.json");
+static boolean readReference()
+{
+	const char *fileContents = read_file("reference_run.json");
 	Json *root = Json_create(fileContents);
-	if (!root) {
+	if (!root)
+	{
 		safePrintf("error in reference_run.json starting at:\n%s\n", Json_getError());
-		free((char*)fileContents);
+		free((char *)fileContents);
 		return FALSE;
 	}
-	
+
 	nReferenceFrames = root->size;
 	referenceFrames = calloc(nReferenceFrames, sizeof(ReferenceFrame));
 	ReferenceFrame *currentFrame = &referenceFrames[0];
 	Json *frameNode = root->child;
-	while (frameNode != NULL) {
+	while (frameNode != NULL)
+	{
 
-// TODO: this can be abstracted better
-#define JSON_SRC(NAME) if (strcmp(dataNode->name, #NAME) == 0) currentFrame->NAME = dataNode->
+		// TODO: this can be abstracted better
+		// clang-format off
+
+		#define JSON_SRC(NAME)                      \
+			if (strcmp(dataNode->name, #NAME) == 0) \
+			currentFrame->NAME = dataNode->
 		Json *dataNode = frameNode->child;
 		while (dataNode != NULL){
 			JSON_SRC(x)valueFloat;
@@ -66,61 +74,69 @@ static boolean readReference() {
 			JSON_SRC(buttonDown)valueInt;
 			dataNode = dataNode->next;
 		}
-#undef JSON_SRC
+		#undef JSON_SRC
+		// clang-format on
 		frameNode = frameNode->next;
 		currentFrame++;
 	}
-	free((char*)fileContents);
+	free((char *)fileContents);
 	Json_dispose(root);
 	return TRUE;
 }
 
-static void initGame() {
+static void initGame()
+{
 	initCamera();
 	initArea();
 	initMario();
-	
+
 	safePrintf("Loading reference run...\n");
-	if (!readReference()) {
+	if (!readReference())
+	{
 		safePrintf("Failed to read reference run!");
 		exit(-1);
 	}
 
 	safePrintf("Loading configuration...\n");
-	if (!bf_init_states()) {
+	if (!bf_init_states())
+	{
 		safePrintf("Failed to load configuration! Exiting...\n");
 		exit(-1);
 	}
-	
+
 	clear_static_surfaces();
 	clear_dynamic_surfaces();
 	init_static_surfaces(bfStaticState.static_tris);
 	init_dynamic_surfaces(bfStaticState.dynamic_tris);
 
 	// srand(bfStaticState.rnd_seed);
-	
+
 	init_camera(gCamera);
 	// Still required to initialize something?
 	execute_mario_action(gMarioState->marioObj);
 	update_camera(gCurrentArea->camera);
 }
 
-static void updateGame(OSContPad *input) {
+static void updateGame(OSContPad *input)
+{
 	updateController(input);
 	adjust_analog_stick(gPlayer1Controller);
 	execute_mario_action(gMarioState->marioObj);
-	if (gCurrentArea != NULL) {
+	if (gCurrentArea != NULL)
+	{
 		update_camera(gCurrentArea->camera);
 	}
 }
 
-static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, u32 frame_idx) {
+static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, u32 frame_idx)
+{
 	if (!bfStaticState.relative_frame_numbers)
 		frame_idx += bfStaticState.m64_start;
 
 	UNUSED f64 score_diff = candidate->stats.lastScore - candidate->score;
-	f64 chance = 1.0; //1.0 / (1.0 + exp(-score_diff));
-	if (randFloat() < chance * bfStaticState.perturbation_chance) {
+	f64 chance = 1.0; // 1.0 / (1.0 + exp(-score_diff));
+	if (randFloat() < chance * bfStaticState.perturbation_chance)
+	{
 		u16 perturb = (u16)(bfStaticState.max_perturbation);
 		u8 perturbation_x = (rand() % (2 * perturb) - perturb);
 		u8 perturbation_y = (rand() % (2 * perturb) - perturb);
@@ -129,7 +145,8 @@ static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, u32 fram
 	}
 }
 
-static f64 getError(ReferenceFrame *reference) {
+static f64 getError(ReferenceFrame *reference)
+{
 	f64 x_diff = (gMarioState->pos[0] - reference->x) * bfStaticState.x_weight;
 	f64 y_diff = (gMarioState->pos[1] - reference->y) * bfStaticState.y_weight;
 	f64 z_diff = (gMarioState->pos[2] - reference->z) * bfStaticState.z_weight;
@@ -138,20 +155,23 @@ static f64 getError(ReferenceFrame *reference) {
 	return (x_diff * x_diff) + (y_diff * y_diff) + (z_diff * z_diff) + (hspeed_diff * hspeed_diff) + (angle_diff * angle_diff);
 }
 
-static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort) {
+static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort)
+{
 	*abort = gMarioState->action != referenceFrames[frame_idx + bfStaticState.reference_offset].action;
-	
+
 	if (frame_idx == 0)
 		candidate->score = 0;
 	candidate->stats.lastScore = candidate->score;
-	
+
 	f64 frame_diff = getError(&referenceFrames[frame_idx + bfStaticState.reference_offset]);
 	candidate->score -= frame_diff * frame_diff;
 	candidate->stats.frame_index = frame_idx;
 
-	if (frame_idx == candidate->sequence->count - 1) {
+	if (frame_idx == candidate->sequence->count - 1)
+	{
 		u8 best = candidate->score > programState->bestScore;
-		if (best) {
+		if (best)
+		{
 			hasbest = TRUE;
 			programState->bestScore = candidate->score;
 			clone_m64_inputs(bestInputs, candidate->sequence);
@@ -159,7 +179,8 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort) {
 	}
 	// Save at most 1 run per second
 	clock_t newClock = clock();
-	if (hasbest && newClock - lastSaveTime > 1000) {
+	if (hasbest && newClock - lastSaveTime > 1000)
+	{
 		hasbest = FALSE;
 		lastSaveTime = newClock;
 		output_input_sequence(bfInitialDynamicState.global_timer, bestInputs);
@@ -167,7 +188,8 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort) {
 	}
 }
 
-void main(int argc, char *argv[]) {
+void main(int argc, char *argv[])
+{
 	parse_command_line_args(argc, argv);
 
 	safePrintf("Running Bruteforcer...\n");
@@ -181,7 +203,8 @@ void main(int argc, char *argv[]) {
 		exit(-1);
 	}
 
-	if (bfStaticState.per_frame_matching) {
+	if (bfStaticState.per_frame_matching)
+	{
 		// Initial runthrough, find best input to match on every frame one by one
 		u32 i;
 		s8 x, y;
@@ -191,7 +214,8 @@ void main(int argc, char *argv[]) {
 			nFramesToMatch = nReferenceFrames;
 
 		bf_load_dynamic_state(&bfInitialDynamicState);
-		for (i = 0; i < nFramesToMatch; i++) {
+		for (i = 0; i < nFramesToMatch; i++)
+		{
 			u32 k = i + bfStaticState.reference_offset;
 			safePrintf("Matching frame %d...\n", k);
 
@@ -203,8 +227,10 @@ void main(int argc, char *argv[]) {
 				cont.button = (u16)referenceFrames[k].buttonDown;
 
 			// Iterate the entire set of control stick options...
-			for (y = -128; y != 127; y++) {
-				for (x = -128; x != 127; x++) {
+			for (y = -128; y != 127; y++)
+			{
+				for (x = -128; x != 127; x++)
+				{
 					bf_load_dynamic_state(&state);
 					cont.stick_x = x;
 					cont.stick_y = y;
@@ -212,7 +238,8 @@ void main(int argc, char *argv[]) {
 
 					// ... and store the best result in the original input sequence
 					f64 newError = getError(&referenceFrames[k]);
-					if (newError < minError) {
+					if (newError < minError)
+					{
 						memcpy(&original_inputs->inputs[i], &cont, sizeof(OSContPad));
 						minError = newError;
 					}
@@ -222,7 +249,7 @@ void main(int argc, char *argv[]) {
 			// Then perform the best found input again and continue from there
 			bf_load_dynamic_state(&state);
 			updateGame(&original_inputs->inputs[i]);
-			
+
 			safePrintf("Matched frame %d with error %f!\n", i, minError);
 		}
 		safePrintf("Matching frames done!\n");
@@ -234,7 +261,7 @@ void main(int argc, char *argv[]) {
 
 	// 2nd phase: optimize inputs to reduce overall error across frames
 	initializeMultiProcess(original_inputs);
-	
+
 	if (isParentProcess())
 		programState->bestScore = -INFINITY;
 

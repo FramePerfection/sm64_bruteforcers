@@ -1,4 +1,4 @@
-/* This file contains stubs for functions that shall not be necessary to execute, 
+/* This file contains stubs for functions that shall not be necessary to execute,
 / but may be called from necessary function.
 / Examples are playing sound, rendering graphics etc.
 */

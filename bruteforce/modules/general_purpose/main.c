@@ -12,7 +12,7 @@
 #include "src/game/game_init.h"
 
 #include "bruteforce/framework/misc_util.h"
-#include "bruteforce/framework/bf_states.h"
+#include "bruteforce/framework/states.h"
 #include "bruteforce/framework/m64.h"
 #include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/interface.h"
@@ -22,51 +22,58 @@
 
 #include "perturbator.h"
 
-static void initGame() {
+static void initGame()
+{
 	initCamera();
 	initArea();
 	initMario();
-	
+
 	safePrintf("Loading configuration...\n");
-	if (!bf_init_states()) {
+	if (!bf_init_states())
+	{
 		safePrintf("Failed to load configuration! Exiting...\n");
 		exit(-1);
 	}
 	safePrintf("m64 path is %s, %p, loaded from %s \n", bfStaticState.m64_input, &bfStaticState.m64_input[0], override_config_file);
-	
+
 	clear_static_surfaces();
 	clear_dynamic_surfaces();
 	init_static_surfaces(bfStaticState.static_tris);
 	init_dynamic_surfaces(bfStaticState.dynamic_tris);
 
 	// srand(bfStaticState.rnd_seed);
-	
+
 	init_camera(gCamera);
 	// Still required to initialize something?
 	execute_mario_action(gMarioState->marioObj);
 	update_camera(gCurrentArea->camera);
 }
 
-static void updateGame(OSContPad *input) {
+static void updateGame(OSContPad *input)
+{
 	updateController(input);
 	adjust_analog_stick(gPlayer1Controller);
 	execute_mario_action(gMarioState->marioObj);
-	if (gCurrentArea != NULL) {
+	if (gCurrentArea != NULL)
+	{
 		update_camera(gCurrentArea->camera);
 	}
 }
 
-static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, u32 frame_idx) {
+static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, u32 frame_idx)
+{
 	if (!bfStaticState.relative_frame_numbers)
 		frame_idx += bfStaticState.m64_start;
 
 	u32 i;
-	for (i = 0; i < bfStaticState.perturbators.nPerturbators; i++) {
+	for (i = 0; i < bfStaticState.perturbators.nPerturbators; i++)
+	{
 		Perturbator *perturbator = &bfStaticState.perturbators.perturbators[i];
 		if (frame_idx < perturbator->min_frame || frame_idx > perturbator->max_frame)
 			continue;
 
-		if (perturbator->max_perturbation > 0 && randFloat() < perturbator->perturbation_chance) {
+		if (perturbator->max_perturbation > 0 && randFloat() < perturbator->perturbation_chance)
+		{
 			u16 perturb = (u16)(perturbator->max_perturbation);
 			u8 perturbation_x = (rand() % (2 * perturb) - perturb);
 			u8 perturbation_y = (rand() % (2 * perturb) - perturb);
@@ -76,7 +83,8 @@ static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, u32 fram
 	}
 }
 
-static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort) {
+static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort)
+{
 	*abort = FALSE;
 	u8 success = TRUE;
 	u32 i;
@@ -89,21 +97,25 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort) {
 		frame_idx += bfStaticState.m64_start;
 
 	candidate->stats.frame_index = frame_idx;
-	for (i = 0; i < bfStaticState.scoring_methods.n_methods; i++) 
-		if (bfStaticState.scoring_methods.methods[i].frame == frame_idx + 1) {
+	for (i = 0; i < bfStaticState.scoring_methods.n_methods; i++)
+		if (bfStaticState.scoring_methods.methods[i].frame == frame_idx + 1)
+		{
 			applyMethod(&bfStaticState.scoring_methods.methods[i], candidate, &success, abort);
-			if (*abort) return;
+			if (*abort)
+				return;
 		}
 
 	u8 best = success && candidate->score > programState->bestScore;
-	if (best && lastFrame) {
+	if (best && lastFrame)
+	{
 		programState->bestScore = candidate->score;
 		output_input_sequence(bfInitialDynamicState.global_timer, candidate->sequence);
 		safePrintf("New best: %f\n", candidate->score);
 	}
 }
 
-void main(int argc, char *argv[]) {
+void main(int argc, char *argv[])
+{
 	parse_command_line_args(argc, argv);
 
 	safePrintf("Running Bruteforcer...\n");

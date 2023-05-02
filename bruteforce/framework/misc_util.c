@@ -9,31 +9,37 @@
 #include "bruteforce/framework/misc_util.h"
 #include "bruteforce/framework/interprocess.h"
 
-f32 randFloat() {
-	return ((float)rand()/(float)(RAND_MAX));
+f32 randFloat()
+{
+    return ((float)rand() / (float)(RAND_MAX));
 }
 
-static void init_surfaces(Triangles tris, u8 dynamic) {
-	u32 i;
-	for (i = 0; i < tris.data_size; i++) {
-		Triangle t = tris.data[i];
-		struct Surface *surface = gen_surface(t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3, t.surf_type);
-		if (surface != NULL)
-			add_surface(surface, dynamic);
-		else
-			safePrintf("found degenerate triangle: (%d,%d,%d),(%d,%d,%d),(%d,%d,%d)\n", t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3);
-	}
+static void init_surfaces(Triangles tris, u8 dynamic)
+{
+    u32 i;
+    for (i = 0; i < tris.data_size; i++)
+    {
+        Triangle t = tris.data[i];
+        struct Surface *surface = gen_surface(t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3, t.surf_type);
+        if (surface != NULL)
+            add_surface(surface, dynamic);
+        else
+            safePrintf("found degenerate triangle: (%d,%d,%d),(%d,%d,%d),(%d,%d,%d)\n", t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3);
+    }
 }
 
-void init_static_surfaces(Triangles tris) {
+void init_static_surfaces(Triangles tris)
+{
     init_surfaces(tris, FALSE);
 }
 
-void init_dynamic_surfaces(Triangles tris) {
+void init_dynamic_surfaces(Triangles tris)
+{
     init_surfaces(tris, TRUE);
 }
 
-struct Surface *gen_surface(s16 x1, s16 y1, s16 z1, s16 x2, s16 y2, s16 z2, s16 x3, s16 y3, s16 z3, s16 surf_type) {
+struct Surface *gen_surface(s16 x1, s16 y1, s16 z1, s16 x2, s16 y2, s16 z2, s16 x3, s16 y3, s16 z3, s16 surf_type)
+{
     // (v2 - v1) x (v3 - v2)
     f32 nx = (y2 - y1) * (z3 - z2) - (z2 - z1) * (y3 - y2);
     f32 ny = (z2 - z1) * (x3 - x2) - (x2 - x1) * (z3 - z2);
@@ -42,23 +48,28 @@ struct Surface *gen_surface(s16 x1, s16 y1, s16 z1, s16 x2, s16 y2, s16 z2, s16 
 
     // Could have used min_3 and max_3 for this...
     f32 minY = y1;
-    if (y2 < minY) {
+    if (y2 < minY)
+    {
         minY = y2;
     }
-    if (y3 < minY) {
+    if (y3 < minY)
+    {
         minY = y3;
     }
 
     f32 maxY = y1;
-    if (y2 > maxY) {
+    if (y2 > maxY)
+    {
         maxY = y2;
     }
-    if (y3 > maxY) {
+    if (y3 > maxY)
+    {
         maxY = y3;
     }
 
     // Checking to make sure no DIV/0
-    if (mag < 0.0001) {
+    if (mag < 0.0001)
+    {
         return NULL;
     }
     mag = (f32)(1.0 / mag);
@@ -98,7 +109,8 @@ struct Surface *gen_surface(s16 x1, s16 y1, s16 z1, s16 x2, s16 y2, s16 z2, s16 
  * Initialize a geo node with a given type. Sets all links such that there
  * are no siblings, parent or children for this node.
  */
-void init_scene_graph_node_links(struct GraphNode *graphNode, s32 type) {
+void init_scene_graph_node_links(struct GraphNode *graphNode, s32 type)
+{
     graphNode->type = type;
     graphNode->flags = GRAPH_RENDER_ACTIVE;
     graphNode->prev = graphNode;
@@ -113,8 +125,10 @@ void init_scene_graph_node_links(struct GraphNode *graphNode, s32 type) {
 struct GraphNodeObject *init_graph_node_object(UNUSED struct AllocOnlyPool *pool,
                                                struct GraphNodeObject *graphNode,
                                                struct GraphNode *sharedChild, Vec3f pos, Vec3s angle,
-                                               Vec3f scale) {
-    if (graphNode != NULL) {
+                                               Vec3f scale)
+{
+    if (graphNode != NULL)
+    {
         init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_OBJECT);
         vec3f_copy(graphNode->pos, pos);
         vec3f_copy(graphNode->scale, scale);
@@ -136,7 +150,8 @@ struct GraphNodeObject *init_graph_node_object(UNUSED struct AllocOnlyPool *pool
 /**
  * Take the updated controller struct and calculate the new x, y, and distance floats.
  */
-void adjust_analog_stick(struct Controller *controller) {
+void adjust_analog_stick(struct Controller *controller)
+{
     UNUSED u8 filler[8];
 
     // Reset the controller's x and y floats.
@@ -144,19 +159,23 @@ void adjust_analog_stick(struct Controller *controller) {
     controller->stickY = 0;
 
     // Modulate the rawStickX and rawStickY to be the new f32 values by adding/subtracting 6.
-    if (controller->rawStickX <= -8) {
+    if (controller->rawStickX <= -8)
+    {
         controller->stickX = controller->rawStickX + 6;
     }
 
-    if (controller->rawStickX >= 8) {
+    if (controller->rawStickX >= 8)
+    {
         controller->stickX = controller->rawStickX - 6;
     }
 
-    if (controller->rawStickY <= -8) {
+    if (controller->rawStickY <= -8)
+    {
         controller->stickY = controller->rawStickY + 6;
     }
 
-    if (controller->rawStickY >= 8) {
+    if (controller->rawStickY >= 8)
+    {
         controller->stickY = controller->rawStickY - 6;
     }
 
@@ -166,37 +185,42 @@ void adjust_analog_stick(struct Controller *controller) {
 
     // Magnitude cannot exceed 64.0f: if it does, modify the values
     // appropriately to flatten the values down to the allowed maximum value.
-    if (controller->stickMag > 64) {
+    if (controller->stickMag > 64)
+    {
         controller->stickX *= 64 / controller->stickMag;
         controller->stickY *= 64 / controller->stickMag;
         controller->stickMag = 64;
     }
 }
 
-void initCamera() {
-	static struct GraphNodeCamera camera;
-	gCamera = (struct Camera*)&camera.config.camera;
-	create_camera(&camera, NULL);
+void initCamera()
+{
+    static struct GraphNodeCamera camera;
+    gCamera = (struct Camera *)&camera.config.camera;
+    create_camera(&camera, NULL);
 }
 
-void initArea() {
-	gCurrentArea = calloc(1, sizeof(struct Area));
-	gCurrentArea->camera = gCamera;
-	gCurrentArea->index = 1;
+void initArea()
+{
+    gCurrentArea = calloc(1, sizeof(struct Area));
+    gCurrentArea->camera = gCamera;
+    gCurrentArea->index = 1;
 }
 
-void initMario() {
-	gMarioState->marioObj = calloc(1, sizeof(struct Object));
-	init_graph_node_object(NULL, (struct GraphNodeObject*)gMarioState->marioObj, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
-	gMarioState->marioBodyState = calloc(1, sizeof(struct MarioBodyState));
-	gMarioState->statusForCamera = &gPlayerCameraState[0];
-	gMarioState->controller = gPlayer1Controller = calloc(1, sizeof(OSContPad));
-	gMarioState->area = gCurrentArea;
+void initMario()
+{
+    gMarioState->marioObj = calloc(1, sizeof(struct Object));
+    init_graph_node_object(NULL, (struct GraphNodeObject *)gMarioState->marioObj, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
+    gMarioState->marioBodyState = calloc(1, sizeof(struct MarioBodyState));
+    gMarioState->statusForCamera = &gPlayerCameraState[0];
+    gMarioState->controller = gPlayer1Controller = calloc(1, sizeof(OSContPad));
+    gMarioState->area = gCurrentArea;
 }
 
-void updateController(OSContPad *input) {
-	gPlayer1Controller->rawStickX = input->stick_x;
-	gPlayer1Controller->rawStickY = input->stick_y;
-	gPlayer1Controller->buttonPressed = input->button & (input->button ^ gPlayer1Controller->buttonDown);
-	gPlayer1Controller->buttonDown = input->button;
+void updateController(OSContPad *input)
+{
+    gPlayer1Controller->rawStickX = input->stick_x;
+    gPlayer1Controller->rawStickY = input->stick_y;
+    gPlayer1Controller->buttonPressed = input->button & (input->button ^ gPlayer1Controller->buttonDown);
+    gPlayer1Controller->buttonDown = input->button;
 }

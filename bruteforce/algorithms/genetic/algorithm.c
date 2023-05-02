@@ -5,14 +5,15 @@
 #include "src/game/game_init.h"
 
 #include "bruteforce/framework/interprocess.h"
-#include "bruteforce/framework/bf_states.h"
+#include "bruteforce/framework/states.h"
 
-void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc updateGame, PerturbInputFunc perturbInput, ScoringFunc updateScore) {
+void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc updateGame, PerturbInputFunc perturbInput, ScoringFunc updateScore)
+{
 	Candidate *survivors;
 	Candidate *best;
 	initCandidates(original_inputs, &survivors);
 	initCandidates(original_inputs, &best);
-	
+
 	clock_t lastClock = clock();
 
 	u32 gen_merge_mod = bfControlState->merge_interval;
@@ -21,7 +22,8 @@ void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc upda
 
 	u32 frames = 0;
 	u32 gen;
-	for (gen = 0; gen < bfStaticState.max_generations; gen++) {
+	for (gen = 0; gen < bfStaticState.max_generations; gen++)
+	{
 		clock_t curClock = clock();
 		float seconds = (float)(curClock - lastClock) / CLOCKS_PER_SEC;
 		if (seconds >= bfControlState->print_interval)
@@ -34,13 +36,15 @@ void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc upda
 
 		// perform all runs
 		u32 candidate_idx;
-		for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++) {
+		for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++)
+		{
 
 			u32 run_idx;
-			for (run_idx = 0; run_idx < bfStaticState.runs_per_survivor; run_idx++) {
+			for (run_idx = 0; run_idx < bfStaticState.runs_per_survivor; run_idx++)
+			{
 				Candidate *candidate = &survivors[candidate_idx].children[run_idx];
 				Candidate *original = &survivors[candidate_idx];
-				
+
 				InputSequence *inputs = candidate->sequence;
 				clone_m64_inputs(inputs, original->sequence);
 
@@ -53,7 +57,8 @@ void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc upda
 				desynced = FALSE;
 
 				u32 frame_idx;
-				for (frame_idx = 0; frame_idx < inputs->count; frame_idx++) {
+				for (frame_idx = 0; frame_idx < inputs->count; frame_idx++)
+				{
 					frames++;
 					OSContPad *currentInput = &inputs->inputs[frame_idx];
 					if (!keepOriginal)
@@ -61,11 +66,12 @@ void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc upda
 					updateGame(currentInput);
 					boolean abort = desynced;
 					updateScore(candidate, frame_idx, &abort);
-					if (abort) break;
+					if (abort)
+						break;
 				}
 			}
 		}
-		
+
 		// sort by scoring
 		updateSurvivors(survivors);
 		updateBest(best, survivors);

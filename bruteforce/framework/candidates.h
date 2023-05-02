@@ -12,12 +12,12 @@
 #include <stdio.h>
 #include STATE_INCLUDE
 
-
 extern u8 desynced;
 
 void desync(char *message);
 
-typedef struct Candidate_s {
+typedef struct Candidate_s
+{
 	InputSequence *sequence;
 	struct Candidate_s *children;
 	f64 score;
@@ -29,4 +29,4 @@ void updateSurvivors(Candidate *survivors);
 void updateBest(Candidate *best, Candidate *survivors);
 void mergeCandidates(Candidate *survivors, Candidate **externalSurvivors, u32 externalSurvivorsCount);
 
-#endif //CANDIDATES_H
+#endif // CANDIDATES_H

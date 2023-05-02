@@ -3,11 +3,13 @@
 
 #include <PR/ultratypes.h>
 
-typedef struct {
+typedef struct
+{
 	f64 bestScore;
 } ProgramState;
 
-typedef struct {
+typedef struct
+{
 	f32 hSpeed;
 } CandidateStats;
 
