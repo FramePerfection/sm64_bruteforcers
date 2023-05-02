@@ -15,6 +15,7 @@ f64 sm_<function_name>(<function_name>Parameters args, Candidate *candidate, u8 
 #endif
 
 #ifndef SCORING_FUNC_IMPL
+// SCORING_FUNC declarations
 
 #define PARAM_MEMBERS_MaximizeHSpeed
 SCORING_FUNC(MaximizeHSpeed)
@@ -41,6 +42,13 @@ SCORING_FUNC(RestrictAngle)
 	PARAM_MEMBER(boolean, approach, "Determines whether a score should be computed for getting close to the restriction plane")
 SCORING_FUNC(RestrictHPosition)
 
+#define PARAM_MEMBERS_RestrictVPosition \
+	PARAM_MEMBER(quarterstep, quarterstep, "The quarter-step on which to apply the function") \
+	PARAM_MEMBER(f32, y, "The y position restriction value to compare to") \
+	PARAM_MEMBER(boolean, above, "If set, the measured quarter-step must be greater than the restriction value") \
+	PARAM_MEMBER(boolean, approach, "Determines whether a score should be computed for getting close to the restriction plane")
+SCORING_FUNC(RestrictVPosition)
+
 #define PARAM_MEMBERS_XZRadialLimit \
 	PARAM_MEMBER(quarterstep, quarterstep, "The quarter-step on which to apply the function") \
 	PARAM_MEMBER(f32, x, "The cylinder's x position") \
@@ -55,6 +63,7 @@ SCORING_FUNC(XZRadialLimit)
 SCORING_FUNC(MatchHSpeed)
 
 #else
+// SCORING_FUNC implementations
 
 // not necessary for compilation, but allows intellisense to find struct definitions
 #include "bruteforce/modules/general_purpose/scoring_method.h"
@@ -105,6 +114,20 @@ f64 sm_RestrictHPosition(RestrictHPositionParameters args, Candidate *candidate,
 	Vec3f *srcPos = GetQuarterstep(args->quarterstep / 4, args->quarterstep % 4);
 	f64 diff = ((*srcPos)[0] * args->nx + (*srcPos)[2] * args->nz) - args->d;
 	if (diff > 0) {
+		*success = FALSE;
+		*abort = TRUE;
+	}
+	else if (args->approach)
+		return diff * -diff;
+	return 0;
+}
+
+f64 sm_RestrictVPosition(RestrictVPositionParameters args, Candidate *candidate, u8 *success, u8 *abort) {
+	Vec3f *srcPos = GetQuarterstep(args->quarterstep / 4, args->quarterstep % 4);
+	f64 diff = (*srcPos)[1] - args->y;
+	if (!args->above)
+		diff *= -1;
+	if (diff < 0) {
 		*success = FALSE;
 		*abort = TRUE;
 	}
