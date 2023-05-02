@@ -1,5 +1,5 @@
-#ifndef PERTURBATOR_H
-#define PERTURBATOR_H
+#ifndef BF_PERTURBATOR_H
+#define BF_PERTURBATOR_H
 
 #include <PR/ultratypes.h>
 
@@ -23,4 +23,4 @@ extern Perturbators perturbators;
 
 void bf_read_Perturbators(Json *, Perturbators *);
 
-#endif // PERTURBATOR_H
+#endif // BF_PERTURBATOR_H

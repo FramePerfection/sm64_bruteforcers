@@ -1,5 +1,5 @@
-#ifndef SCORING_METHOD_H
-#define SCORING_METHOD_H
+#ifndef BF_SCORING_METHOD_H
+#define BF_SCORING_METHOD_H
 
 #include <PR/ultratypes.h>
 
@@ -45,4 +45,4 @@ void applyMethod(ScoringMethod *method, Candidate *candidate, u8 *success, u8 *a
 #undef PARAM_MEMBER
 #undef SCORING_FUNC
 
-#endif // SCORING_METHOD_H
+#endif // BF_SCORING_METHOD_H

@@ -1,5 +1,5 @@
-#ifndef CANDIDATES_H
-#define CANDIDATES_H
+#ifndef BF_CANDIDATES_H
+#define BF_CANDIDATES_H
 
 #define STATE_INCLUDE <bruteforce/modules/MODULE_PATH/state.h>
 
@@ -29,4 +29,4 @@ void bf_update_survivors(Candidate *survivors);
 void bf_update_best(Candidate *best, Candidate *survivors);
 void bf_merge_candidates(Candidate *survivors, Candidate **externalSurvivors, u32 externalSurvivorsCount);
 
-#endif // CANDIDATES_H
+#endif // BF_CANDIDATES_H

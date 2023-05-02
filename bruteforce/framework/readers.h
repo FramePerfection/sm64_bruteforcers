@@ -1,5 +1,5 @@
-#ifndef READERS_H
-#define READERS_H
+#ifndef BF_READERS_H
+#define BF_READERS_H
 
 #include <PR/ultratypes.h>
 
@@ -54,4 +54,4 @@ void bf_read_Vec3f(Json *, Vec3f *);
 	if (strcmp(node->name, field_name) == 0)             \
 		target##bf_read_##type(node);
 
-#endif // READERS_H
+#endif // BF_READERS_H

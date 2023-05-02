@@ -1,5 +1,5 @@
-#ifndef INTERPROCESS_H
-#define INTERPROCESS_H
+#ifndef BF_INTERPROCESS_H
+#define BF_INTERPROCESS_H
 
 #include "bruteforce/framework/candidates.h"
 
@@ -9,4 +9,4 @@ void bf_child_update_messages(Candidate *survivors);
 void bf_parent_merge_candidates(Candidate *survivors);
 void bf_safe_printf(const char *fmt, ...);
 
-#endif // INTERPROCESS_H
+#endif // BF_INTERPROCESS_H

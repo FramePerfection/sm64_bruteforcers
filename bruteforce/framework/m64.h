@@ -1,5 +1,5 @@
-#ifndef M64_H
-#define M64_H
+#ifndef BF_M64_H
+#define BF_M64_H
 
 #include <PR/ultratypes.h>
 #include <PR/os_cont.h>
@@ -20,4 +20,4 @@ InputSequence *bf_clone_m64(InputSequence *src);
 u8 bf_fwrite_input_sequence(FILE *file, InputSequence *sequence);
 u8 bf_save_to_m64_file(char *originalFileName, char *fileName, InputSequence *sequence);
 
-#endif // M64_H
+#endif // BF_M64_H

@@ -1,5 +1,5 @@
-#ifndef STATE_H
-#define STATE_H
+#ifndef BF_STATE_H
+#define BF_STATE_H
 
 #include <PR/ultratypes.h>
 
@@ -18,4 +18,4 @@ typedef struct
 	f32 z;
 } CandidateStats;
 
-#endif // STATE_H
+#endif // BF_STATE_H

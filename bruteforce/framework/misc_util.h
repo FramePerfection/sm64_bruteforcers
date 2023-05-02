@@ -1,7 +1,5 @@
-
-
-#ifndef MISC_UTIL_H
-#define MISC_UTIL_H
+#ifndef BF_MISC_UTIL_H
+#define BF_MISC_UTIL_H
 
 #include <PR/ultratypes.h>
 #include "types.h"
@@ -24,4 +22,4 @@ void bf_init_area();
 void bf_init_mario();
 void bf_update_controller(OSContPad *input);
 
-#endif // MISC_UTIL_H
+#endif // BF_MISC_UTIL_H
