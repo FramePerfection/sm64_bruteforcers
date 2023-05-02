@@ -10,7 +10,7 @@
 
 #include "include/types.h"
 
-void read_ScoringMethods(Json *jsonNode, ScoringMethods *target)
+void bf_read_ScoringMethods(Json *jsonNode, ScoringMethods *target)
 {
 	target->n_methods = jsonNode->size;
 	target->methods = calloc(jsonNode->size, sizeof(ScoringMethod));
@@ -46,7 +46,7 @@ void read_ScoringMethods(Json *jsonNode, ScoringMethods *target)
 				// clang-format on
 
 				if (currentReadMethod->func == NULL)
-					safePrintf("Warning: Unknown scoring function '%s'\n", methodName);
+					bf_safe_printf("Warning: Unknown scoring function '%s'\n", methodName);
 			}
 			else if (strcmp(innerNode->name, "params") == 0)
 				paramsNode = innerNode;
@@ -61,7 +61,7 @@ void read_ScoringMethods(Json *jsonNode, ScoringMethods *target)
 			#define SCORING_FUNC(NAME) \
 				if (strcmp(methodName, #NAME) == 0) { \
 					currentReadMethod->args = calloc(1, sizeof(struct NAME##Parameters_s)); \
-					read_##NAME##Parameters(paramsNode, (NAME##Parameters*)&(currentReadMethod->args)); \
+					bf_read_##NAME##Parameters(paramsNode, (NAME##Parameters*)&(currentReadMethod->args)); \
 				}
 			#include "scoring_funcs.inc.c"
 			#undef SCORING_FUNC
@@ -89,21 +89,21 @@ void applyMethod(ScoringMethod *method, Candidate *candidate, u8 *success, u8 *a
 #include "scoring_funcs.inc.c"
 #undef SCORING_FUNC_IMPL
 
-#define PARAM_MEMBER(type, MEMBER_NAME, _)                         \
-	if (strcmp(#MEMBER_NAME, innerNode->name) == 0)                \
-	{                                                              \
-		read_##type(innerNode, (type *)&((*target)->MEMBER_NAME)); \
+#define PARAM_MEMBER(type, MEMBER_NAME, _)                            \
+	if (strcmp(#MEMBER_NAME, innerNode->name) == 0)                   \
+	{                                                                 \
+		bf_read_##type(innerNode, (type *)&((*target)->MEMBER_NAME)); \
 	}
 
-#define SCORING_FUNC(NAME)                                             \
-	void read_##NAME##Parameters(Json *json, NAME##Parameters *target) \
-	{                                                                  \
-		Json *innerNode = json->child;                                 \
-		while (innerNode != NULL)                                      \
-		{                                                              \
-			PARAM_MEMBERS_##NAME                                       \
-				innerNode = innerNode->next;                           \
-		}                                                              \
+#define SCORING_FUNC(NAME)                                                \
+	void bf_read_##NAME##Parameters(Json *json, NAME##Parameters *target) \
+	{                                                                     \
+		Json *innerNode = json->child;                                    \
+		while (innerNode != NULL)                                         \
+		{                                                                 \
+			PARAM_MEMBERS_##NAME                                          \
+				innerNode = innerNode->next;                              \
+		}                                                                 \
 	}
 #include "scoring_funcs.inc.c"
 

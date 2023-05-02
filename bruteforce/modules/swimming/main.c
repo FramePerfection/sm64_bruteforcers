@@ -25,24 +25,24 @@ void update_mario_info_for_cam(UNUSED struct MarioState *m) {}
 
 static void initGame()
 {
-	initCamera(); // Ideally this wouldn't be needed, but there are still functions that reference the camera currently
-	initArea();
-	initMario();
+	bf_init_camera(); // Ideally this wouldn't be needed, but there are still functions that reference the camera currently
+	bf_init_area();
+	bf_init_mario();
 
-	safePrintf("Loading configuration...\n");
+	bf_safe_printf("Loading configuration...\n");
 	if (!bf_init_states())
 	{
-		safePrintf("Failed to load configuration! Exiting...\n");
+		bf_safe_printf("Failed to load configuration! Exiting...\n");
 		exit(-1);
 	}
 
 	clear_static_surfaces();
-	init_static_surfaces(bfStaticState.static_tris);
+	bf_init_static_surfaces(bfStaticState.static_tris);
 }
 
 static void updateGame(OSContPad *input)
 {
-	updateController(input);
+	bf_update_controller(input);
 	adjust_analog_stick(gPlayer1Controller);
 	execute_mario_action(gMarioState->marioObj);
 }
@@ -87,34 +87,34 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort)
 			(gMarioState->pos[1] < bfStaticState.hitboxes.data[0].above + bfStaticState.hitboxes.data[0].y) && (distance_to_coin1 < (bfStaticState.hitboxes.data[0].radius + 37)) && (gMarioState->angleVel[1] > -630))
 		{
 			programState->bestScore = score;
-			output_input_sequence(bfInitialDynamicState.global_timer, candidate->sequence);
-			safePrintf("x: %f y: %f z: %f yaw: %i yawvel: %i\n", gMarioState->pos[0], gMarioState->pos[1], gMarioState->pos[2], gMarioState->faceAngle[1], gMarioState->angleVel[1]);
-			safePrintf("New best: %f\n", score);
+			bf_output_input_sequence(bfInitialDynamicState.global_timer, candidate->sequence);
+			bf_safe_printf("x: %f y: %f z: %f yaw: %i yawvel: %i\n", gMarioState->pos[0], gMarioState->pos[1], gMarioState->pos[2], gMarioState->faceAngle[1], gMarioState->angleVel[1]);
+			bf_safe_printf("New best: %f\n", score);
 		}
 	}
 }
 
 void main(int argc, char *argv[])
 {
-	parse_command_line_args(argc, argv);
+	bf_parse_command_line_args(argc, argv);
 
-	safePrintf("Running Bruteforcer...\n");
+	bf_safe_printf("Running Bruteforcer...\n");
 	initGame();
 
-	safePrintf("Loading m64...\n");
+	bf_safe_printf("Loading m64...\n");
 	InputSequence *original_inputs;
-	if (!read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_end, &original_inputs))
+	if (!bf_read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_end, &original_inputs))
 	{
-		safePrintf("Failed to load m64! Exiting...\n");
+		bf_safe_printf("Failed to load m64! Exiting...\n");
 		exit(-1);
 	}
 
 	Candidate *survivors;
 	Candidate *best;
-	initCandidates(original_inputs, &survivors);
-	initCandidates(original_inputs, &best);
+	bf_init_candidates(original_inputs, &survivors);
+	bf_init_candidates(original_inputs, &best);
 
-	initializeMultiProcess(original_inputs);
+	bf_initialize_multi_process(original_inputs);
 
-	bruteforce_loop_genetic(original_inputs, &updateGame, &perturbInput, &updateScore);
+	bf_algorithm_genetic_loop(original_inputs, &updateGame, &perturbInput, &updateScore);
 }

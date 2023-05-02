@@ -6,7 +6,7 @@
 
 Candidate **temp = NULL;
 
-void initCandidates(InputSequence *original_inputs, Candidate **survivors)
+void bf_init_candidates(InputSequence *original_inputs, Candidate **survivors)
 {
 	u8 assignTemp = temp == NULL;
 	*survivors = calloc(bfStaticState.survivors_per_generation, sizeof(Candidate));
@@ -20,14 +20,14 @@ void initCandidates(InputSequence *original_inputs, Candidate **survivors)
 		(*survivors)[i].children = calloc(bfStaticState.runs_per_survivor, sizeof(Candidate));
 		u32 k;
 		for (k = 0; k < bfStaticState.runs_per_survivor; k++)
-			(*survivors)[i].children[k].sequence = clone_m64(original_inputs);
-		(*survivors)[i].sequence = clone_m64(original_inputs);
+			(*survivors)[i].children[k].sequence = bf_clone_m64(original_inputs);
+		(*survivors)[i].sequence = bf_clone_m64(original_inputs);
 		if (assignTemp)
 			temp[i] = &((*survivors)[i]);
 	}
 }
 
-void insertSorted(Candidate *new)
+static void s_insert_sorted(Candidate *new)
 {
 	if (temp[0] == NULL)
 	{
@@ -51,80 +51,80 @@ void insertSorted(Candidate *new)
 	temp[rank] = new;
 }
 
-static void clearTemp()
+static void s_clear_temp()
 {
 	u32 candidate_idx;
 	for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++)
 		temp[candidate_idx] = NULL;
 }
 
-static void applyTemp(Candidate *survivors)
+static void s_apply_temp(Candidate *survivors)
 {
 	u32 candidate_idx;
 	for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++)
 	{
-		clone_m64_inputs(survivors[candidate_idx].sequence, temp[candidate_idx]->sequence);
+		bf_clone_m64_inputs(survivors[candidate_idx].sequence, temp[candidate_idx]->sequence);
 		survivors[candidate_idx].score = temp[candidate_idx]->score;
 		memcpy(&survivors[candidate_idx].stats, &temp[candidate_idx]->stats, sizeof(CandidateStats));
 	}
 }
 
-void updateSurvivors(Candidate *survivors)
+void bf_update_survivors(Candidate *survivors)
 {
-	clearTemp();
+	s_clear_temp();
 
 	u32 candidate_idx;
 	for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++)
 	{
 		u32 run_idx = 0;
 		for (run_idx = 0; run_idx < bfStaticState.runs_per_survivor; run_idx++)
-			insertSorted(&(survivors[candidate_idx].children[run_idx]));
+			s_insert_sorted(&(survivors[candidate_idx].children[run_idx]));
 	}
 
-	applyTemp(survivors);
+	s_apply_temp(survivors);
 }
 
-void mergeCandidates(Candidate *survivors, Candidate **externalSurvivors, u32 externalSurvivorsCount)
+void bf_merge_candidates(Candidate *survivors, Candidate **externalSurvivors, u32 externalSurvivorsCount)
 {
-	clearTemp();
+	s_clear_temp();
 
 	u32 candidate_idx;
 	for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++)
 	{
-		insertSorted(&survivors[candidate_idx]);
+		s_insert_sorted(&survivors[candidate_idx]);
 	}
 
 	for (candidate_idx = 0; candidate_idx < externalSurvivorsCount; candidate_idx++)
 	{
-		insertSorted(externalSurvivors[candidate_idx]);
+		s_insert_sorted(externalSurvivors[candidate_idx]);
 	}
 
-	applyTemp(survivors);
+	s_apply_temp(survivors);
 }
 
-void updateBest(Candidate *temp, Candidate *survivors)
+void bf_update_best(Candidate *temp, Candidate *survivors)
 {
-	clearTemp();
+	s_clear_temp();
 
 	u32 candidate_idx;
 	for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++)
 	{
-		insertSorted(&temp[candidate_idx]);
+		s_insert_sorted(&temp[candidate_idx]);
 	}
 
 	for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++)
 	{
-		insertSorted(&survivors[candidate_idx]);
+		s_insert_sorted(&survivors[candidate_idx]);
 	}
 
-	applyTemp(temp);
+	s_apply_temp(temp);
 }
 
 u8 desynced;
 
-void desync(char *message)
+void bf_desync(char *message)
 {
 	desynced = TRUE;
 	if (bfStaticState.display_desync_messages)
-		safePrintf(message);
+		bf_safe_printf(message);
 }

@@ -7,12 +7,12 @@
 #include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/states.h"
 
-void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc updateGame, PerturbInputFunc perturbInput, ScoringFunc updateScore)
+void bf_algorithm_genetic_loop(InputSequence *original_inputs, UpdateGameFunc updateGame, PerturbInputFunc perturbInput, ScoringFunc updateScore)
 {
 	Candidate *survivors;
 	Candidate *best;
-	initCandidates(original_inputs, &survivors);
-	initCandidates(original_inputs, &best);
+	bf_init_candidates(original_inputs, &survivors);
+	bf_init_candidates(original_inputs, &best);
 
 	clock_t lastClock = clock();
 
@@ -30,7 +30,7 @@ void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc upda
 		{
 			float fps = frames / seconds;
 			lastClock = curClock;
-			safePrintf("Generation %d starting... (%f FPS) (Best score: %f) (%d)\n", gen, fps, programState->bestScore, bfControlState->print_interval);
+			bf_safe_printf("Generation %d starting... (%f FPS) (Best score: %f) (%d)\n", gen, fps, programState->bestScore, bfControlState->print_interval);
 			frames = 0;
 		}
 
@@ -46,7 +46,7 @@ void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc upda
 				Candidate *original = &survivors[candidate_idx];
 
 				InputSequence *inputs = candidate->sequence;
-				clone_m64_inputs(inputs, original->sequence);
+				bf_clone_m64_inputs(inputs, original->sequence);
 
 				u8 keepOriginal = run_idx == 0 && (randFloat() > bfControlState->forget_rate);
 
@@ -73,13 +73,13 @@ void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc upda
 		}
 
 		// sort by scoring
-		updateSurvivors(survivors);
-		updateBest(best, survivors);
+		bf_update_survivors(survivors);
+		bf_update_best(best, survivors);
 		if (!isParentProcess())
-			childUpdateMessages(best);
+			bf_child_update_messages(best);
 
 		if (gen % gen_merge_mod == 0)
 			if (isParentProcess())
-				parentMergeCandidates(survivors);
+				bf_parent_merge_candidates(survivors);
 	}
 }

@@ -14,31 +14,31 @@ f32 randFloat()
     return ((float)rand() / (float)(RAND_MAX));
 }
 
-static void init_surfaces(Triangles tris, u8 dynamic)
+static void s_init_surfaces(Triangles tris, u8 dynamic)
 {
     u32 i;
     for (i = 0; i < tris.data_size; i++)
     {
         Triangle t = tris.data[i];
-        struct Surface *surface = gen_surface(t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3, t.surf_type);
+        struct Surface *surface = bf_gen_surface(t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3, t.surf_type);
         if (surface != NULL)
             add_surface(surface, dynamic);
         else
-            safePrintf("found degenerate triangle: (%d,%d,%d),(%d,%d,%d),(%d,%d,%d)\n", t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3);
+            bf_safe_printf("found degenerate triangle: (%d,%d,%d),(%d,%d,%d),(%d,%d,%d)\n", t.x1, t.y1, t.z1, t.x2, t.y2, t.z2, t.x3, t.y3, t.z3);
     }
 }
 
-void init_static_surfaces(Triangles tris)
+void bf_init_static_surfaces(Triangles tris)
 {
-    init_surfaces(tris, FALSE);
+    s_init_surfaces(tris, FALSE);
 }
 
-void init_dynamic_surfaces(Triangles tris)
+void bf_init_dynamic_surfaces(Triangles tris)
 {
-    init_surfaces(tris, TRUE);
+    s_init_surfaces(tris, TRUE);
 }
 
-struct Surface *gen_surface(s16 x1, s16 y1, s16 z1, s16 x2, s16 y2, s16 z2, s16 x3, s16 y3, s16 z3, s16 surf_type)
+struct Surface *bf_gen_surface(s16 x1, s16 y1, s16 z1, s16 x2, s16 y2, s16 z2, s16 x3, s16 y3, s16 z3, s16 surf_type)
 {
     // (v2 - v1) x (v3 - v2)
     f32 nx = (y2 - y1) * (z3 - z2) - (z2 - z1) * (y3 - y2);
@@ -193,21 +193,21 @@ void adjust_analog_stick(struct Controller *controller)
     }
 }
 
-void initCamera()
+void bf_init_camera()
 {
     static struct GraphNodeCamera camera;
     gCamera = (struct Camera *)&camera.config.camera;
     create_camera(&camera, NULL);
 }
 
-void initArea()
+void bf_init_area()
 {
     gCurrentArea = calloc(1, sizeof(struct Area));
     gCurrentArea->camera = gCamera;
     gCurrentArea->index = 1;
 }
 
-void initMario()
+void bf_init_mario()
 {
     gMarioState->marioObj = calloc(1, sizeof(struct Object));
     init_graph_node_object(NULL, (struct GraphNodeObject *)gMarioState->marioObj, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
@@ -217,7 +217,7 @@ void initMario()
     gMarioState->area = gCurrentArea;
 }
 
-void updateController(OSContPad *input)
+void bf_update_controller(OSContPad *input)
 {
     gPlayer1Controller->rawStickX = input->stick_x;
     gPlayer1Controller->rawStickY = input->stick_y;

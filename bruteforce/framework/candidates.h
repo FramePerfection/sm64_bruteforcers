@@ -14,7 +14,7 @@
 
 extern u8 desynced;
 
-void desync(char *message);
+void bf_desync(char *message);
 
 typedef struct Candidate_s
 {
@@ -24,9 +24,9 @@ typedef struct Candidate_s
 	CandidateStats stats;
 } Candidate;
 
-void initCandidates(InputSequence *original_inputs, Candidate **survivors);
-void updateSurvivors(Candidate *survivors);
-void updateBest(Candidate *best, Candidate *survivors);
-void mergeCandidates(Candidate *survivors, Candidate **externalSurvivors, u32 externalSurvivorsCount);
+void bf_init_candidates(InputSequence *original_inputs, Candidate **survivors);
+void bf_update_survivors(Candidate *survivors);
+void bf_update_best(Candidate *best, Candidate *survivors);
+void bf_merge_candidates(Candidate *survivors, Candidate **externalSurvivors, u32 externalSurvivorsCount);
 
 #endif // CANDIDATES_H

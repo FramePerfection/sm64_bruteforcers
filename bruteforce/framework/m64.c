@@ -9,7 +9,7 @@ u32 MIN(u32 x, u32 y)
 	return ((x) < (y)) ? (x) : (y);
 }
 
-u8 read_m64_from_file(char *fileName, u32 offset, u32 end, InputSequence **inputs)
+u8 bf_read_m64_from_file(char *fileName, u32 offset, u32 end, InputSequence **inputs)
 {
 	FILE *file = fopen(fileName, "rb");
 	if (!file)
@@ -20,7 +20,7 @@ u8 read_m64_from_file(char *fileName, u32 offset, u32 end, InputSequence **input
 	s32 count = end - offset;
 	if (count <= 0)
 	{
-		safePrintf("End frame [%d] is less than or equal to start frame [%d]!\n", end, offset);
+		bf_safe_printf("End frame [%d] is less than or equal to start frame [%d]!\n", end, offset);
 		return FALSE;
 	}
 
@@ -60,12 +60,12 @@ u8 read_m64_from_file(char *fileName, u32 offset, u32 end, InputSequence **input
 	return TRUE;
 }
 
-void fwrite_hex32string(FILE *file, u8 input_buffer[4])
+void bf_fwrite_hex32string(FILE *file, u8 input_buffer[4])
 {
 	fprintf(file, "0x%lx ", (long unsigned int)(((u32)input_buffer[0]) << 0x18 | ((u32)input_buffer[1]) << 0x10 | ((u32)input_buffer[2]) << 0x8 | ((u32)input_buffer[3])));
 }
 
-u8 fwrite_input_sequence(FILE *file, InputSequence *sequence)
+u8 bf_fwrite_input_sequence(FILE *file, InputSequence *sequence)
 {
 	u32 i;
 	for (i = 0; i < sequence->count; i++)
@@ -76,12 +76,12 @@ u8 fwrite_input_sequence(FILE *file, InputSequence *sequence)
 			(char)(sequence->inputs[i].stick_x & 0xFF),
 			(char)(sequence->inputs[i].stick_y & 0xFF),
 		};
-		fwrite_hex32string(file, input_buffer);
+		bf_fwrite_hex32string(file, input_buffer);
 	}
 	fprintf(file, ";\n");
 }
 
-u8 save_to_m64_file(char *originalFileName, char *fileName, InputSequence *sequence)
+u8 bf_save_to_m64_file(char *originalFileName, char *fileName, InputSequence *sequence)
 {
 	FILE *src_file = fopen(originalFileName, "rb");
 	FILE *dst_file = fopen(fileName, "wb");
@@ -117,17 +117,17 @@ u8 save_to_m64_file(char *originalFileName, char *fileName, InputSequence *seque
 	return TRUE;
 }
 
-void clone_m64_inputs(InputSequence *dest, InputSequence *src)
+void bf_clone_m64_inputs(InputSequence *dest, InputSequence *src)
 {
 	memcpy(&dest->originalInput, &src->originalInput, sizeof(OSContPad));
 	memcpy(dest->inputs, src->inputs, sizeof(OSContPad) * dest->count);
 }
 
-InputSequence *clone_m64(InputSequence *src)
+InputSequence *bf_clone_m64(InputSequence *src)
 {
 	InputSequence *dest = calloc(sizeof(InputSequence) + sizeof(OSContPad) * src->count, sizeof(char));
 	dest->count = src->count;
 	dest->offset = src->offset;
-	clone_m64_inputs(dest, src);
+	bf_clone_m64_inputs(dest, src);
 	return dest;
 }

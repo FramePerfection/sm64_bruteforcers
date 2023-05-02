@@ -118,7 +118,7 @@ f64 sm_RestrictAngle(RestrictAngleParameters args, Candidate *candidate, u8 *suc
 
 f64 sm_RestrictHPosition(RestrictHPositionParameters args, Candidate *candidate, u8 *success, u8 *abort)
 {
-	Vec3f *srcPos = GetQuarterstep(args->quarterstep / 4, args->quarterstep % 4);
+	Vec3f *srcPos = bf_get_quarterstep(args->quarterstep / 4, args->quarterstep % 4);
 	f64 diff = ((*srcPos)[0] * args->nx + (*srcPos)[2] * args->nz) - args->d;
 	if (diff > 0)
 	{
@@ -132,7 +132,7 @@ f64 sm_RestrictHPosition(RestrictHPositionParameters args, Candidate *candidate,
 
 f64 sm_RestrictVPosition(RestrictVPositionParameters args, Candidate *candidate, u8 *success, u8 *abort)
 {
-	Vec3f *srcPos = GetQuarterstep(args->quarterstep / 4, args->quarterstep % 4);
+	Vec3f *srcPos = bf_get_quarterstep(args->quarterstep / 4, args->quarterstep % 4);
 	f64 diff = (*srcPos)[1] - args->y;
 	if (!args->above)
 		diff *= -1;
@@ -148,7 +148,7 @@ f64 sm_RestrictVPosition(RestrictVPositionParameters args, Candidate *candidate,
 
 f64 sm_XZRadialLimit(XZRadialLimitParameters args, Candidate *candidate, u8 *success, u8 *abort)
 {
-	Vec3f *srcPos = GetQuarterstep(args->quarterstep / 4, args->quarterstep % 4);
+	Vec3f *srcPos = bf_get_quarterstep(args->quarterstep / 4, args->quarterstep % 4);
 	f32 dx = (*srcPos)[0] - args->x;
 	f32 dz = (*srcPos)[2] - args->z;
 	f32 distSq = (dx * dx + dz * dz);

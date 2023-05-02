@@ -8,15 +8,15 @@
 
 #include "include/types.h"
 
-void read_s32(Json *, s32 *);
-void read_s16(Json *, s16 *);
-void read_u32(Json *, u32 *);
-void read_u16(Json *, u16 *);
-void read_u8(Json *, u8 *);
-void read_f32(Json *, f32 *);
-void read_f64(Json *, f64 *);
-void read_string(Json *, string *);
-void read_boolean(Json *, boolean *);
+void bf_read_s32(Json *, s32 *);
+void bf_read_s16(Json *, s16 *);
+void bf_read_u32(Json *, u32 *);
+void bf_read_u16(Json *, u16 *);
+void bf_read_u8(Json *, u8 *);
+void bf_read_f32(Json *, f32 *);
+void bf_read_f64(Json *, f64 *);
+void bf_read_string(Json *, string *);
+void bf_read_boolean(Json *, boolean *);
 
 typedef struct Triangle
 {
@@ -42,16 +42,16 @@ typedef struct HitBoxes
 	HitBox *data;
 } HitBoxes;
 
-void read_Triangles(Json *, Triangles *);
-void read_HitBoxes(Json *, HitBoxes *);
+void bf_read_Triangles(Json *, Triangles *);
+void bf_read_HitBoxes(Json *, HitBoxes *);
 typedef s16 *EnvironmentRegions;
 
-void read_EnvironmentRegions(Json *, EnvironmentRegions *);
+void bf_read_EnvironmentRegions(Json *, EnvironmentRegions *);
 
-void read_Vec3f(Json *, Vec3f *);
+void bf_read_Vec3f(Json *, Vec3f *);
 
 #define JSON_PARSE_FIELD(target, type, field_name, node) \
 	if (strcmp(node->name, field_name) == 0)             \
-		target##read_##type(node);
+		target##bf_read_##type(node);
 
 #endif // READERS_H

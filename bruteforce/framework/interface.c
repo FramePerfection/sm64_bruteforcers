@@ -23,7 +23,7 @@ char *m64_input = NULL;
 char *m64_output = NULL;
 u32 max_write_fails = 10;
 
-const char *read_file(const char *fileName)
+const char *bf_read_file(const char *fileName)
 {
 	FILE *file = fopen(fileName, "r");
 	if (!file)
@@ -37,7 +37,7 @@ const char *read_file(const char *fileName)
 	return fileContents;
 }
 
-void parse_command_line_args(int argc, char *argv[])
+void bf_parse_command_line_args(int argc, char *argv[])
 {
 	int c, long_opt_idx = 0;
 	static struct option long_opts[] = {
@@ -70,13 +70,13 @@ void parse_command_line_args(int argc, char *argv[])
 	// clang-format on
 
 	if (override_config_file)
-		safePrintf("launching from %s...\n", override_config_file);
+		bf_safe_printf("launching from %s...\n", override_config_file);
 }
 
 #ifdef _WIN32
-DWORD WINAPI listen_to_input_func(__attribute__((unused)) LPVOID lpParam)
+static DWORD WINAPI s_listen_to_input_func(__attribute__((unused)) LPVOID lpParam)
 #else
-void *listen_to_input_func()
+static void *s_listen_to_input_func()
 #endif
 {
 	// loop indefinitely
@@ -85,7 +85,7 @@ void *listen_to_input_func()
 		// TODO(Important): Read strings of indefinite length
 		char blub[MAX_CONTROL_STATE_JSON_BUFFER];
 		fgets(blub, MAX_CONTROL_STATE_JSON_BUFFER, stdin);
-		safePrintf("Updating control state!\n");
+		bf_safe_printf("Updating control state!\n");
 		bf_update_control_state(blub);
 
 		// sleep to not hog the processor
@@ -96,37 +96,37 @@ void *listen_to_input_func()
 	}
 }
 
-void listen_to_inputs()
+void bf_listen_to_inputs()
 {
 #ifdef _WIN32
-	CreateThread(NULL, 0, listen_to_input_func, NULL, 0, &threadIdInputListener);
+	CreateThread(NULL, 0, s_listen_to_input_func, NULL, 0, &threadIdInputListener);
 #endif
 }
 
-u8 save_to_sequence_file(char *fileName, u32 globalTimerAtStart, InputSequence *inputSequence)
+static u8 s_save_to_sequence_file(char *fileName, u32 globalTimerAtStart, InputSequence *inputSequence)
 {
 	FILE *dst_file = fopen(fileName, "w");
 	if (dst_file == NULL)
 		return FALSE;
 	u8 globalTimerBytes[4] = {globalTimerAtStart >> 0x18, globalTimerAtStart >> 0x10, globalTimerAtStart >> 0x8, globalTimerAtStart};
-	fwrite_hex32string(dst_file, globalTimerBytes);
-	fwrite_input_sequence(dst_file, inputSequence);
+	bf_fwrite_hex32string(dst_file, globalTimerBytes);
+	bf_fwrite_input_sequence(dst_file, inputSequence);
 	fclose(dst_file);
 	return TRUE;
 }
 
-#define TRY_WRITE(expr)                                      \
-	while (!expr)                                            \
-	{                                                        \
-		if (++fail_counter > max_write_fails)                \
-		{                                                    \
-			safePrintf("Failed to write result to file!\n"); \
-			return FALSE;                                    \
-		}                                                    \
-		nanosleep(&ts, &ts);                                 \
+#define TRY_WRITE(expr)                                          \
+	while (!expr)                                                \
+	{                                                            \
+		if (++fail_counter > max_write_fails)                    \
+		{                                                        \
+			bf_safe_printf("Failed to write result to file!\n"); \
+			return FALSE;                                        \
+		}                                                        \
+		nanosleep(&ts, &ts);                                     \
 	}
 
-u8 output_input_sequence(u32 globalTimerAtStart, InputSequence *inputSequence)
+u8 bf_output_input_sequence(u32 globalTimerAtStart, InputSequence *inputSequence)
 {
 	u32 fail_counter = 0;
 	struct timespec ts;
@@ -135,11 +135,11 @@ u8 output_input_sequence(u32 globalTimerAtStart, InputSequence *inputSequence)
 
 	if (strcmp(output_mode, "m64") == 0 || strcmp(output_mode, "m64_and_sequence") == 0)
 	{
-		TRY_WRITE(save_to_m64_file(m64_input, m64_output, inputSequence))
+		TRY_WRITE(bf_save_to_m64_file(m64_input, m64_output, inputSequence))
 	}
 	if (strcmp(output_mode, "sequence") == 0 || strcmp(output_mode, "m64_and_sequence") == 0)
 	{
-		TRY_WRITE(save_to_sequence_file("tmp.m64.part", globalTimerAtStart, inputSequence))
+		TRY_WRITE(s_save_to_sequence_file("tmp.m64.part", globalTimerAtStart, inputSequence))
 	}
 	return TRUE;
 }

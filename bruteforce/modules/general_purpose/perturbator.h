@@ -21,6 +21,6 @@ typedef struct Perturbators_s
 
 extern Perturbators perturbators;
 
-void read_Perturbators(Json *, Perturbators *);
+void bf_read_Perturbators(Json *, Perturbators *);
 
 #endif // PERTURBATOR_H

@@ -30,19 +30,19 @@ extern Vec3f last_q_step, last_q_step2;
 
 void initGame()
 {
-	initCamera();
-	initArea();
-	initMario();
+	bf_init_camera();
+	bf_init_area();
+	bf_init_mario();
 
-	safePrintf("Loading configuration...\n");
+	bf_safe_printf("Loading configuration...\n");
 	if (!bf_init_states())
 	{
-		safePrintf("Failed to load configuration! Exiting...\n");
+		bf_safe_printf("Failed to load configuration! Exiting...\n");
 		exit(-1);
 	}
 
 	clear_static_surfaces();
-	init_static_surfaces(bfStaticState.static_tris);
+	bf_init_static_surfaces(bfStaticState.static_tris);
 
 	time_t t;
 	srand((unsigned)time(&t));
@@ -50,7 +50,7 @@ void initGame()
 
 void updateGame(OSContPad *input)
 {
-	updateController(input);
+	bf_update_controller(input);
 	adjust_analog_stick(gPlayer1Controller);
 	execute_mario_action(gMarioState->marioObj);
 	if (gCurrentArea != NULL)
@@ -75,8 +75,8 @@ u8 updateScore(Candidate *candidate, u32 frame_idx)
 {
 	if (frame_idx == bfStaticState.scoring_frame - 1)
 	{
-		Vec3f *last_q_step = GetQuarterstep(2, 0);
-		Vec3f *last_q_step2 = GetQuarterstep(3, 0);
+		Vec3f *last_q_step = bf_get_quarterstep(2, 0);
+		Vec3f *last_q_step2 = bf_get_quarterstep(3, 0);
 		f64 dist = (*last_q_step)[0] * bfStaticState.plane_nx + (*last_q_step)[2] * bfStaticState.plane_nz + bfStaticState.plane_d - 50.0;
 		f64 dist2 = (*last_q_step2)[0] * bfStaticState.plane_nx + (*last_q_step2)[2] * bfStaticState.plane_nz + bfStaticState.plane_d - 50.0;
 		f64 score = -(dist * dist + dist2 * dist2);
@@ -88,10 +88,10 @@ u8 updateScore(Candidate *candidate, u32 frame_idx)
 
 		if (gMarioState->faceAngle[1] == (s16)(bfStaticState.gwk_angle + 0x8000))
 		{
-			safePrintf("Found one: %d, %f %s\n", gMarioState->faceAngle[1], gMarioState->forwardVel, best ? "\t(new best!)" : "");
+			bf_safe_printf("Found one: %d, %f %s\n", gMarioState->faceAngle[1], gMarioState->forwardVel, best ? "\t(new best!)" : "");
 			if (best)
 			{
-				output_input_sequence(bfInitialDynamicState.global_timer, candidate->sequence);
+				bf_output_input_sequence(bfInitialDynamicState.global_timer, candidate->sequence);
 				programState->bestScore = gMarioState->forwardVel;
 			}
 		}
@@ -119,7 +119,7 @@ void bruteforceLoop()
 			float seconds = (float)(curClock - lastClock) / CLOCKS_PER_SEC;
 			float fps = gen_mod * original_inputs->count * bfStaticState.runs_per_survivor * bfStaticState.survivors_per_generation / seconds;
 			lastClock = curClock;
-			safePrintf("Generation %d starting... (bestSpeed %f, %f FPS)\n", gen, programState->bestScore, fps);
+			bf_safe_printf("Generation %d starting... (bestSpeed %f, %f FPS)\n", gen, programState->bestScore, fps);
 		}
 
 		// perform all runs
@@ -133,7 +133,7 @@ void bruteforceLoop()
 				Candidate *original = &survivors[candidate_idx];
 
 				InputSequence *inputs = candidate->sequence;
-				clone_m64_inputs(inputs, original->sequence);
+				bf_clone_m64_inputs(inputs, original->sequence);
 
 				u8 keepOriginal = run_idx == 0 && (randFloat() > bfControlState->forget_rate);
 
@@ -153,49 +153,49 @@ void bruteforceLoop()
 				}
 
 				if (candidate->stats.hSpeed < programState->bestScore - bfControlState->score_leniency)
-					clone_m64_inputs(inputs, original->sequence);
+					bf_clone_m64_inputs(inputs, original->sequence);
 			}
 		}
 
 		// sort by scoring
-		updateSurvivors(survivors);
-		updateBest(best, survivors);
+		bf_update_survivors(survivors);
+		bf_update_best(best, survivors);
 
 		if (isParentProcess())
 		{
 			if (gen % gen_mod == 0)
 				for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++)
-					safePrintf("%d:\t%a;\t%f\n", candidate_idx, survivors[candidate_idx].score, survivors[candidate_idx].stats.hSpeed);
+					bf_safe_printf("%d:\t%a;\t%f\n", candidate_idx, survivors[candidate_idx].score, survivors[candidate_idx].stats.hSpeed);
 
 			// We're the parent process. Send a merge request to all children and merge, then send the merged results back to the children.
 			if (gen % gen_merge_mod == 0)
 			{
-				parentMergeCandidates(survivors);
+				bf_parent_merge_candidates(survivors);
 			}
 		}
 		else
-			childUpdateMessages(best);
+			bf_child_update_messages(best);
 	}
 }
 
 void main(int argc, char *argv[])
 {
-	parse_command_line_args(argc, argv);
-	safePrintf("Running Bruteforcer...\n");
+	bf_parse_command_line_args(argc, argv);
+	bf_safe_printf("Running Bruteforcer...\n");
 
-	safePrintf("Initializing game state...\n");
+	bf_safe_printf("Initializing game state...\n");
 	initGame();
 
-	safePrintf("Loading m64...\n");
-	if (!read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_end, &original_inputs))
+	bf_safe_printf("Loading m64...\n");
+	if (!bf_read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_end, &original_inputs))
 	{
-		safePrintf("Failed to load m64! Exiting...\n");
+		bf_safe_printf("Failed to load m64! Exiting...\n");
 		exit(-1);
 	}
-	initCandidates(original_inputs, &survivors);
-	initCandidates(original_inputs, &best);
+	bf_init_candidates(original_inputs, &survivors);
+	bf_init_candidates(original_inputs, &best);
 
-	initializeMultiProcess(original_inputs);
+	bf_initialize_multi_process(original_inputs);
 	programState->bestScore = minSpeed;
 
 	bruteforceLoop();

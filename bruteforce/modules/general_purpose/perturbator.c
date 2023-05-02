@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void read_Perturbators(Json *jsonNode, Perturbators *target)
+void bf_read_Perturbators(Json *jsonNode, Perturbators *target)
 {
 	target->nPerturbators = jsonNode->size;
 	target->perturbators = calloc(target->nPerturbators, sizeof(Perturbator));

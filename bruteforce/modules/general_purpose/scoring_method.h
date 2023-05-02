@@ -6,6 +6,7 @@
 #include "bruteforce/framework/candidates.h"
 #include "bruteforce/framework/json.h"
 #include "bruteforce/framework/quarter_steps.h"
+#include "bruteforce/framework/types.h"
 
 typedef f64 (*scoringFunc)(void *, Candidate *, u8 *, u8 *);
 
@@ -23,7 +24,7 @@ typedef struct ScoringMethods_s
 	ScoringMethod *methods;
 } ScoringMethods;
 
-void read_ScoringMethods(Json *jsonNode, ScoringMethods *target);
+void bf_read_ScoringMethods(Json *jsonNode, ScoringMethods *target);
 
 void applyMethod(ScoringMethod *method, Candidate *candidate, u8 *success, u8 *abort);
 
@@ -37,7 +38,7 @@ void applyMethod(ScoringMethod *method, Candidate *candidate, u8 *success, u8 *a
 	typedef struct NAME##Parameters_s *NAME##Parameters;                                      \
                                                                                               \
 	f64 sm_##NAME(NAME##Parameters parameters, Candidate *candidate, u8 *success, u8 *abort); \
-	void read_##NAME##Parameters(Json *, NAME##Parameters *);
+	void bf_read_##NAME##Parameters(Json *, NAME##Parameters *);
 
 #include "scoring_funcs.inc.c"
 

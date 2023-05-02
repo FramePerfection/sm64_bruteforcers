@@ -52,10 +52,10 @@ static void createPipe(HANDLE *readPipe, HANDLE *writePipe)
 
 	if (!MyCreatePipeEx(readPipe, writePipe, &saAttr, 0, FILE_FLAG_OVERLAPPED, 0))
 	{
-		safePrintf("Failed to create pipe: Error code %ld\n", GetLastError());
+		bf_safe_printf("Failed to create pipe: Error code %ld\n", GetLastError());
 		return;
 	}
-	safePrintf("Successfully created pipes %p (read) and %p (write)\n", *readPipe, *writePipe);
+	bf_safe_printf("Successfully created pipes %p (read) and %p (write)\n", *readPipe, *writePipe);
 }
 
 static void createProcess(HANDLE readPipe, HANDLE writePipe, HANDLE hJob)
@@ -72,12 +72,12 @@ static void createProcess(HANDLE readPipe, HANDLE writePipe, HANDLE hJob)
 
 	if (!CreateProcess(NULL, lpszArgs, NULL, NULL, TRUE, CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi))
 	{
-		safePrintf("Failed to launch child process. Error code %ld\n", GetLastError());
+		bf_safe_printf("Failed to launch child process. Error code %ld\n", GetLastError());
 		return;
 	}
 
 	if (!AssignProcessToJobObject(hJob, pi.hProcess))
-		safePrintf("Failed AssignProcessToJobObject: %ld\n", GetLastError());
+		bf_safe_printf("Failed AssignProcessToJobObject: %ld\n", GetLastError());
 }
 
 static void createMapFile()
@@ -90,7 +90,7 @@ static void createMapFile()
 	hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, &saAttr, PAGE_READWRITE, 0, BUF_SIZE, NULL);
 	if (hMapFile == NULL)
 	{
-		safePrintf("Could not create file mapping (%ld).\n", GetLastError());
+		bf_safe_printf("Could not create file mapping (%ld).\n", GetLastError());
 		return;
 	}
 }
@@ -100,7 +100,7 @@ static void createMapFileView()
 	pBuf = MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, BUF_SIZE);
 	if (pBuf == NULL)
 	{
-		safePrintf("Could not map view of file (%ld).\n", GetLastError());
+		bf_safe_printf("Could not map view of file (%ld).\n", GetLastError());
 		CloseHandle(hMapFile);
 		return;
 	}
@@ -120,7 +120,7 @@ static void createChildProcesses()
 	parentToChildWritePipes = calloc(num_processes, sizeof(HANDLE));
 	childToParentReadPipes = calloc(num_processes, sizeof(HANDLE));
 
-	safePrintf("Running %d processes...\n", num_processes);
+	bf_safe_printf("Running %d processes...\n", num_processes);
 	s32 i;
 	for (i = 0; i < num_processes; i++)
 	{
@@ -137,7 +137,7 @@ u8 isParentProcess()
 	return child_args == NULL;
 }
 
-void initializeMultiProcess(InputSequence *original_inputs)
+void bf_initialize_multi_process(InputSequence *original_inputs)
 {
 	sequenceSize = sizeof(InputSequence) + original_inputs->count * sizeof(OSContPad);
 	transmissionCandidateSize = sizeof(Candidate) + sequenceSize;
@@ -155,7 +155,7 @@ void initializeMultiProcess(InputSequence *original_inputs)
 		arg2 = strtok(NULL, ";");
 		if (arg2 == NULL)
 		{
-			safePrintf("Invalid arguments to create child process. Exiting...\n");
+			bf_safe_printf("Invalid arguments to create child process. Exiting...\n");
 			exit(0);
 		}
 		char *end;
@@ -174,7 +174,7 @@ void initializeMultiProcess(InputSequence *original_inputs)
 		createMapFileView();
 		createMutex();
 		createChildProcesses();
-		listen_to_inputs();
+		bf_listen_to_inputs();
 	}
 	programState = pBuf;
 	BFControlState *initialState = bfControlState;
@@ -192,7 +192,7 @@ static void writeSurvivorsToBuffer(Candidate *survivors)
 	}
 }
 
-void parentMergeCandidates(Candidate *survivors)
+void bf_parent_merge_candidates(Candidate *survivors)
 {
 	s32 numChildProcesses = bfStaticState.max_processes - 1;
 	if (numChildProcesses <= 0)
@@ -207,7 +207,7 @@ void parentMergeCandidates(Candidate *survivors)
 	{
 		if (!WriteFile(parentToChildWritePipes[childProcId], pipeBuffer, pipeBufferSize, &written, NULL))
 		{
-			safePrintf("Failed to write sync message:%ld\n", GetLastError());
+			bf_safe_printf("Failed to write sync message:%ld\n", GetLastError());
 		}
 	}
 
@@ -221,7 +221,7 @@ void parentMergeCandidates(Candidate *survivors)
 	{
 		if (!ReadFile(childToParentReadPipes[childProcId], mergeBuffer + childProcId * pipeBufferSize, pipeBufferSize, &read, NULL))
 		{
-			safePrintf("Failed to read merge message:%ld\n", GetLastError());
+			bf_safe_printf("Failed to read merge message:%ld\n", GetLastError());
 		}
 
 		u32 i;
@@ -233,7 +233,7 @@ void parentMergeCandidates(Candidate *survivors)
 		}
 	}
 
-	mergeCandidates(survivors, externalCandidates, k);
+	bf_merge_candidates(survivors, externalCandidates, k);
 	free(mergeBuffer);
 
 	// Send the merge result to each child process
@@ -242,12 +242,12 @@ void parentMergeCandidates(Candidate *survivors)
 	{
 		if (!WriteFile(parentToChildWritePipes[childProcId], pipeBuffer, pipeBufferSize, &written, NULL))
 		{
-			safePrintf("Failed to write merge result to child %d: %ld\n", childProcId, GetLastError());
+			bf_safe_printf("Failed to write merge result to child %d: %ld\n", childProcId, GetLastError());
 		}
 	}
 }
 
-void childUpdateMessages(Candidate *survivors)
+void bf_child_update_messages(Candidate *survivors)
 {
 	if (!pipeReadPending)
 	{
@@ -268,12 +268,12 @@ void childUpdateMessages(Candidate *survivors)
 			writeSurvivorsToBuffer(survivors);
 			if (!WriteFile(childWritePipe, pipeBuffer, pipeBufferSize, &written, NULL))
 			{
-				safePrintf("Failed to fulfil merge command: %ld", GetLastError());
+				bf_safe_printf("Failed to fulfil merge command: %ld", GetLastError());
 			}
 
 			if (!ReadFile(childReadPipe, pipeBuffer, pipeBufferSize, &read, NULL))
 			{
-				safePrintf("Failed to read merge message:%ld\n", GetLastError());
+				bf_safe_printf("Failed to read merge message:%ld\n", GetLastError());
 			}
 			u32 i;
 			for (i = 0; i < bfStaticState.survivors_per_generation; i++)
@@ -282,7 +282,7 @@ void childUpdateMessages(Candidate *survivors)
 				candidate->sequence = (InputSequence *)(candidate + 1);
 				survivors[i].score = candidate->score;
 				survivors[i].stats = candidate->stats;
-				clone_m64_inputs(survivors[i].sequence, candidate->sequence);
+				bf_clone_m64_inputs(survivors[i].sequence, candidate->sequence);
 			}
 		}
 
@@ -293,7 +293,7 @@ void childUpdateMessages(Candidate *survivors)
 	}
 }
 
-void safePrintf(const char *fmt, ...)
+void bf_safe_printf(const char *fmt, ...)
 {
 	if (mutex)
 		WaitForSingleObject(mutex, INFINITE);

@@ -13,11 +13,11 @@ typedef struct InputSequence_s
 	OSContPad inputs[0];
 } InputSequence;
 
-void fwrite_hex32string(FILE *file, u8 input_buffer[4]);
-u8 read_m64_from_file(char *fileName, u32 offset, u32 max_count, InputSequence **inputs);
-void clone_m64_inputs(InputSequence *dest, InputSequence *src);
-InputSequence *clone_m64(InputSequence *src);
-u8 fwrite_input_sequence(FILE *file, InputSequence *sequence);
-u8 save_to_m64_file(char *originalFileName, char *fileName, InputSequence *sequence);
+void bf_fwrite_hex32string(FILE *file, u8 input_buffer[4]);
+u8 bf_read_m64_from_file(char *fileName, u32 offset, u32 max_count, InputSequence **inputs);
+void bf_clone_m64_inputs(InputSequence *dest, InputSequence *src);
+InputSequence *bf_clone_m64(InputSequence *src);
+u8 bf_fwrite_input_sequence(FILE *file, InputSequence *sequence);
+u8 bf_save_to_m64_file(char *originalFileName, char *fileName, InputSequence *sequence);
 
 #endif // M64_H

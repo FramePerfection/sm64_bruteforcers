@@ -41,11 +41,11 @@ static clock_t lastSaveTime;
 
 static boolean readReference()
 {
-	const char *fileContents = read_file("reference_run.json");
+	const char *fileContents = bf_read_file("reference_run.json");
 	Json *root = Json_create(fileContents);
 	if (!root)
 	{
-		safePrintf("error in reference_run.json starting at:\n%s\n", Json_getError());
+		bf_safe_printf("error in reference_run.json starting at:\n%s\n", Json_getError());
 		free((char *)fileContents);
 		return FALSE;
 	}
@@ -86,28 +86,28 @@ static boolean readReference()
 
 static void initGame()
 {
-	initCamera();
-	initArea();
-	initMario();
+	bf_init_camera();
+	bf_init_area();
+	bf_init_mario();
 
-	safePrintf("Loading reference run...\n");
+	bf_safe_printf("Loading reference run...\n");
 	if (!readReference())
 	{
-		safePrintf("Failed to read reference run!");
+		bf_safe_printf("Failed to read reference run!");
 		exit(-1);
 	}
 
-	safePrintf("Loading configuration...\n");
+	bf_safe_printf("Loading configuration...\n");
 	if (!bf_init_states())
 	{
-		safePrintf("Failed to load configuration! Exiting...\n");
+		bf_safe_printf("Failed to load configuration! Exiting...\n");
 		exit(-1);
 	}
 
 	clear_static_surfaces();
 	clear_dynamic_surfaces();
-	init_static_surfaces(bfStaticState.static_tris);
-	init_dynamic_surfaces(bfStaticState.dynamic_tris);
+	bf_init_static_surfaces(bfStaticState.static_tris);
+	bf_init_dynamic_surfaces(bfStaticState.dynamic_tris);
 
 	// srand(bfStaticState.rnd_seed);
 
@@ -119,7 +119,7 @@ static void initGame()
 
 static void updateGame(OSContPad *input)
 {
-	updateController(input);
+	bf_update_controller(input);
 	adjust_analog_stick(gPlayer1Controller);
 	execute_mario_action(gMarioState->marioObj);
 	if (gCurrentArea != NULL)
@@ -174,7 +174,7 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort)
 		{
 			hasbest = TRUE;
 			programState->bestScore = candidate->score;
-			clone_m64_inputs(bestInputs, candidate->sequence);
+			bf_clone_m64_inputs(bestInputs, candidate->sequence);
 		}
 	}
 	// Save at most 1 run per second
@@ -183,23 +183,23 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort)
 	{
 		hasbest = FALSE;
 		lastSaveTime = newClock;
-		output_input_sequence(bfInitialDynamicState.global_timer, bestInputs);
-		safePrintf("New best: %f\n", programState->bestScore);
+		bf_output_input_sequence(bfInitialDynamicState.global_timer, bestInputs);
+		bf_safe_printf("New best: %f\n", programState->bestScore);
 	}
 }
 
 void main(int argc, char *argv[])
 {
-	parse_command_line_args(argc, argv);
+	bf_parse_command_line_args(argc, argv);
 
-	safePrintf("Running Bruteforcer...\n");
+	bf_safe_printf("Running Bruteforcer...\n");
 	initGame();
 
-	safePrintf("Loading m64...\n");
+	bf_safe_printf("Loading m64...\n");
 	InputSequence *original_inputs;
-	if (!read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_end, &original_inputs))
+	if (!bf_read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_end, &original_inputs))
 	{
-		safePrintf("Failed to load m64! (%s) Exiting...\n", bfStaticState.m64_input);
+		bf_safe_printf("Failed to load m64! (%s) Exiting...\n", bfStaticState.m64_input);
 		exit(-1);
 	}
 
@@ -217,7 +217,7 @@ void main(int argc, char *argv[])
 		for (i = 0; i < nFramesToMatch; i++)
 		{
 			u32 k = i + bfStaticState.reference_offset;
-			safePrintf("Matching frame %d...\n", k);
+			bf_safe_printf("Matching frame %d...\n", k);
 
 			bf_save_dynamic_state(&state);
 			OSContPad cont;
@@ -250,20 +250,20 @@ void main(int argc, char *argv[])
 			bf_load_dynamic_state(&state);
 			updateGame(&original_inputs->inputs[i]);
 
-			safePrintf("Matched frame %d with error %f!\n", i, minError);
+			bf_safe_printf("Matched frame %d with error %f!\n", i, minError);
 		}
-		safePrintf("Matching frames done!\n");
+		bf_safe_printf("Matching frames done!\n");
 	}
 
-	bestInputs = clone_m64(original_inputs);
+	bestInputs = bf_clone_m64(original_inputs);
 
-	output_input_sequence(bfInitialDynamicState.global_timer, original_inputs);
+	bf_output_input_sequence(bfInitialDynamicState.global_timer, original_inputs);
 
 	// 2nd phase: optimize inputs to reduce overall error across frames
-	initializeMultiProcess(original_inputs);
+	bf_initialize_multi_process(original_inputs);
 
 	if (isParentProcess())
 		programState->bestScore = -INFINITY;
 
-	bruteforce_loop_genetic(original_inputs, &updateGame, &perturbInput, &updateScore);
+	bf_algorithm_genetic_loop(original_inputs, &updateGame, &perturbInput, &updateScore);
 }

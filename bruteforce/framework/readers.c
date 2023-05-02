@@ -8,7 +8,7 @@
 // clang-format off
 
 #define read_int(cast_type) \
-void read_##cast_type(Json *jsonNode, cast_type *target) { \
+void bf_read_##cast_type(Json *jsonNode, cast_type *target) { \
 	if (jsonNode->type == Json_String) { \
 		char* end; \
 		*target = (cast_type)strtol(jsonNode->valueString, &end, 0); \
@@ -24,23 +24,23 @@ read_int(u8)
 #undef read_int
 
 
-void read_f32(Json *jsonNode, f32 *target)
+void bf_read_f32(Json *jsonNode, f32 *target)
 {
 	// clang-format on
 	*target = (f32)jsonNode->valueFloat;
 }
 
-void read_f64(Json *jsonNode, f64 *target)
+void bf_read_f64(Json *jsonNode, f64 *target)
 {
 	*target = (f64)jsonNode->valueFloat;
 }
 
-void read_string(Json *jsonNode, string *target)
+void bf_read_string(Json *jsonNode, string *target)
 {
 	*target = strdup(jsonNode->valueString);
 }
 
-void read_boolean(Json *jsonNode, boolean *target)
+void bf_read_boolean(Json *jsonNode, boolean *target)
 {
 	if (jsonNode->type == Json_String)
 	{
@@ -56,21 +56,21 @@ void read_boolean(Json *jsonNode, boolean *target)
 		*target = (jsonNode->valueInt != 0) ? 1 : 0;
 }
 
-f32 advance_read(Json **nodePtr)
+static f32 s_advance_read(Json **nodePtr)
 {
 	f32 val = (*nodePtr)->valueFloat;
 	*nodePtr = (*nodePtr)->next;
 	return val;
 }
 
-void read_Vec3f(Json *jsonNode, Vec3f *target)
+void bf_read_Vec3f(Json *jsonNode, Vec3f *target)
 {
-	(*target)[0] = advance_read(&jsonNode);
-	(*target)[1] = advance_read(&jsonNode);
-	(*target)[2] = advance_read(&jsonNode);
+	(*target)[0] = s_advance_read(&jsonNode);
+	(*target)[1] = s_advance_read(&jsonNode);
+	(*target)[2] = s_advance_read(&jsonNode);
 }
 
-void read_Triangles(Json *jsonNode, Triangles *target)
+void bf_read_Triangles(Json *jsonNode, Triangles *target)
 {
 	Json *triNode = jsonNode->child;
 	target->data_size = jsonNode->size;
@@ -105,7 +105,7 @@ void read_Triangles(Json *jsonNode, Triangles *target)
 	}
 }
 
-void read_EnvironmentRegions(Json *jsonNode, EnvironmentRegions *target)
+void bf_read_EnvironmentRegions(Json *jsonNode, EnvironmentRegions *target)
 {
 	*target = calloc(jsonNode->size, sizeof(s16));
 	s32 i;
@@ -117,7 +117,7 @@ void read_EnvironmentRegions(Json *jsonNode, EnvironmentRegions *target)
 	}
 }
 
-void read_HitBoxes(Json *jsonNode, HitBoxes *target)
+void bf_read_HitBoxes(Json *jsonNode, HitBoxes *target)
 {
 	Json *n = jsonNode->child;
 	target->data_size = jsonNode->size;
