@@ -84,10 +84,10 @@ static void *s_listen_to_input_func()
     while (1)
     {
         // TODO(Important): Read strings of indefinite length
-        char blub[MAX_CONTROL_STATE_JSON_BUFFER];
-        fgets(blub, MAX_CONTROL_STATE_JSON_BUFFER, stdin);
+        char inputText[MAX_CONTROL_STATE_JSON_BUFFER];
+        fgets(inputText, MAX_CONTROL_STATE_JSON_BUFFER, stdin);
         bf_safe_printf("Updating control state!\n");
-        bf_update_control_state(blub);
+        bf_update_control_state(inputText);
 
         // sleep to not hog the processor
         struct timespec ts;
