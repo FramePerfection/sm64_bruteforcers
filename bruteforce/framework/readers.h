@@ -3,8 +3,8 @@
 
 #include <PR/ultratypes.h>
 
-#include "bruteforce/framework/types.h"
 #include "bruteforce/framework/json.h"
+#include "bruteforce/framework/types.h"
 
 #include "include/types.h"
 
@@ -20,26 +20,26 @@ void bf_read_boolean(Json *, boolean *);
 
 typedef struct Triangle
 {
-	s16 x1, y1, z1;
-	s16 x2, y2, z2;
-	s16 x3, y3, z3;
-	s16 surf_type;
+    s16 x1, y1, z1;
+    s16 x2, y2, z2;
+    s16 x3, y3, z3;
+    s16 surf_type;
 } Triangle;
 
 typedef struct Triangles
 {
-	u32 data_size;
-	Triangle *data;
+    u32 data_size;
+    Triangle *data;
 } Triangles;
 
 typedef struct HitBox
 {
-	f32 x, y, z, radius, above, below;
+    f32 x, y, z, radius, above, below;
 } HitBox;
 typedef struct HitBoxes
 {
-	u32 data_size;
-	HitBox *data;
+    u32 data_size;
+    HitBox *data;
 } HitBoxes;
 
 void bf_read_Triangles(Json *, Triangles *);
@@ -51,7 +51,7 @@ void bf_read_EnvironmentRegions(Json *, EnvironmentRegions *);
 void bf_read_Vec3f(Json *, Vec3f *);
 
 #define JSON_PARSE_FIELD(target, type, field_name, node) \
-	if (strcmp(node->name, field_name) == 0)             \
-		target##bf_read_##type(node);
+    if (strcmp(node->name, field_name) == 0)             \
+        target##bf_read_##type(node);
 
 #endif // BF_READERS_H

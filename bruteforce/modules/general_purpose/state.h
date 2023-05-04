@@ -5,12 +5,12 @@
 
 typedef struct
 {
-	f64 bestScore;
+    f64 bestScore;
 } ProgramState;
 
 typedef struct
 {
-	u32 frame_index;
+    u32 frame_index;
 } CandidateStats;
 
 #endif // BF_STATE_H

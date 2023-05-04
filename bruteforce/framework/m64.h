@@ -1,16 +1,16 @@
 #ifndef BF_M64_H
 #define BF_M64_H
 
-#include <PR/ultratypes.h>
 #include <PR/os_cont.h>
+#include <PR/ultratypes.h>
 #include <stdio.h>
 
 typedef struct InputSequence_s
 {
-	u32 offset;
-	u32 count;
-	OSContPad originalInput;
-	OSContPad inputs[0];
+    u32 offset;
+    u32 count;
+    OSContPad originalInput;
+    OSContPad inputs[0];
 } InputSequence;
 
 void bf_fwrite_hex32string(FILE *file, u8 input_buffer[4]);

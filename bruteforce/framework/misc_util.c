@@ -1,13 +1,13 @@
-#include <stdlib.h>
+#include "bruteforce/framework/misc_util.h"
+
+#include "bruteforce/framework/interprocess.h"
 
 #include "src/engine/math_util.h"
 #include "src/game/area.h"
 #include "src/game/camera.h"
 #include "src/game/game_init.h"
 #include "src/game/level_update.h"
-
-#include "bruteforce/framework/misc_util.h"
-#include "bruteforce/framework/interprocess.h"
+#include <stdlib.h>
 
 f32 randFloat()
 {

@@ -1,10 +1,11 @@
 #ifndef BF_MISC_UTIL_H
 #define BF_MISC_UTIL_H
 
-#include <PR/ultratypes.h>
-#include "types.h"
-#include "engine/graph_node.h"
 #include "bruteforce/framework/readers.h"
+#include "bruteforce/framework/types.h"
+
+#include "engine/graph_node.h"
+#include <PR/ultratypes.h>
 
 f32 randFloat();
 extern void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool);

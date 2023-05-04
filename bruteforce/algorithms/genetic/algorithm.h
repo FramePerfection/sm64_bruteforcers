@@ -1,8 +1,8 @@
 #ifndef BF_ALGORITHMS_GENETIC_H
 #define BF_ALGORITHMS_GENETIC_H
 
-#include "bruteforce/framework/types.h"
 #include "bruteforce/framework/candidates.h"
+#include "bruteforce/framework/types.h"
 
 typedef void (*PerturbInputFunc)(Candidate *candidate, OSContPad *controller, u32 frame_index);
 typedef void (*ScoringFunc)(Candidate *candidate, u32 frame_index, boolean *abort);

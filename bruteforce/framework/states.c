@@ -1,11 +1,13 @@
-#include <string.h>
+#include "bruteforce/framework/states.h"
+
+#include "bruteforce/framework/interface.h"
+#include "bruteforce/framework/interprocess.h"
+#include "bruteforce/framework/json.h"
+#include "bruteforce/framework/readers.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-#include "bruteforce/framework/readers.h"
-#include "bruteforce/framework/states.h"
-#include "bruteforce/framework/json.h"
-#include "bruteforce/framework/interprocess.h"
-#include "bruteforce/framework/interface.h"
+#include <string.h>
 
 #define BF_STATE_INCLUDE
 #include STATE_DEFINITION_FILE
@@ -19,7 +21,7 @@ ProgramState *programState;
 
 static void s_read_state_json(Json *node)
 {
-	// clang-format off
+    // clang-format off
 	
 	#define BF_CONTROL_STATE(type, struct_name, documentation) \
 		if (strcmp(#struct_name, node->name) == 0) \
@@ -49,36 +51,36 @@ static void s_read_state_json(Json *node)
 	#undef BF_CONTROL_STATE
 	#undef BF_DYNAMIC_STATE
 	#undef BF_STATIC_STATE
-	// clang-format on
+    // clang-format on
 
-	bf_safe_printf("Warning: Undefined state \"%s\" set.\n", node->name);
+    bf_safe_printf("Warning: Undefined state \"%s\" set.\n", node->name);
 }
 
 u8 bf_init_states()
 {
-	bfControlState = &bfInitialControlState;
-	const char *fileContents = bf_read_file(override_config_file != NULL ? override_config_file : "configuration.json");
-	Json *root = Json_create(fileContents);
-	if (!root)
-	{
-		printf("error in configuration.json starting at:\n%s\n", Json_getError());
-		free(fileContents);
-		return FALSE;
-	}
-	Json *node = root->child;
-	while (node != NULL)
-	{
-		s_read_state_json(node);
-		node = node->next;
-	}
-	free(fileContents);
-	Json_dispose(root);
-	return TRUE;
+    bfControlState = &bfInitialControlState;
+    const char *fileContents = bf_read_file(override_config_file != NULL ? override_config_file : "configuration.json");
+    Json *root = Json_create(fileContents);
+    if (!root)
+    {
+        printf("error in configuration.json starting at:\n%s\n", Json_getError());
+        free(fileContents);
+        return FALSE;
+    }
+    Json *node = root->child;
+    while (node != NULL)
+    {
+        s_read_state_json(node);
+        node = node->next;
+    }
+    free(fileContents);
+    Json_dispose(root);
+    return TRUE;
 }
 
 void bf_load_dynamic_state(BFDynamicState *state)
 {
-	// clang-format off
+    // clang-format off
 
 	#define BF_CONTROL_STATE(_0, _1, _2)
 	#define BF_DYNAMIC_STATE(type, struct_name, target_expr, documentation) \
@@ -90,12 +92,12 @@ void bf_load_dynamic_state(BFDynamicState *state)
 	#undef BF_CONTROL_STATE
 	#undef BF_DYNAMIC_STATE
 	#undef BF_STATIC_STATE
-	// clang-format on
+    // clang-format on
 }
 
 void bf_save_dynamic_state(BFDynamicState *state)
 {
-	// clang-format off
+    // clang-format off
 	
 	#define BF_CONTROL_STATE(_0, _1, _2)
 	#define BF_DYNAMIC_STATE(type, struct_name, target_expr, documentation) \
@@ -107,22 +109,22 @@ void bf_save_dynamic_state(BFDynamicState *state)
 	#undef BF_CONTROL_STATE
 	#undef BF_DYNAMIC_STATE
 	#undef BF_STATIC_STATE
-	// clang-format on
+    // clang-format on
 }
 
 void bf_update_control_state(char *input)
 {
-	Json *root = Json_create(input);
-	if (!root)
-	{
-		bf_safe_printf("Invalid conrol state json starting at:\n%s\n", Json_getError());
-		return FALSE;
-	}
-	Json *node = root->child;
-	// TODO(Important): lock a mutex to prevent "torn reads" in running processes
-	while (node != NULL)
-	{
-		// clang-format off
+    Json *root = Json_create(input);
+    if (!root)
+    {
+        bf_safe_printf("Invalid conrol state json starting at:\n%s\n", Json_getError());
+        return FALSE;
+    }
+    Json *node = root->child;
+    // TODO(Important): lock a mutex to prevent "torn reads" in running processes
+    while (node != NULL)
+    {
+        // clang-format off
 
 		#define BF_CONTROL_STATE(type, struct_name, documentation) \
 			if (strcmp(#struct_name, node->name) == 0) \
@@ -135,9 +137,9 @@ void bf_update_control_state(char *input)
 		#undef BF_CONTROL_STATE
 		#undef BF_DYNAMIC_STATE
 		#undef BF_STATIC_STATE
-		// clang-format on
+        // clang-format on
 
-		node = node->next;
-	}
-	Json_dispose(root);
+        node = node->next;
+    }
+    Json_dispose(root);
 }

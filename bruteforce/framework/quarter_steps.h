@@ -1,8 +1,9 @@
 #ifndef BF_QUARTER_STEPS_H
 #define BF_QUARTER_STEPS_H
 
-#include "include/types.h"
 #include "bruteforce/framework/json.h"
+
+#include "include/types.h"
 
 typedef u8 quarterstep;
 
