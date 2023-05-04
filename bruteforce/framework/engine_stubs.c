@@ -1,14 +1,13 @@
-/* This file contains stubs for functions that shall not be necessary to execute, 
+/* This file contains stubs for functions that shall not be necessary to execute,
 / but may be called from necessary function.
 / Examples are playing sound, rendering graphics etc.
 */
 
+#include "include/macros.h"
 #include <PR/ultratypes.h>
 
-#include "include/macros.h"
-
-#include "src/engine/math_util.h"
 #include "game/level_update.h"
+#include "src/engine/math_util.h"
 
 // external.c; data.c; sound_init.c
 u32 gAudioRandom;

@@ -1,14 +1,16 @@
-#ifndef STATE_H
-#define STATE_H
+#ifndef BF_STATE_H
+#define BF_STATE_H
 
 #include <PR/ultratypes.h>
 
-typedef struct {
+typedef struct
+{
 	f64 bestScore;
 } ProgramState;
 
-typedef struct {
+typedef struct
+{
 	f32 hSpeed;
 } CandidateStats;
 
-#endif // STATE_H
+#endif // BF_STATE_H

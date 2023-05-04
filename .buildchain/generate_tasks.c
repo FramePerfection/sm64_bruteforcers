@@ -13,7 +13,7 @@ __TAB__ __TAB__		{__NL__ \
 __TAB__ __TAB__ __TAB__   "type": "shell",__NL__ \
 __TAB__ __TAB__ __TAB__   "label": __QUOTE__build NAME##__QUOTE__,__NL__ \
 __TAB__ __TAB__ __TAB__   "command": "make",__NL__ \
-__TAB__ __TAB__ __TAB__   "args": [],__NL__ \
+__TAB__ __TAB__ __TAB__   "args": [#NAME],__NL__ \
 __TAB__ __TAB__ __TAB__   "options": {__NL__ \
 __TAB__ __TAB__ __TAB__ __TAB__      "cwd": "${cwd}"__NL__ \
 __TAB__ __TAB__ __TAB__   },__NL__ \

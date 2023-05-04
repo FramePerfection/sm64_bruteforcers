@@ -4,7 +4,7 @@
 #include "src/engine/surface_load.h"
 
 /**
- *variables defined in other files that may be edited from outside later 
+ *variables defined in other files that may be edited from outside later
  */
 s16 gFindFloorIncludeSurfaceIntangible;
 s16 gCheckingSurfaceCollisionsForCamera;

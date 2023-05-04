@@ -1739,7 +1739,7 @@ s32 execute_mario_action(UNUSED struct Object *o) {
         // which can lead to unexpected sub-frame behavior. Could potentially hang
         // if a loop of actions were found, but there has not been a situation found.
         // _EDIT_ disable mario_execute_cutscene_action, mario_execute_automatic_action, mario_execute_object_action
-#define NOT_IMPL desync("action group not implemented\n"); inLoop = FALSE; break;
+#define NOT_IMPL(GROUP) bf_desync("action group '"#GROUP"' not implemented\n"); inLoop = FALSE; break;
 
         while (inLoop) {
             switch (gMarioState->action & ACT_GROUP_MASK) {
@@ -1760,15 +1760,15 @@ s32 execute_mario_action(UNUSED struct Object *o) {
                     break;
 
                 case ACT_GROUP_CUTSCENE:
-                    NOT_IMPL// inLoop = mario_execute_cutscene_action(gMarioState);
+                    NOT_IMPL(cutscene)// inLoop = mario_execute_cutscene_action(gMarioState);
                     break;
 
                 case ACT_GROUP_AUTOMATIC:
-                    NOT_IMPL// inLoop = mario_execute_automatic_action(gMarioState);
+                    NOT_IMPL(automatic)// inLoop = mario_execute_automatic_action(gMarioState);
                     break;
 
                 case ACT_GROUP_OBJECT:
-                    NOT_IMPL// inLoop = mario_execute_object_action(gMarioState);
+                    NOT_IMPL(object)// inLoop = mario_execute_object_action(gMarioState);
                     break;
             }
         }

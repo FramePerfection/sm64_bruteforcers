@@ -852,7 +852,7 @@ s32 act_move_punching(struct MarioState *m) {
     m->actionState = 1;
 
     // _EDIT_ desync in mario_update_punch_sequence
-    desync("mario_update_punch_sequence not implemented\n");
+    bf_desync("mario_update_punch_sequence not implemented\n");
     //mario_update_punch_sequence(m);
 
     if (m->forwardVel >= 0.0f) {

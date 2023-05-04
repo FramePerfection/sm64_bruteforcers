@@ -1,12 +1,16 @@
-#include "sm64.h"
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include "bruteforce/framework/json.h"
 #include "bruteforce/framework/readers.h"
 
+#include "bruteforce/framework/json.h"
+
+#include "sm64.h"
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
+
+// clang-format off
+
 #define read_int(cast_type) \
-void read_##cast_type(Json *jsonNode, cast_type *target) { \
+void bf_read_##cast_type(Json *jsonNode, cast_type *target) { \
 	if (jsonNode->type == Json_String) { \
 		char* end; \
 		*target = (cast_type)strtol(jsonNode->valueString, &end, 0); \
@@ -21,50 +25,64 @@ read_int(u16)
 read_int(u8)
 #undef read_int
 
-void read_f32(Json *jsonNode, f32 *target) {
-	*target = (f32)jsonNode->valueFloat;
+
+void bf_read_f32(Json *jsonNode, f32 *target)
+{
+    // clang-format on
+    *target = (f32)jsonNode->valueFloat;
 }
 
-void read_f64(Json *jsonNode, f64 *target) {
-	*target = (f64)jsonNode->valueFloat;
+void bf_read_f64(Json *jsonNode, f64 *target)
+{
+    *target = (f64)jsonNode->valueFloat;
 }
 
-void read_string(Json *jsonNode, string *target) {
-	*target = strdup(jsonNode->valueString);
+void bf_read_string(Json *jsonNode, string *target)
+{
+    *target = strdup(jsonNode->valueString);
 }
 
-void read_boolean(Json *jsonNode, boolean *target) {
-	if (jsonNode->type == Json_String) {
-		char *p = (char*)jsonNode->valueString;
-		for ( ; *p; ++p) *p = tolower(*p);
-		if (strcmp(jsonNode->valueString, "true") == 0)
-			*target = 1;
-		else if (strcmp(jsonNode->valueString, "false") == 0)
-			*target = 0;
-	}
-	else if (jsonNode->type == Json_Number)
-		*target = (jsonNode->valueInt != 0) ? 1 : 0;
+void bf_read_boolean(Json *jsonNode, boolean *target)
+{
+    if (jsonNode->type == Json_String)
+    {
+        char *p = (char *)jsonNode->valueString;
+        for (; *p; ++p)
+            *p = tolower(*p);
+        if (strcmp(jsonNode->valueString, "true") == 0)
+            *target = 1;
+        else if (strcmp(jsonNode->valueString, "false") == 0)
+            *target = 0;
+    }
+    else if (jsonNode->type == Json_Number)
+        *target = (jsonNode->valueInt != 0) ? 1 : 0;
 }
 
-f32 advance_read(Json **nodePtr) {
-	f32 val = (*nodePtr)->valueFloat;
-	*nodePtr = (*nodePtr)->next;
-	return val;
+static f32 s_advance_read(Json **nodePtr)
+{
+    f32 val = (*nodePtr)->valueFloat;
+    *nodePtr = (*nodePtr)->next;
+    return val;
 }
 
-void read_Vec3f(Json *jsonNode, Vec3f *target) {
-	(*target)[0] = advance_read(&jsonNode);
-	(*target)[1] = advance_read(&jsonNode);
-	(*target)[2] = advance_read(&jsonNode);
+void bf_read_Vec3f(Json *jsonNode, Vec3f *target)
+{
+    (*target)[0] = s_advance_read(&jsonNode);
+    (*target)[1] = s_advance_read(&jsonNode);
+    (*target)[2] = s_advance_read(&jsonNode);
 }
 
-void read_Triangles(Json *jsonNode, Triangles *target) {
-	Json *triNode = jsonNode->child;
-	target->data_size = jsonNode->size;
-	target->data = calloc(target->data_size, sizeof(Triangle));
-	u32 i = 0;
-	while (triNode != NULL) {
-		Json *vertNode = triNode->child;
+void bf_read_Triangles(Json *jsonNode, Triangles *target)
+{
+    Json *triNode = jsonNode->child;
+    target->data_size = jsonNode->size;
+    target->data = calloc(target->data_size, sizeof(Triangle));
+    u32 i = 0;
+    while (triNode != NULL)
+    {
+        Json *vertNode = triNode->child;
+        // clang-format off
+
 		#define ADVANCE \
 			(s16)vertNode->valueInt; \
 			vertNode = vertNode->next;
@@ -85,26 +103,33 @@ void read_Triangles(Json *jsonNode, Triangles *target) {
 		triNode = triNode->next;
 
 		#undef ADVANCE
-	}
+        // clang-format on
+    }
 }
 
-void read_EnvironmentRegions(Json *jsonNode, EnvironmentRegions *target) {
-	*target = calloc(jsonNode->size, sizeof(s16));
-	s32 i;
-	Json *n = jsonNode->child;
-	for (i = 0; i < jsonNode->size; i++) {
-		(*target)[i] = n->valueInt;
-		n = n->next;
-	}
+void bf_read_EnvironmentRegions(Json *jsonNode, EnvironmentRegions *target)
+{
+    *target = calloc(jsonNode->size, sizeof(s16));
+    s32 i;
+    Json *n = jsonNode->child;
+    for (i = 0; i < jsonNode->size; i++)
+    {
+        (*target)[i] = n->valueInt;
+        n = n->next;
+    }
 }
 
-void read_HitBoxes(Json *jsonNode, HitBoxes *target) {
-	Json *n = jsonNode->child;
-	target->data_size = jsonNode->size;
-	target->data = calloc(target->data_size, sizeof(HitBox));
-	u32 i = 0;
-	while (n != NULL) {
-		Json *hitbox = n->child;
+void bf_read_HitBoxes(Json *jsonNode, HitBoxes *target)
+{
+    Json *n = jsonNode->child;
+    target->data_size = jsonNode->size;
+    target->data = calloc(target->data_size, sizeof(HitBox));
+    u32 i = 0;
+    while (n != NULL)
+    {
+        Json *hitbox = n->child;
+        // clang-format off
+
 		#define ADVANCE \
 			(s16)hitbox->valueInt; \
 			hitbox = hitbox->next;
@@ -120,5 +145,6 @@ void read_HitBoxes(Json *jsonNode, HitBoxes *target) {
 		n = n->next;
 
 		#undef ADVANCE
-	}
+        // clang-format on
+    }
 }

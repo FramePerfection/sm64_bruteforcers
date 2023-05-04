@@ -1,79 +1,84 @@
 #include "bruteforce/algorithms/genetic/algorithm.h"
 
+#include "src/game/game_init.h"
 #include <time.h>
 
-#include "src/game/game_init.h"
-
 #include "bruteforce/framework/interprocess.h"
-#include "bruteforce/framework/bf_states.h"
+#include "bruteforce/framework/states.h"
 
-void bruteforce_loop_genetic(InputSequence *original_inputs, UpdateGameFunc updateGame, PerturbInputFunc perturbInput, ScoringFunc updateScore) {
-	Candidate *survivors;
-	Candidate *best;
-	initCandidates(original_inputs, &survivors);
-	initCandidates(original_inputs, &best);
-	
-	clock_t lastClock = clock();
+void bf_algorithm_genetic_loop(InputSequence *original_inputs, UpdateGameFunc updateGame, PerturbInputFunc perturbInput, ScoringFunc updateScore)
+{
+    Candidate *survivors;
+    Candidate *best;
+    bf_init_candidates(original_inputs, &survivors);
+    bf_init_candidates(original_inputs, &best);
 
-	u32 gen_merge_mod = bfControlState->merge_interval;
-	if (gen_merge_mod == 0)
-		gen_merge_mod = 20;
+    clock_t lastClock = clock();
 
-	u32 frames = 0;
-	u32 gen;
-	for (gen = 0; gen < bfStaticState.max_generations; gen++) {
-		clock_t curClock = clock();
-		float seconds = (float)(curClock - lastClock) / CLOCKS_PER_SEC;
-		if (seconds >= bfControlState->print_interval)
-		{
-			float fps = frames / seconds;
-			lastClock = curClock;
-			safePrintf("Generation %d starting... (%f FPS) (Best score: %f) (%d)\n", gen, fps, programState->bestScore, bfControlState->print_interval);
-			frames = 0;
-		}
+    u32 gen_merge_mod = bfControlState->merge_interval;
+    if (gen_merge_mod == 0)
+        gen_merge_mod = 20;
 
-		// perform all runs
-		u32 candidate_idx;
-		for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++) {
+    u32 frames = 0;
+    u32 gen;
+    for (gen = 0; gen < bfStaticState.max_generations; gen++)
+    {
+        clock_t curClock = clock();
+        float seconds = (float)(curClock - lastClock) / CLOCKS_PER_SEC;
+        if (seconds >= bfControlState->print_interval)
+        {
+            float fps = frames / seconds;
+            lastClock = curClock;
+            bf_safe_printf("Generation %d starting... (%f FPS) (Best score: %f) (%d)\n", gen, fps, programState->bestScore, bfControlState->print_interval);
+            frames = 0;
+        }
 
-			u32 run_idx;
-			for (run_idx = 0; run_idx < bfStaticState.runs_per_survivor; run_idx++) {
-				Candidate *candidate = &survivors[candidate_idx].children[run_idx];
-				Candidate *original = &survivors[candidate_idx];
-				
-				InputSequence *inputs = candidate->sequence;
-				clone_m64_inputs(inputs, original->sequence);
+        // perform all runs
+        u32 candidate_idx;
+        for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++)
+        {
 
-				u8 keepOriginal = run_idx == 0 && (randFloat() > bfControlState->forget_rate);
+            u32 run_idx;
+            for (run_idx = 0; run_idx < bfStaticState.runs_per_survivor; run_idx++)
+            {
+                Candidate *candidate = &survivors[candidate_idx].children[run_idx];
+                Candidate *original = &survivors[candidate_idx];
 
-				gPlayer1Controller->buttonDown = inputs->originalInput.button;
-				gPlayer1Controller->rawStickX = inputs->originalInput.stick_x;
-				gPlayer1Controller->rawStickY = inputs->originalInput.stick_y;
-				bf_load_dynamic_state(&bfInitialDynamicState);
-				desynced = FALSE;
+                InputSequence *inputs = candidate->sequence;
+                bf_clone_m64_inputs(inputs, original->sequence);
 
-				u32 frame_idx;
-				for (frame_idx = 0; frame_idx < inputs->count; frame_idx++) {
-					frames++;
-					OSContPad *currentInput = &inputs->inputs[frame_idx];
-					if (!keepOriginal)
-						perturbInput(candidate, currentInput, frame_idx);
-					updateGame(currentInput);
-					boolean abort = desynced;
-					updateScore(candidate, frame_idx, &abort);
-					if (abort) break;
-				}
-			}
-		}
-		
-		// sort by scoring
-		updateSurvivors(survivors);
-		updateBest(best, survivors);
-		if (!isParentProcess())
-			childUpdateMessages(best);
+                u8 keepOriginal = run_idx == 0 && (randFloat() > bfControlState->forget_rate);
 
-		if (gen % gen_merge_mod == 0)
-			if (isParentProcess())
-				parentMergeCandidates(survivors);
-	}
+                gPlayer1Controller->buttonDown = inputs->originalInput.button;
+                gPlayer1Controller->rawStickX = inputs->originalInput.stick_x;
+                gPlayer1Controller->rawStickY = inputs->originalInput.stick_y;
+                bf_load_dynamic_state(&bfInitialDynamicState);
+                desynced = FALSE;
+
+                u32 frame_idx;
+                for (frame_idx = 0; frame_idx < inputs->count; frame_idx++)
+                {
+                    frames++;
+                    OSContPad *currentInput = &inputs->inputs[frame_idx];
+                    if (!keepOriginal)
+                        perturbInput(candidate, currentInput, frame_idx);
+                    updateGame(currentInput);
+                    boolean abort = desynced;
+                    updateScore(candidate, frame_idx, &abort);
+                    if (abort)
+                        break;
+                }
+            }
+        }
+
+        // sort by scoring
+        bf_update_survivors(survivors);
+        bf_update_best(best, survivors);
+        if (!isParentProcess())
+            bf_child_update_messages(best);
+
+        if (gen % gen_merge_mod == 0)
+            if (isParentProcess())
+                bf_parent_merge_candidates(survivors);
+    }
 }
