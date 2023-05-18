@@ -10,7 +10,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#define MAX_CONTROL_STATE_JSON_BUFFER 4096
+#define CONTROL_STATE_JSON_BUFFER 4096
 
 #ifdef _WIN32
 #include <windows.h>
@@ -74,6 +74,30 @@ void bf_parse_command_line_args(int argc, char *argv[])
         bf_safe_printf("launching from %s...\n", override_config_file);
 }
 
+static char *s_input_string(FILE *fp, size_t bufferSize)
+{
+    char *str;
+    int ch;
+    size_t len = 0;
+    str = realloc(NULL, sizeof(*str) * bufferSize);
+    if (!str)
+        return str;
+        
+    while (EOF != (ch = fgetc(fp)) && ch != '\0')
+    {
+        str[len++] = ch;
+        if (len == bufferSize)
+        {
+            str = realloc(str, sizeof(*str) * (bufferSize += 16));
+            if (!str)
+                return str;
+        }
+    }
+    str[len++] = '\0';
+
+    return realloc(str, sizeof(*str) * len);
+}
+
 #ifdef _WIN32
 static DWORD WINAPI s_listen_to_input_func(__attribute__((unused)) LPVOID lpParam)
 #else
@@ -83,24 +107,30 @@ static void *s_listen_to_input_func()
     // loop indefinitely
     while (1)
     {
-        // TODO(Important): Read strings of indefinite length
-        char inputText[MAX_CONTROL_STATE_JSON_BUFFER];
-        fgets(inputText, MAX_CONTROL_STATE_JSON_BUFFER, stdin);
-        bf_safe_printf("Updating control state!\n");
-        bf_update_control_state(inputText);
+        char *inputText = s_input_string(stdin, CONTROL_STATE_JSON_BUFFER);
+        if (inputText) {
+            bf_safe_printf("Updating control state!\n");
+            bf_update_control_state(inputText);
+            free(inputText);
+        }
+        else
+            bf_safe_printf("Failed to read control state input!\n");
 
-        // sleep to not hog the processor
+        // sleep to not hog the processor, just in case inputs come in too fast
         struct timespec ts;
         ts.tv_sec = 1;
         ts.tv_nsec = 0;
         nanosleep(&ts, &ts);
     }
+    return 0;
 }
 
 void bf_listen_to_inputs()
 {
 #ifdef _WIN32
     CreateThread(NULL, 0, s_listen_to_input_func, NULL, 0, &threadIdInputListener);
+#else
+    // TODO(Important): Implement posix thread start
 #endif
 }
 
