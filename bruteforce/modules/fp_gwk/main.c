@@ -61,7 +61,7 @@ void updateGame(OSContPad *input)
 
 void perturbInput(OSContPad *input)
 {
-    if (bfStaticState.max_perturbation > 0 && randFloat() <= bfStaticState.perturbation_chance)
+    if (bfStaticState.max_perturbation > 0 && bf_random_float() <= bfStaticState.perturbation_chance)
     {
         u16 perturb = (u16)(bfStaticState.max_perturbation);
         u8 perturbation_x = (rand() % (2 * perturb) - perturb);
@@ -135,7 +135,7 @@ void bruteforceLoop()
                 InputSequence *inputs = candidate->sequence;
                 bf_clone_m64_inputs(inputs, original->sequence);
 
-                u8 keepOriginal = run_idx == 0 && (randFloat() > bfControlState->forget_rate);
+                u8 keepOriginal = run_idx == 0 && (bf_random_float() > bfControlState->forget_rate);
 
                 bf_load_dynamic_state(&bfInitialDynamicState);
                 gPlayer1Controller->rawStickX = inputs->originalInput.stick_x;

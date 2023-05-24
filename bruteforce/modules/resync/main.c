@@ -117,7 +117,7 @@ static void initGame()
     update_camera(gCurrentArea->camera);
 }
 
-static void updateGame(OSContPad *input)
+static void updateGame(OSContPad *input, UNUSED u32 frame_index)
 {
     bf_update_controller(input);
     adjust_analog_stick(gPlayer1Controller);
@@ -135,7 +135,7 @@ static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, u32 fram
 
     UNUSED f64 score_diff = candidate->stats.lastScore - candidate->score;
     f64 chance = 1.0; // 1.0 / (1.0 + exp(-score_diff));
-    if (randFloat() < chance * bfStaticState.perturbation_chance)
+    if (bf_random_float() < chance * bfStaticState.perturbation_chance)
     {
         u16 perturb = (u16)(bfStaticState.max_perturbation);
         u8 perturbation_x = (rand() % (2 * perturb) - perturb);
@@ -234,7 +234,7 @@ void main(int argc, char *argv[])
                     bf_load_dynamic_state(&state);
                     cont.stick_x = x;
                     cont.stick_y = y;
-                    updateGame(&cont);
+                    updateGame(&cont, i);
 
                     // ... and store the best result in the original input sequence
                     f64 newError = getError(&referenceFrames[k]);
@@ -248,7 +248,7 @@ void main(int argc, char *argv[])
 
             // Then perform the best found input again and continue from there
             bf_load_dynamic_state(&state);
-            updateGame(&original_inputs->inputs[i]);
+            updateGame(&original_inputs->inputs[i], i);
 
             bf_safe_printf("Matched frame %d with error %f!\n", i, minError);
         }

@@ -40,7 +40,7 @@ static void initGame()
     bf_init_static_surfaces(bfStaticState.static_tris);
 }
 
-static void updateGame(OSContPad *input)
+static void updateGame(OSContPad *input, UNUSED u32 frame_index)
 {
     bf_update_controller(input);
     adjust_analog_stick(gPlayer1Controller);
@@ -49,7 +49,7 @@ static void updateGame(OSContPad *input)
 
 static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, UNUSED u32 frame_idx)
 {
-    if (bfStaticState.max_perturbation > 0 && randFloat() < bfStaticState.perturbation_chance)
+    if (bfStaticState.max_perturbation > 0 && bf_random_float() < bfStaticState.perturbation_chance)
     {
         u16 perturb = (u16)(bfStaticState.max_perturbation);
         u8 perturbation_x = (rand() % (2 * perturb) - perturb);

@@ -49,7 +49,7 @@ static void initGame()
     update_camera(gCurrentArea->camera);
 }
 
-static void updateGame(OSContPad *input)
+static void updateGame(OSContPad *input, UNUSED u32 frame_index)
 {
     bf_update_controller(input);
     adjust_analog_stick(gPlayer1Controller);
@@ -72,7 +72,7 @@ static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, u32 fram
         if (frame_idx < perturbator->min_frame || frame_idx > perturbator->max_frame)
             continue;
 
-        if (perturbator->max_perturbation > 0 && randFloat() < perturbator->perturbation_chance)
+        if (perturbator->max_perturbation > 0 && bf_random_float() < perturbator->perturbation_chance)
         {
             u16 perturb = (u16)(perturbator->max_perturbation);
             u8 perturbation_x = (rand() % (2 * perturb) - perturb);
