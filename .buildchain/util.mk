@@ -36,7 +36,7 @@ find-command = $(shell which $(1) 2>/dev/null)
 ALGORITHMS := genetic
 
 # List of o files compiled from the same source, but into different module directories, and their dependencies, separated by <o-file>?<dependency>
-SPECIAL_O := $(addprefix framework/,bf_states?bf_state_definitions.inc.c candidates?state.h interprocess?state.h interface?state.h)
+SPECIAL_O := $(addprefix framework/,states?bf_state_definitions.inc.c candidates?state.h interprocess?state.h interface?state.h)
 SPECIAL_O += $(foreach a,$(ALGORITHMS),algorithms/$(a)/algorithm?state.h)
 
 MARIO_STEP_OBJECTS := mario_step.o mario.o mario_actions_airborne.o mario_actions_moving.o mario_actions_stationary.o mario_actions_submerged.o
@@ -57,7 +57,7 @@ endef
 # Function to register a module from its make.split file
 define register-module
 $(eval $(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/framework/, m64.o readers.o json.o engine_feed.o engine_stubs.o misc_util.o pipeex.o quarter_steps.o))
-$(eval $(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/$(NAME)/framework/, candidates.o bf_states.o interprocess.o interface.o))
+$(eval $(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/$(NAME)/framework/, candidates.o states.o interprocess.o interface.o))
 $(eval $(NAME)REQUIRED_O_FILES := $(addprefix $(BUILD_DIR)/, $($(NAME)REQUIRED_OBJECTS)))
 ALL_TARGETS += $(NAME)
 SRC_DIRS += bruteforce/$(NAME)
@@ -66,7 +66,7 @@ $(eval $(NAME): MODULE_PATH := $(NAME))
 $(eval $(NAME): $($(NAME)ADDITIONAL_DEPENDENCIES))
 $(NAME): $($(NAME)REQUIRED_O_FILES)
 	$(CC) -o $(BINARY_DIR)/$(NAME)/main.exe $($(NAME)REQUIRED_O_FILES)
-	$(call create-state-definition-file,./bruteforce/framework/generate_state_defintion.c,state_definitions.txt)
+	$(call create-state-definition-file,./bruteforce/framework/generate_state_definition.c,state_definitions.txt)
 
 $(foreach o,$(SPECIAL_O),$(eval $(call special,$(NAME),$(o))))
 endef
