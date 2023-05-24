@@ -7,7 +7,7 @@
 #include "engine/graph_node.h"
 #include <PR/ultratypes.h>
 
-f32 randFloat();
+f32 bf_random_float();
 extern void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool);
 extern void clear_static_surfaces(void);
 extern void add_surface(struct Surface *surface, s32 dynamic);

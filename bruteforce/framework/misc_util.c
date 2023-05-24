@@ -9,7 +9,7 @@
 #include "src/game/level_update.h"
 #include <stdlib.h>
 
-f32 randFloat()
+f32 bf_random_float()
 {
     return ((float)rand() / (float)(RAND_MAX));
 }

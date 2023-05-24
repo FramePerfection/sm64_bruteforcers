@@ -5,6 +5,7 @@
 
 #include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/states.h"
+#include "bruteforce/framework/misc_util.h"
 
 void bf_algorithm_genetic_loop(InputSequence *original_inputs, UpdateGameFunc updateGame, PerturbInputFunc perturbInput, ScoringFunc updateScore)
 {
@@ -47,7 +48,7 @@ void bf_algorithm_genetic_loop(InputSequence *original_inputs, UpdateGameFunc up
                 InputSequence *inputs = candidate->sequence;
                 bf_clone_m64_inputs(inputs, original->sequence);
 
-                u8 keepOriginal = run_idx == 0 && (randFloat() > bfControlState->forget_rate);
+                u8 keepOriginal = run_idx == 0 && (bf_random_float() > bfControlState->forget_rate);
 
                 gPlayer1Controller->buttonDown = inputs->originalInput.button;
                 gPlayer1Controller->rawStickX = inputs->originalInput.stick_x;
@@ -62,7 +63,7 @@ void bf_algorithm_genetic_loop(InputSequence *original_inputs, UpdateGameFunc up
                     OSContPad *currentInput = &inputs->inputs[frame_idx];
                     if (!keepOriginal)
                         perturbInput(candidate, currentInput, frame_idx);
-                    updateGame(currentInput);
+                    updateGame(currentInput, frame_idx);
                     boolean abort = desynced;
                     updateScore(candidate, frame_idx, &abort);
                     if (abort)
