@@ -7,14 +7,15 @@
  * Collision models for the different seesaw platforms.
  */
 static Collision const *sSeesawPlatformCollisionModels[] = {
-    bitdw_seg7_collision_0700F70C,
-    bits_seg7_collision_0701ADD8,
-    bits_seg7_collision_0701AE5C,
-    bob_seg7_collision_bridge,
-    bitfs_seg7_collision_07015928,
-    rr_seg7_collision_07029750,
-    rr_seg7_collision_07029858,
-    vcutm_seg7_collision_0700AC44,
+    // _EDIT_ remove collision info
+    // bitdw_seg7_collision_0700F70C,
+    // bits_seg7_collision_0701ADD8,
+    // bits_seg7_collision_0701AE5C,
+    // bob_seg7_collision_bridge,
+    // bitfs_seg7_collision_07015928,
+    // rr_seg7_collision_07029750,
+    // rr_seg7_collision_07029858,
+    // vcutm_seg7_collision_0700AC44,
 };
 
 /**

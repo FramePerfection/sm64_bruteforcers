@@ -18,9 +18,10 @@
  * forgot to remove its entry in this table.
  */
 static Collision const *sActivatedBackAndForthPlatformCollisionModels[] = {
-    /* ACTIVATED_BF_PLAT_TYPE_BITS_ARROW_PLAT */ bits_seg7_collision_0701AD54,
-    /* ACTIVATED_BF_PLAT_TYPE_BITFS_MESH_PLAT */ bitfs_seg7_collision_070157E0,
-    /* ACTIVATED_BF_PLAT_TYPE_BITFS_ELEVATOR  */ bitfs_seg7_collision_07015124
+    // _EDIT_ remove collision info
+    // /* ACTIVATED_BF_PLAT_TYPE_BITS_ARROW_PLAT */ bits_seg7_collision_0701AD54,
+    // /* ACTIVATED_BF_PLAT_TYPE_BITFS_MESH_PLAT */ bitfs_seg7_collision_070157E0,
+    // /* ACTIVATED_BF_PLAT_TYPE_BITFS_ELEVATOR  */ bitfs_seg7_collision_07015124
 };
 
 /**

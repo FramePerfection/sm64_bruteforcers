@@ -10,6 +10,7 @@
 #include "src/game/level_update.h"
 #include "src/game/mario.h"
 #include "src/game/mario_step.h"
+#include "src/game/object_list_processor.h"
 
 #include "bruteforce/framework/candidates.h"
 #include "bruteforce/framework/interface.h"
@@ -43,6 +44,7 @@ static void initGame()
 
     // srand(bfStaticState.rnd_seed);
 
+    clear_objects();
     init_camera(gCamera);
     // Still required to initialize something?
     execute_mario_action(gMarioState->marioObj);
@@ -53,6 +55,9 @@ static void updateGame(OSContPad *input, UNUSED u32 frame_index)
 {
     bf_update_controller(input);
     adjust_analog_stick(gPlayer1Controller);
+    
+    // TODO: work out how updating objects should be done in the face of needing to update Mario, too
+    area_update_objects();
     execute_mario_action(gMarioState->marioObj);
     if (gCurrentArea != NULL)
     {

@@ -103,7 +103,8 @@ static void enemy_lakitu_sub_act_no_spiny(void) {
         if (spiny != NULL) {
             o->prevObj = spiny;
             spiny->oAction = SPINY_ACT_HELD_BY_LAKITU;
-            obj_init_animation_with_sound(spiny, spiny_egg_seg5_anims_050157E4, 0);
+            // _EDIT_ remove reference to 'spiny_egg_seg5_anims_050157E4'
+            obj_init_animation_with_sound(spiny, 0 /*spiny_egg_seg5_anims_050157E4*/, 0);
 
             o->oEnemyLakituNumSpinies++;
             o->oSubAction = ENEMY_LAKITU_SUB_ACT_HOLD_SPINY;

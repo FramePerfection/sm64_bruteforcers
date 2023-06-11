@@ -8,8 +8,12 @@ $(eval $(NAME)_dep: force; \
 
 $(NAME)REQUIRED_OBJECTS := $(addprefix bruteforce/modules/$(NAME)/,main.o scoring_method.o perturbator.o)
 $(NAME)REQUIRED_OBJECTS += bruteforce/$(NAME)/algorithms/genetic/algorithm.o
-$(NAME)REQUIRED_OBJECTS += $(addprefix src/engine/,math_util.o surface_collision.o surface_load_reduced.o)
-$(NAME)REQUIRED_OBJECTS += $(addprefix src/game/,camera_reduced.o $(MARIO_STEP_OBJECTS))
+$(NAME)REQUIRED_OBJECTS += $(addprefix src/engine/,math_util.o surface_collision.o surface_load_reduced.o behavior_script.o graph_node.o)
+$(NAME)REQUIRED_OBJECTS += $(addprefix src/game/,camera_reduced.o $(MARIO_STEP_OBJECTS) area.o memory.o \
+												 object_list_processor.o behavior_actions.o object_helpers.o \
+												 obj_behaviors.o obj_behaviors_2.o platform_displacement.o spawn_object.o object_collision.o \
+												 mario_actions_cutscene.o interaction.o)
+$(NAME)REQUIRED_OBJECTS += data/behavior_data.o
 
 $(NAME)ADDITIONAL_DEPENDENCIES := $(NAME)_dep
 

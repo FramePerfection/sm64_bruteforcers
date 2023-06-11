@@ -606,51 +606,52 @@ struct GraphNode *geo_make_first_child(struct GraphNode *newFirstChild) {
  * traverses the scene graph and calls the functions of global nodes.
  */
 void geo_call_global_function_nodes_helper(struct GraphNode *graphNode, s32 callContext) {
-    struct GraphNode **globalPtr;
-    struct GraphNode *curNode;
-    struct FnGraphNode *asFnNode;
+    // _EDIT_ stub 'geo_call_global_function_nodes_helper'
+    // struct GraphNode **globalPtr;
+    // struct GraphNode *curNode;
+    // struct FnGraphNode *asFnNode;
 
-    curNode = graphNode;
+    // curNode = graphNode;
 
-    do {
-        asFnNode = (struct FnGraphNode *) curNode;
+    // do {
+    //     asFnNode = (struct FnGraphNode *) curNode;
 
-        if (curNode->type & GRAPH_NODE_TYPE_FUNCTIONAL) {
-            if (asFnNode->func != NULL) {
-                asFnNode->func(callContext, curNode, NULL);
-            }
-        }
+    //     if (curNode->type & GRAPH_NODE_TYPE_FUNCTIONAL) {
+    //         if (asFnNode->func != NULL) {
+    //             asFnNode->func(callContext, curNode, NULL);
+    //         }
+    //     }
 
-        if (curNode->children != NULL) {
-            switch (curNode->type) {
-                case GRAPH_NODE_TYPE_MASTER_LIST:
-                    globalPtr = (struct GraphNode **) &gCurGraphNodeMasterList;
-                    break;
-                case GRAPH_NODE_TYPE_PERSPECTIVE:
-                    globalPtr = (struct GraphNode **) &gCurGraphNodeCamFrustum;
-                    break;
-                case GRAPH_NODE_TYPE_CAMERA:
-                    globalPtr = (struct GraphNode **) &gCurGraphNodeCamera;
-                    break;
-                case GRAPH_NODE_TYPE_OBJECT:
-                    globalPtr = (struct GraphNode **) &gCurGraphNodeObject;
-                    break;
-                default:
-                    globalPtr = NULL;
-                    break;
-            }
+    //     if (curNode->children != NULL) {
+    //         switch (curNode->type) {
+    //             case GRAPH_NODE_TYPE_MASTER_LIST:
+    //                 globalPtr = (struct GraphNode **) &gCurGraphNodeMasterList;
+    //                 break;
+    //             case GRAPH_NODE_TYPE_PERSPECTIVE:
+    //                 globalPtr = (struct GraphNode **) &gCurGraphNodeCamFrustum;
+    //                 break;
+    //             case GRAPH_NODE_TYPE_CAMERA:
+    //                 globalPtr = (struct GraphNode **) &gCurGraphNodeCamera;
+    //                 break;
+    //             case GRAPH_NODE_TYPE_OBJECT:
+    //                 globalPtr = (struct GraphNode **) &gCurGraphNodeObject;
+    //                 break;
+    //             default:
+    //                 globalPtr = NULL;
+    //                 break;
+    //         }
 
-            if (globalPtr != NULL) {
-                *globalPtr = curNode;
-            }
+    //         if (globalPtr != NULL) {
+    //             *globalPtr = curNode;
+    //         }
 
-            geo_call_global_function_nodes_helper(curNode->children, callContext);
+    //         geo_call_global_function_nodes_helper(curNode->children, callContext);
 
-            if (globalPtr != NULL) {
-                *globalPtr = NULL;
-            }
-        }
-    } while ((curNode = curNode->next) != graphNode);
+    //         if (globalPtr != NULL) {
+    //             *globalPtr = NULL;
+    //         }
+    //     }
+    // } while ((curNode = curNode->next) != graphNode);
 }
 
 /**
@@ -661,15 +662,16 @@ void geo_call_global_function_nodes_helper(struct GraphNode *graphNode, s32 call
  * The graphNode argument should be of type GraphNodeRoot.
  */
 void geo_call_global_function_nodes(struct GraphNode *graphNode, s32 callContext) {
-    if (graphNode->flags & GRAPH_RENDER_ACTIVE) {
-        gCurGraphNodeRoot = (struct GraphNodeRoot *) graphNode;
+    // _EDIT_ stub 'geo_call_global_function_nodes'
+    // if (graphNode->flags & GRAPH_RENDER_ACTIVE) {
+    //     gCurGraphNodeRoot = (struct GraphNodeRoot *) graphNode;
 
-        if (graphNode->children != NULL) {
-            geo_call_global_function_nodes_helper(graphNode->children, callContext);
-        }
+    //     if (graphNode->children != NULL) {
+    //         geo_call_global_function_nodes_helper(graphNode->children, callContext);
+    //     }
 
-        gCurGraphNodeRoot = 0;
-    }
+    //     gCurGraphNodeRoot = 0;
+    // }
 }
 
 /**

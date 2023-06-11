@@ -36,7 +36,7 @@
 
 // From behavior_script.c
 // Generate a pseudorandom float in the range [0, 1).
-f32 random_float(void) {
+WEAK f32 random_float(void) {
     f32 rnd = random_u16();
     return rnd / (double) 0x10000;
 }
@@ -73,16 +73,13 @@ u16 random_u16(void) {
 }
 
 // From object_helpers.c
-void set_time_stop_flags(s32 flags) {
+WEAK void set_time_stop_flags(s32 flags) {
     gTimeStopState |= flags;
 }
 
-void clear_time_stop_flags(s32 flags) {
+WEAK void clear_time_stop_flags(s32 flags) {
     gTimeStopState = gTimeStopState & (flags ^ 0xFFFFFFFF);
 }
-
-// From object_list_processor.c
-u32 gTimeStopState;
 
 // From ingame_menu.c
 enum DialogBoxType {
@@ -125,16 +122,6 @@ void create_dialog_box_with_response(s16 dialog) {
         gLastDialogResponse = 1;
     }
 }
-
-// From paintings.c
-struct Painting *gRipplingPainting;
-
-// From area.c
-s16 gCurrCourseNum;
-s16 gCurrActNum;
-
-// From save_file.c
-u8 gLastCompletedStarNum;
 
 #define CBUTTON_MASK (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS)
 

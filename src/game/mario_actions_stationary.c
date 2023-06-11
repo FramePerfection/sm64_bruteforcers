@@ -438,11 +438,9 @@ s32 act_coughing(struct MarioState *m) {
 
 s32 act_hold_idle(struct MarioState *m) {
     // _EDIT_ ignore crazybox
-#ifdef BF_ENABLE_INTERACTIONS
-    if (segmented_to_virtual(&bhvJumpingBox) == m->heldObj->behavior) {
-        return set_mario_action(m, ACT_CRAZY_BOX_BOUNCE, 0);
-    }
-#endif
+    // if (segmented_to_virtual(&bhvJumpingBox) == m->heldObj->behavior) {
+    //     return set_mario_action(m, ACT_CRAZY_BOX_BOUNCE, 0);
+    // }
 
     if (m->marioObj->oInteractStatus & INT_STATUS_MARIO_DROP_OBJECT) {
         return drop_and_set_mario_action(m, ACT_IDLE, 0);
@@ -1000,10 +998,7 @@ s32 act_air_throw_land(struct MarioState *m) {
     }
 
     if (++m->actionTimer == 4) {
-        // _EDIT_ ignore throw held object
-#ifdef BF_ENABLE_INTERACTIONS
         mario_throw_held_object(m);
-#endif
     }
 
     landing_step(m, MARIO_ANIM_THROW_LIGHT_OBJECT, ACT_IDLE);

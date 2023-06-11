@@ -69,4 +69,7 @@
 #define VIRTUAL_TO_PHYSICAL2(addr)  ((void *)(addr))
 #endif
 
+// _EDIT_ add WEAK macro
+#define WEAK __attribute__((weak))
+
 #endif // MACROS_H

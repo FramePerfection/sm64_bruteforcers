@@ -61,7 +61,7 @@ s16 gDebugInfoOverwrite[16][8];
  * A set of flags to control which objects are updated on a given frame.
  * This is used during dialog and cutscenes to freeze most objects in place.
  */
-u32 gTimeStopState;
+extern u32 gTimeStopState;
 
 /**
  * The pool that objects are allocated from.
@@ -143,10 +143,9 @@ s32 gNumStaticSurfaces;
  */
 struct MemoryPool *gObjectMemoryPool;
 
-
-s16 gCheckingSurfaceCollisionsForCamera;
-s16 gFindFloorIncludeSurfaceIntangible;
-s16 *gEnvironmentRegions;
+extern s16 gCheckingSurfaceCollisionsForCamera;
+extern s16 gFindFloorIncludeSurfaceIntangible;
+extern s16 *gEnvironmentRegions;
 s32 gEnvironmentLevels[20];
 s8 gDoorAdjacentRooms[60][2];
 s16 gMarioCurrentRoom;
@@ -497,7 +496,8 @@ void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo) {
 
             if (spawnInfo->behaviorArg & 0x01) {
                 gMarioObject = object;
-                geo_make_first_child(&object->header.gfx.node);
+                // _EDIT_ remove 'geo_make_first_child' 
+                // geo_make_first_child(&object->header.gfx.node);
             }
 
             geo_obj_init_spawninfo(&object->header.gfx, spawnInfo);
@@ -538,7 +538,8 @@ void clear_objects(void) {
         gDoorAdjacentRooms[i][1] = 0;
     }
 
-    debug_unknown_level_select_check();
+    // _EDIT_ remove 'debug_unknown_level_select_check();'
+    // debug_unknown_level_select_check();
 
     init_free_object_list();
     clear_object_lists(gObjectListArray);
@@ -599,34 +600,14 @@ void unload_deactivated_objects(void) {
     gTimeStopState &= ~TIME_STOP_UNKNOWN_0;
 }
 
-/**
- * Unused profiling function.
- */
-UNUSED static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
-    u16 time;
-    f64 cycles;
-
-    cycles = cycleCounts[index] - cycleCounts[index - 1];
-    if (cycles < 0) {
-        cycles = 0;
-    }
-
-    time = (u16)(((u64) cycles * 1000000 / osClockRate) / 16667.0 * 1000.0);
-    if (time > 999) {
-        time = 999;
-    }
-
-    return time;
-}
+// _EDIT_ remove unused 'unused_get_elapsed_time'
 
 /**
  * Update all objects. This includes script execution, object collision detection,
  * and object surface management.
  */
 void update_objects(UNUSED s32 unused) {
-    s64 cycleCounts[30];
-
-    cycleCounts[0] = get_current_clock();
+    // _EDIT_ remove cylceCounts debug info
 
     gTimeStopState &= ~TIME_STOP_MARIO_OPENED_DOOR;
 
@@ -634,17 +615,16 @@ void update_objects(UNUSED s32 unused) {
     gNumRoomedObjectsNotInMarioRoom = 0;
     gCheckingSurfaceCollisionsForCamera = FALSE;
 
-    reset_debug_objectinfo();
-    stub_debug_5();
+    // _EDIT_ remove 'reset_debug_objectinfo();' and 'stub_debug_5();'
+    // reset_debug_objectinfo();
+    // stub_debug_5();
 
     gObjectLists = gObjectListArray;
 
     // If time stop is not active, unload object surfaces
-    cycleCounts[1] = get_clock_difference(cycleCounts[0]);
     clear_dynamic_surfaces();
 
     // Update spawners and objects with surfaces
-    cycleCounts[2] = get_clock_difference(cycleCounts[0]);
     update_terrain_objects();
 
     // If Mario was touching a moving platform at the end of last frame, apply
@@ -654,25 +634,18 @@ void update_objects(UNUSED s32 unused) {
     apply_mario_platform_displacement();
 
     // Detect which objects are intersecting
-    cycleCounts[3] = get_clock_difference(cycleCounts[0]);
     detect_object_collisions();
 
     // Update all other objects that haven't been updated yet
-    cycleCounts[4] = get_clock_difference(cycleCounts[0]);
     update_non_terrain_objects();
 
     // Unload any objects that have been deactivated
-    cycleCounts[5] = get_clock_difference(cycleCounts[0]);
     unload_deactivated_objects();
 
     // Check if Mario is on a platform object and save this object
-    cycleCounts[6] = get_clock_difference(cycleCounts[0]);
     update_mario_platform();
 
-    cycleCounts[7] = get_clock_difference(cycleCounts[0]);
-
-    cycleCounts[0] = 0;
-    try_print_debug_mario_object_info();
+    // _EDIT_ remove 'try_print_debug_mario_object_info();'
 
     // If time stop was enabled this frame, activate it now so that it will
     // take effect next frame

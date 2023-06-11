@@ -35,7 +35,8 @@
 #include "platform_displacement.h"
 #include "rendering_graph_node.h"
 #include "save_file.h"
-#include "levels/course_defines.h"
+// _EDIT_ remove inapplicable #include
+// #include "levels/course_defines.h"
 #include "level_table.h"
 #include "seq_ids.h"
 #include "sm64.h"

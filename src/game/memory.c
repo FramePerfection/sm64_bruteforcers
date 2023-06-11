@@ -88,11 +88,12 @@ void *virtual_to_segmented(u32 segment, const void *addr) {
 }
 
 void move_segment_table_to_dmem(void) {
-    s32 i;
+    // _EDIT_ stub 'move_segment_table_to_dmem'
+    // s32 i;
 
-    for (i = 0; i < 16; i++) {
-        gSPSegment(gDisplayListHead++, i, sSegmentTable[i]);
-    }
+    // for (i = 0; i < 16; i++) {
+    //     gSPSegment(gDisplayListHead++, i, sSegmentTable[i]);
+    // }
 }
 #else
 void *segmented_to_virtual(const void *addr) {
@@ -244,20 +245,21 @@ u32 main_pool_pop_state(void) {
  * function blocks until completion.
  */
 static void dma_read(u8 *dest, u8 *srcStart, u8 *srcEnd) {
-    u32 size = ALIGN16(srcEnd - srcStart);
+    // _EDIT_ stub dma_read
+    // u32 size = ALIGN16(srcEnd - srcStart);
 
-    osInvalDCache(dest, size);
-    while (size != 0) {
-        u32 copySize = (size >= 0x1000) ? 0x1000 : size;
+    // osInvalDCache(dest, size);
+    // while (size != 0) {
+    //     u32 copySize = (size >= 0x1000) ? 0x1000 : size;
 
-        osPiStartDma(&gDmaIoMesg, OS_MESG_PRI_NORMAL, OS_READ, (uintptr_t) srcStart, dest, copySize,
-                     &gDmaMesgQueue);
-        osRecvMesg(&gDmaMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
+    //     osPiStartDma(&gDmaIoMesg, OS_MESG_PRI_NORMAL, OS_READ, (uintptr_t) srcStart, dest, copySize,
+    //                  &gDmaMesgQueue);
+    //     osRecvMesg(&gDmaMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
 
-        dest += copySize;
-        srcStart += copySize;
-        size -= copySize;
-    }
+    //     dest += copySize;
+    //     srcStart += copySize;
+    //     size -= copySize;
+    // }
 }
 
 /**
@@ -521,15 +523,16 @@ void mem_pool_free(struct MemoryPool *pool, void *addr) {
 }
 
 void *alloc_display_list(u32 size) {
-    void *ptr = NULL;
+    // _EDIT_ stub 'alloc_display_list'
+    // void *ptr = NULL;
 
-    size = ALIGN8(size);
-    if (gGfxPoolEnd - size >= (u8 *) gDisplayListHead) {
-        gGfxPoolEnd -= size;
-        ptr = gGfxPoolEnd;
-    } else {
-    }
-    return ptr;
+    // size = ALIGN8(size);
+    // if (gGfxPoolEnd - size >= (u8 *) gDisplayListHead) {
+    //     gGfxPoolEnd -= size;
+    //     ptr = gGfxPoolEnd;
+    // } else {
+    // }
+    // return ptr;
 }
 
 static struct DmaTable *load_dma_table_address(u8 *srcAddr) {
@@ -552,7 +555,7 @@ void setup_dma_table_list(struct DmaHandlerList *list, void *srcAddr, void *buff
     list->bufTarget = buffer;
 }
 
-s32 load_patchable_table(struct DmaHandlerList *list, s32 index) {
+WEAK s32 load_patchable_table(struct DmaHandlerList *list, s32 index) {
     s32 ret = FALSE;
     struct DmaTable *table = list->dmaTable;
 

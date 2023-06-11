@@ -109,11 +109,12 @@ void bhv_bubble_splash_init(void) {
 }
 
 void bhv_shallow_water_splash_init(void) {
-    // Have a 1 in 256 chance to spawn the fish particle easter egg.
-    if ((random_u16() & 0xFF) <= 0) { // Strange
-        struct Object *fishObj = spawn_water_droplet(o, &sWaterDropletFishParams);
-        obj_init_animation_with_sound(fishObj, blue_fish_seg3_anims_0301C2B0, 0);
-    }
+    // _EDIT_ stub 'bhv_shallow_water_splash_init'
+    // // Have a 1 in 256 chance to spawn the fish particle easter egg.
+    // if ((random_u16() & 0xFF) <= 0) { // Strange
+    //     struct Object *fishObj = spawn_water_droplet(o, &sWaterDropletFishParams);
+    //     obj_init_animation_with_sound(fishObj, blue_fish_seg3_anims_0301C2B0, 0);
+    // }
 }
 
 void bhv_wave_trail_shrink(void) {

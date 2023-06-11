@@ -9,43 +9,44 @@
  * These settings are animations, colour, and spawn quantity.
  */
 static void fish_spawner_act_spawn(void) {
-    s32 i;
-    s32 schoolQuantity;
-    s16 model;
-    f32 minDistToMario;
-    const struct Animation * const *fishAnimation;
+    // _EDIT_ stub 'fish_spawner_act_spawn'
+    // s32 i;
+    // s32 schoolQuantity;
+    // s16 model;
+    // f32 minDistToMario;
+    // const struct Animation * const *fishAnimation;
 
-    switch (o->oBehParams2ndByte) {
-        // Cases need to be on one line to match with and without optimizations.
-        case FISH_SPAWNER_BP_MANY_BLUE:
-            model = MODEL_FISH;      schoolQuantity = 20; minDistToMario = 1500.0f; fishAnimation = blue_fish_seg3_anims_0301C2B0;
-            break;
+    // switch (o->oBehParams2ndByte) {
+    //     // Cases need to be on one line to match with and without optimizations.
+    //     case FISH_SPAWNER_BP_MANY_BLUE:
+    //         model = MODEL_FISH;      schoolQuantity = 20; minDistToMario = 1500.0f; fishAnimation = blue_fish_seg3_anims_0301C2B0;
+    //         break;
 
-        case FISH_SPAWNER_BP_FEW_BLUE:
-            model = MODEL_FISH;      schoolQuantity = 5;  minDistToMario = 1500.0f; fishAnimation = blue_fish_seg3_anims_0301C2B0;
-            break;
+    //     case FISH_SPAWNER_BP_FEW_BLUE:
+    //         model = MODEL_FISH;      schoolQuantity = 5;  minDistToMario = 1500.0f; fishAnimation = blue_fish_seg3_anims_0301C2B0;
+    //         break;
 
-        case FISH_SPAWNER_BP_MANY_CYAN:
-            model = MODEL_CYAN_FISH; schoolQuantity = 20; minDistToMario = 1500.0f; fishAnimation = cyan_fish_seg6_anims_0600E264;
-            break;
+    //     case FISH_SPAWNER_BP_MANY_CYAN:
+    //         model = MODEL_CYAN_FISH; schoolQuantity = 20; minDistToMario = 1500.0f; fishAnimation = cyan_fish_seg6_anims_0600E264;
+    //         break;
 
-        case FISH_SPAWNER_BP_FEW_CYAN:
-            model = MODEL_CYAN_FISH; schoolQuantity = 5;  minDistToMario = 1500.0f; fishAnimation = cyan_fish_seg6_anims_0600E264;
-            break;
-    }
+    //     case FISH_SPAWNER_BP_FEW_CYAN:
+    //         model = MODEL_CYAN_FISH; schoolQuantity = 5;  minDistToMario = 1500.0f; fishAnimation = cyan_fish_seg6_anims_0600E264;
+    //         break;
+    // }
 
-    // Spawn and animate the schoolQuantity of fish if Mario enters render distance
-    // or the stage is Secret Aquarium.
-    // Fish moves randomly within a range of 700.0f.
-    if (o->oDistanceToMario < minDistToMario || gCurrLevelNum == LEVEL_SA) {
-        for (i = 0; i < schoolQuantity; i++) {
-            struct Object *fishObject = spawn_object(o, model, bhvFish);
-            fishObject->oBehParams2ndByte = o->oBehParams2ndByte;
-            obj_init_animation_with_sound(fishObject, fishAnimation, 0);
-            obj_translate_xyz_random(fishObject, 700.0f);
-        }
-        o->oAction = FISH_SPAWNER_ACT_IDLE;
-    }
+    // // Spawn and animate the schoolQuantity of fish if Mario enters render distance
+    // // or the stage is Secret Aquarium.
+    // // Fish moves randomly within a range of 700.0f.
+    // if (o->oDistanceToMario < minDistToMario || gCurrLevelNum == LEVEL_SA) {
+    //     for (i = 0; i < schoolQuantity; i++) {
+    //         struct Object *fishObject = spawn_object(o, model, bhvFish);
+    //         fishObject->oBehParams2ndByte = o->oBehParams2ndByte;
+    //         obj_init_animation_with_sound(fishObject, fishAnimation, 0);
+    //         obj_translate_xyz_random(fishObject, 700.0f);
+    //     }
+    //     o->oAction = FISH_SPAWNER_ACT_IDLE;
+    // }
 }
 
 /**
