@@ -730,7 +730,8 @@ static s32 bhv_cmd_set_int_random_from_table(void) {
 // Command 0x2A: Loads collision data for the object.
 // Usage: LOAD_COLLISION_DATA(collisionData)
 static s32 bhv_cmd_load_collision_data(void) {
-    u32 *collisionData = segmented_to_virtual(BHV_CMD_GET_VPTR(1));
+    // _EDIT_ assume absolute collision data pointers
+    u32 *collisionData = BHV_CMD_GET_VPTR(1);
 
     gCurrentObject->collisionData = collisionData;
 

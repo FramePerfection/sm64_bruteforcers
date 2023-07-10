@@ -70,7 +70,7 @@ s8 gRedCoinsCollected; // Yes, it IS weird that this value is defined in that fi
 void geo_process_root(UNUSED struct GraphNodeRoot *node, UNUSED Vp *b, UNUSED Vp *c, UNUSED s32 clearColor) {}
 
 // surface_load.c
-void load_object_collision_model(void) {}
+WEAK void load_object_collision_model(void) {}
 
 // spawn_sound.c
 void cur_obj_play_sound_1(UNUSED s32 soundMagic) {}

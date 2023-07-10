@@ -8,6 +8,7 @@
 #include "types.h"
 #include "scoring_method.h"
 #include "perturbator.h"
+#include "object_utils.h"
 extern f32 minSpeed;
 extern s16 gCurrLevelNum;
 extern s16 gCurrCourseNum;
@@ -31,4 +32,7 @@ __NL__
 
 BF_DYNAMIC_STATE(u16, area_terrain_type, gMarioState->area->terrainType, "The area's terrain type as defined by the level script, such as normal, snowy, slippery")
 
+BF_STATIC_STATE(BehaviorScriptWrapper, test_behavior_script, bfStaticState.test_behavior_script, "Test man")
+BF_STATIC_STATE(ObjectTriangles, test_dynamic_object_tris, bfStaticState.test_dynamic_object_tris, "Testing testeing test")
+BF_STATIC_STATE(boolean, update_objects, bfStaticState.update_objects, "Enables logic to update objects.")
 #endif

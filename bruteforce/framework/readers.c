@@ -9,14 +9,15 @@
 
 // clang-format off
 
-#define read_int(cast_type) \
-void bf_read_##cast_type(Json *jsonNode, cast_type *target) { \
-	if (jsonNode->type == Json_String) { \
-		char* end; \
-		*target = (cast_type)strtol(jsonNode->valueString, &end, 0); \
-	} \
-	else *target = (cast_type)jsonNode->valueInt; \
+long long bf_readers_util_read_int(Json *jsonNode) {
+	if (jsonNode->type == Json_String) 
+        return strtoll(jsonNode->valueString, NULL, 0);
+	else 
+        return jsonNode->valueInt;
 }
+
+#define read_int(cast_type) \
+void bf_read_##cast_type(Json *jsonNode, cast_type *target) { *target = (cast_type)bf_readers_util_read_int(jsonNode); }
 
 read_int(s32)
 read_int(s16)

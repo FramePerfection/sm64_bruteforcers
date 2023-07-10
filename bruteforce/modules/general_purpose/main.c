@@ -4,6 +4,7 @@
 
 #include "src/engine/surface_collision.h"
 #include "src/engine/surface_load.h"
+#include "src/engine/math_util.h"
 #include "src/game/area.h"
 #include "src/game/camera.h"
 #include "src/game/game_init.h"
@@ -11,6 +12,7 @@
 #include "src/game/mario.h"
 #include "src/game/mario_step.h"
 #include "src/game/object_list_processor.h"
+#include "src/game/spawn_object.h"
 
 #include "bruteforce/framework/candidates.h"
 #include "bruteforce/framework/interface.h"
@@ -22,9 +24,33 @@
 #include "bruteforce/algorithms/genetic/algorithm.h"
 
 #include "perturbator.h"
+#include "behavior_function_map.h"
+
+extern BehaviorScript bhvMario[];
+
+static void remapBehaviorScript(BehaviorScriptWrapper script) {
+    u32 i;
+    for (i = 0; i < script.size; i++) {
+        u8 command = script.data[i] >> 0x18; 
+        if (command == 0x2A) { // LOAD_COLLISION_DATA
+            s16* mappedValue;
+            // TODO: use multiple objects m9
+            if (bfStaticState.test_dynamic_object_tris.overrides == (BehaviorScript)script.data[i + 1]) {
+                bf_safe_printf("This works.");
+                mappedValue = bfStaticState.test_dynamic_object_tris.data;
+            }
+            script.data[i + 1] = (BehaviorScript)mappedValue;
+        }
+        else if (command == 0x0C) { // EXECUTE_NATIVE_FUNC
+            script.data[i + 1] = (BehaviorScript)bf_map_native_behavior_func((u32)script.data[i + 1]);
+        }
+    }
+}
 
 static void initGame()
 {
+    // TODO: load and reset object state etc.
+    clear_objects();
     bf_init_camera();
     bf_init_area();
     bf_init_mario();
@@ -44,11 +70,21 @@ static void initGame()
 
     // srand(bfStaticState.rnd_seed);
 
-    clear_objects();
     init_camera(gCamera);
     // Still required to initialize something?
     execute_mario_action(gMarioState->marioObj);
     update_camera(gCurrentArea->camera);
+
+    if (bfStaticState.update_objects) {
+        gMarioState->marioObj = gMarioObject = create_object(bhvMario);
+        vec3f_copy(gMarioObject->header.gfx.pos, gMarioState->pos);
+        remapBehaviorScript(bfStaticState.test_behavior_script);
+        struct Object *testObj = create_object(bfStaticState.test_behavior_script.data);
+        testObj->rawData.asF32[0x06] = -3111.0f;
+        testObj->rawData.asF32[0x07] = -829;
+        testObj->rawData.asF32[0x08] = 3497;
+        testObj->rawData.asS32[0x13] = 63716;
+    }
 }
 
 static void updateGame(OSContPad *input, UNUSED u32 frame_index)
@@ -56,13 +92,16 @@ static void updateGame(OSContPad *input, UNUSED u32 frame_index)
     bf_update_controller(input);
     adjust_analog_stick(gPlayer1Controller);
     
-    // TODO: work out how updating objects should be done in the face of needing to update Mario, too
-    area_update_objects();
-    execute_mario_action(gMarioState->marioObj);
+    if (bfStaticState.update_objects)
+        area_update_objects();
+    else
+        execute_mario_action(gMarioState->marioObj);
+    
     if (gCurrentArea != NULL)
     {
         update_camera(gCurrentArea->camera);
     }
+    // bf_safe_printf("%f; %f; %f\n", gMarioState->pos[0], gMarioState->pos[1], gMarioState->pos[2]);
 }
 
 static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, u32 frame_idx)
