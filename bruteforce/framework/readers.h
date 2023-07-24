@@ -52,8 +52,4 @@ void bf_read_EnvironmentRegions(Json *, EnvironmentRegions *);
 
 void bf_read_Vec3f(Json *, Vec3f *);
 
-#define JSON_PARSE_FIELD(target, type, field_name, node) \
-    if (strcmp(node->name, field_name) == 0)             \
-        target##bf_read_##type(node);
-
 #endif // BF_READERS_H
