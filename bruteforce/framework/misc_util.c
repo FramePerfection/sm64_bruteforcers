@@ -28,9 +28,16 @@ static void s_init_surfaces(Triangles tris, u8 dynamic)
     }
 }
 
+
+extern s32 gNumStaticSurfaceNodes;
+extern s32 gNumStaticSurfaces;
+extern s32 gSurfaceNodesAllocated;
+extern s32 gSurfacesAllocated;
 void bf_init_static_surfaces(Triangles tris)
 {
     s_init_surfaces(tris, FALSE);
+    gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
+    gNumStaticSurfaces = gSurfacesAllocated;
 }
 
 void bf_init_dynamic_surfaces(Triangles tris)

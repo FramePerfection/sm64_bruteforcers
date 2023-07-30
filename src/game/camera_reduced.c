@@ -3590,11 +3590,12 @@ void select_mario_cam_mode(void) {
  * Allocate the GraphNodeCamera's config.camera, and copy `c`'s focus to the Camera's area center point.
  */
 
-#include <stdlib.h>
 void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool) {
+    static struct Camera theOneAndOnlyCamera;
+
     s16 mode = gc->config.mode;
-    // _EDIT_ alloc camera in system memory
-    struct Camera *c = calloc(1, sizeof(struct Camera)); // alloc_only_pool_alloc(pool, sizeof(struct Camera));
+    // _EDIT_ alloc exactly one camera in system memory
+    struct Camera *c = &theOneAndOnlyCamera; // alloc_only_pool_alloc(pool, sizeof(struct Camera));
 
     gc->config.camera = c;
     c->mode = mode;

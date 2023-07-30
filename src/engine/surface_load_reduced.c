@@ -35,20 +35,24 @@ void clear_static_surfaces(void) {
     clear_spatial_partition(&gStaticSurfacePartition[0][0]);
 }
 
+// TODO: proper fix for this
+static struct SurfaceNode surfaceNodePool[10000];
 /**
  * Allocate the part of the surface node pool to contain a surface node.
  */
-#include <stdlib.h>
 static struct SurfaceNode *alloc_surface_node(void) {
-    struct SurfaceNode *node = calloc(1, sizeof(struct SurfaceNode));
+    struct SurfaceNode *node = &surfaceNodePool[gSurfaceNodesAllocated++];
 
     node->next = NULL;
     
     return node;
 }
 
+
+// TODO: proper fix for this
+static struct Surface surfacePool[10000];
 struct Surface *alloc_surface(void) {
-    struct Surface *surface = calloc(1, sizeof(struct Surface));
+    struct Surface *surface = &surfacePool[gSurfacesAllocated++];
 
     surface->type = 0;
     surface->force = 0;
@@ -451,6 +455,8 @@ void clear_dynamic_surfaces(void) {
     if (!(gTimeStopState & TIME_STOP_ACTIVE)) {
         clear_spatial_partition(&gDynamicSurfacePartition[0][0]);
     }
+    gSurfacesAllocated = gNumStaticSurfaces;
+    gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
 }
 
 
