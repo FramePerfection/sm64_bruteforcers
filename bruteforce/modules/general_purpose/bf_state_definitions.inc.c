@@ -32,7 +32,10 @@ __NL__
 
 BF_DYNAMIC_STATE(u16, area_terrain_type, gMarioState->area->terrainType, "The area's terrain type as defined by the level script, such as normal, snowy, slippery")
 
-BF_STATIC_STATE(BehaviorScriptWrapper, test_behavior_script, bfStaticState.test_behavior_script, "Test man")
-BF_STATIC_STATE(ObjectTriangles, test_dynamic_object_tris, bfStaticState.test_dynamic_object_tris, "Testing testeing test")
+BF_STATIC_STATE(BehaviorScriptArrayArray, behavior_scripts, bfStaticState.behavior_scripts, "all behavior scripts required to do stuff")
+BF_STATIC_STATE(ObjectTrianglesArray, dynamic_object_tris, bfStaticState.dynamic_object_tris, \
+"A set mapping from 'original segmented collision pointer' to triangle data. __NL__ \
+Used to map LOAD_COLLISION_DATA arguments.")
 BF_STATIC_STATE(boolean, update_objects, bfStaticState.update_objects, "Enables logic to update objects.")
+BF_STATIC_STATE(BfObjectStateArray, object_states, bfStaticState.object_states, "all object information")
 #endif

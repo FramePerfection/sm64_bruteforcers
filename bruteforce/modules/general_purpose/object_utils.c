@@ -6,19 +6,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-void bf_read_BehaviorScriptWrapper(Json *jsonNode, BehaviorScriptWrapper *target) {
-	// Assumes Json-node type Array
-	if (jsonNode->type == Json_Array)
-	{;}
-	target->size = jsonNode->size;
-	target->data = malloc(sizeof(BehaviorScript) * target->size);
-	Json *child = jsonNode->child;
-	u32 i = 0;
-	while (child != NULL) {
-		long lal = (BehaviorScript)bf_readers_util_read_int(child);
-		target->data[i++] = lal;
-		child = child->next;
-	}
+void bf_read_BehaviorScript(Json *jsonNode, BehaviorScript *target) {
+	*target = (BehaviorScript)bf_readers_util_read_int(jsonNode);
 }
 
 void bf_read_ObjectTriangles(Json *jsonNode, ObjectTriangles *target) {
@@ -39,3 +28,7 @@ void bf_read_ObjectTriangles(Json *jsonNode, ObjectTriangles *target) {
 		prop = prop->next;
 	}
 }
+
+#define BF_JSON_STRUCT_READER_IMPLEMENTATION
+
+#include "json_structs.inc.h"

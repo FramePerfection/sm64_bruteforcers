@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #include "src/engine/surface_collision.h"
 #include "src/engine/surface_load.h"
@@ -28,16 +29,19 @@
 
 extern BehaviorScript bhvMario[];
 
-static void remapBehaviorScript(BehaviorScriptWrapper script) {
+static void remapBehaviorScript(BehaviorScriptArray script) {
     u32 i;
     for (i = 0; i < script.size; i++) {
         u8 command = script.data[i] >> 0x18; 
         if (command == 0x2A) { // LOAD_COLLISION_DATA
-            s16* mappedValue;
-            // TODO: use multiple objects m9
-            if (bfStaticState.test_dynamic_object_tris.overrides == (BehaviorScript)script.data[i + 1]) {
-                bf_safe_printf("This works.");
-                mappedValue = bfStaticState.test_dynamic_object_tris.data;
+            // TODO: warn on mapping not found
+            s16* mappedValue = 0;
+            u32 k;
+            for (k = 0; k < bfStaticState.dynamic_object_tris.size; k++) {
+                if (bfStaticState.dynamic_object_tris.data[k].overrides == (BehaviorScript)script.data[i + 1]) {
+                    mappedValue = bfStaticState.dynamic_object_tris.data[k].data;
+                    break;
+                }
             }
             script.data[i + 1] = (BehaviorScript)mappedValue;
         }
@@ -49,8 +53,6 @@ static void remapBehaviorScript(BehaviorScriptWrapper script) {
 
 static void initGame()
 {
-    // TODO: load and reset object state etc.
-    clear_objects();
     bf_init_camera();
     bf_init_area();
     bf_init_mario();
@@ -76,19 +78,44 @@ static void initGame()
     update_camera(gCurrentArea->camera);
 
     if (bfStaticState.update_objects) {
+        clear_objects();
         gMarioState->marioObj = gMarioObject = create_object(bhvMario);
         vec3f_copy(gMarioObject->header.gfx.pos, gMarioState->pos);
-        remapBehaviorScript(bfStaticState.test_behavior_script);
-        struct Object *testObj = create_object(bfStaticState.test_behavior_script.data);
-        testObj->rawData.asF32[0x06] = -3111.0f;
-        testObj->rawData.asF32[0x07] = -829;
-        testObj->rawData.asF32[0x08] = 3497;
-        testObj->rawData.asS32[0x13] = 63716;
+        u32 i;
+        for (i = 0; i < bfStaticState.behavior_scripts.size; i++)
+            remapBehaviorScript(bfStaticState.behavior_scripts.data[i]);
+    }
+}
+
+static void resetObjects() {
+    clear_objects();
+    clear_dynamic_surfaces();
+    gMarioState->marioObj = gMarioObject = create_object(bhvMario);
+    vec3f_copy(gMarioObject->header.gfx.pos, gMarioState->pos);
+
+    u32 i;
+    for (i = 0; i < bfStaticState.object_states.size; i++) {
+        BfObjectState *state = &bfStaticState.object_states.data[i];
+        struct Object *obj = create_object(bfStaticState.behavior_scripts.data[state->behavior_script_index].data);
+        memcpy(obj->rawData.asU32, &state->raw_data, sizeof(u32) * 0x50);
+        /* obj->activeFlags = state->active_flags;
+        obj->bhvDelayTimer = state->bhv_delay_timer;
+        memcpy(obj->bhvStack, state->bhv_stack, sizeof(uint8_t) * 8);
+        obj->bhvStackIndex = state->bhv_stack_index;
+        obj->collidedObjInteractTypes = state->collided_obj_interact_types;
+        obj->hitboxRadius = state->hitbox_radius;
+        obj->hitboxHeight = state->hitbox_height;
+        obj->hurtboxRadius = state->hurtbox_radius;
+        obj->hurtboxHeight = state->hurtbox_height;
+        obj->hitboxDownOffset = state->hitbox_down_offset; */
     }
 }
 
 static void updateGame(OSContPad *input, UNUSED u32 frame_index)
 {
+    if (bfStaticState.update_objects && frame_index == 0)
+        resetObjects();
+
     bf_update_controller(input);
     adjust_analog_stick(gPlayer1Controller);
     
@@ -101,7 +128,6 @@ static void updateGame(OSContPad *input, UNUSED u32 frame_index)
     {
         update_camera(gCurrentArea->camera);
     }
-    // bf_safe_printf("%f; %f; %f\n", gMarioState->pos[0], gMarioState->pos[1], gMarioState->pos[2]);
 }
 
 static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, u32 frame_idx)

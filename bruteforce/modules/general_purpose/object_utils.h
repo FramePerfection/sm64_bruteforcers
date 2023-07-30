@@ -2,15 +2,13 @@
 #define OBJECT_UTILS_H
 
 #include "types.h"
-
-typedef struct BehaviorScriptWrapper_s {
-	u32 size;
-	BehaviorScript *data;
-} BehaviorScriptWrapper;
+#include "bruteforce/framework/readers.h"
 
 typedef struct ObjectTriangles_s {
 	u32 overrides;
 	s16 *data;
 } ObjectTriangles;
+
+#include "json_structs.inc.h"
 
 #endif
