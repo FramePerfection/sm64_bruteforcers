@@ -13,6 +13,11 @@
 #include "game/object_list_processor.h"
 #include "surface_load.h"
 
+s32 gNumStaticSurfaceNodes;
+s32 gNumStaticSurfaces;
+s32 gSurfaceNodesAllocated;
+s32 gSurfacesAllocated;
+
 /**
  * Iterates through the entire partition, clearing the surfaces.
  */
@@ -35,20 +40,24 @@ void clear_static_surfaces(void) {
     clear_spatial_partition(&gStaticSurfacePartition[0][0]);
 }
 
+// TODO: proper fix for this
+static struct SurfaceNode surfaceNodePool[10000];
 /**
  * Allocate the part of the surface node pool to contain a surface node.
  */
-#include <stdlib.h>
 static struct SurfaceNode *alloc_surface_node(void) {
-    struct SurfaceNode *node = calloc(1, sizeof(struct SurfaceNode));
+    struct SurfaceNode *node = &surfaceNodePool[gSurfaceNodesAllocated++];
 
     node->next = NULL;
     
     return node;
 }
 
+
+// TODO: proper fix for this
+static struct Surface surfacePool[10000];
 struct Surface *alloc_surface(void) {
-    struct Surface *surface = calloc(1, sizeof(struct Surface));
+    struct Surface *surface = &surfacePool[gSurfacesAllocated++];
 
     surface->type = 0;
     surface->force = 0;
@@ -254,7 +263,7 @@ void add_surface(struct Surface *surface, s32 dynamic) {
  * @param vertexData The raw data containing vertex positions
  * @param vertexIndices Helper which tells positions in vertexData to start reading vertices
  */
-static struct Surface *read_surface_data(s16 *vertexData, s16 **vertexIndices) {
+struct Surface *read_surface_data(s16 *vertexData, s16 **vertexIndices) {
     struct Surface *surface;
     register s32 x1, y1, z1;
     register s32 x2, y2, z2;
@@ -342,7 +351,7 @@ static struct Surface *read_surface_data(s16 *vertexData, s16 **vertexIndices) {
  * Returns whether a surface has exertion/moves Mario
  * based on the surface type.
  */
-static s32 surface_has_force(s16 surfaceType) {
+s32 surface_has_force(s16 surfaceType) {
     s32 hasForce = FALSE;
 
     switch (surfaceType) {
@@ -366,7 +375,7 @@ static s32 surface_has_force(s16 surfaceType) {
  * Returns whether a surface should have the
  * SURFACE_FLAG_NO_CAM_COLLISION flag.
  */
-static s32 surf_has_no_cam_collision(s16 surfaceType) {
+s32 surf_has_no_cam_collision(s16 surfaceType) {
     s32 flags = 0;
 
     switch (surfaceType) {
@@ -428,27 +437,12 @@ static void load_static_surfaces(s16 **data, s16 *vertexData, s16 surfaceType, s
 }
 
 /**
- * Read the data for vertices for reference by triangles.
- */
-static s16 *read_vertex_data(s16 **data) {
-    s32 numVertices;
-    UNUSED u8 filler[16];
-    s16 *vertexData;
-
-    numVertices = *(*data);
-    (*data)++;
-
-    vertexData = *data;
-    *data += 3 * numVertices;
-
-    return vertexData;
-}
-
-/**
  * If not in time stop, clear the surface partitions.
  */
 void clear_dynamic_surfaces(void) {
     if (!(gTimeStopState & TIME_STOP_ACTIVE)) {
         clear_spatial_partition(&gDynamicSurfacePartition[0][0]);
     }
+    gSurfacesAllocated = gNumStaticSurfaces;
+    gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
 }

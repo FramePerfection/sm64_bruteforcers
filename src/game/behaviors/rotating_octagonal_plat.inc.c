@@ -1,8 +1,9 @@
 // rotating_octagonal_plat.inc.c
 
 static const Collision *sOctagonalPlatformCollision[] = {
-    bits_seg7_collision_0701AA84,
-    rr_seg7_collision_07029508,
+    // _EDIT_ remove collision info
+    // bits_seg7_collision_0701AA84,
+    // rr_seg7_collision_07029508,
 };
 
 static s16 sOctagonalPlatformAngularVelocities[] = { 300, -300, 600, -600 };

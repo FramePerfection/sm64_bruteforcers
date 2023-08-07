@@ -84,7 +84,8 @@ void bhv_bowser_flame_spawn_loop(void) {
     f32 posZ;
     f32 cossYaw = coss(bowser->oMoveAngleYaw);
     f32 sinsYaw = sins(bowser->oMoveAngleYaw);
-    s16 *data = segmented_to_virtual(dBowserFlamesOrientationValues);
+    // _EDIT_ remove reference to 'dBowserFlamesOrientationValues'
+    s16 *data = 0 /*segmented_to_virtual(dBowserFlamesOrientationValues);*/;
 
     // Check for Bowser breathing animation
     if (bowser->oSoundStateID == BOWSER_ANIM_BREATH) {

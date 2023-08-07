@@ -808,7 +808,9 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
         m->usedObj = o;
 
         starIndex = (o->oBehParams >> 24) & 0x1F;
-        save_file_collect_star_or_key(m->numCoins, starIndex);
+
+        // _EDIT_ remove 'save_file_collect_star_or_key(...);'
+        // save_file_collect_star_or_key(m->numCoins, starIndex);
 
         m->numStars =
             save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
@@ -885,10 +887,11 @@ u32 interact_warp(struct MarioState *m, UNUSED u32 interactType, struct Object *
                 queue_rumble_data(12, 80);
             }
 #else
-            play_sound(o->collisionData == segmented_to_virtual(warp_pipe_seg3_collision_03009AC8)
-                           ? SOUND_MENU_ENTER_PIPE
-                           : SOUND_MENU_ENTER_HOLE,
-                       m->marioObj->header.gfx.cameraToObject);
+            // _EDIT_ remove 'play_sound(...);'
+            // play_sound(o->collisionData == segmented_to_virtual(warp_pipe_seg3_collision_03009AC8)
+            //                ? SOUND_MENU_ENTER_PIPE
+            //                : SOUND_MENU_ENTER_HOLE,
+            //            m->marioObj->header.gfx.cameraToObject);
 #endif
 
             mario_stop_riding_object(m);

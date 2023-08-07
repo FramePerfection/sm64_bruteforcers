@@ -772,8 +772,6 @@ static s32 act_water_shell_swimming(struct MarioState *m) {
 }
 
 static s32 check_water_grab(struct MarioState *m) {
-    // _EDIT_ ignore water grabs
-#ifdef BF_ENABLE_INTERACTIONS
     //! Heave hos have the grabbable interaction type but are not normally
     // grabbable. Since water grabbing doesn't check the appropriate input flag,
     // you can use water grab to pick up heave ho.
@@ -790,8 +788,7 @@ static s32 check_water_grab(struct MarioState *m) {
             return TRUE;
         }
     }
-#endif
-
+    
     return FALSE;
 }
 

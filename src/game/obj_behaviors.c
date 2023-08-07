@@ -770,30 +770,7 @@ void spawn_orange_number(s8 behParam, s16 relX, s16 relY, s16 relZ) {
 s8 sDebugSequenceTracker = 0;
 s8 sDebugTimer = 0;
 
-/**
- * Unused presumably debug function that tracks for a sequence of inputs.
- */
-UNUSED s8 debug_sequence_tracker(s16 debugInputSequence[]) {
-    // If end of sequence reached, return true.
-    if (debugInputSequence[sDebugSequenceTracker] == 0) {
-        sDebugSequenceTracker = 0;
-        return TRUE;
-    }
-
-    // If the third controller button pressed is next in sequence, reset timer and progress to next value.
-    if (debugInputSequence[sDebugSequenceTracker] & gPlayer3Controller->buttonPressed) {
-        sDebugSequenceTracker++;
-        sDebugTimer = 0;
-    // If wrong input or timer reaches 10, reset sequence progress.
-    } else if (sDebugTimer == 10 || gPlayer3Controller->buttonPressed != 0) {
-        sDebugSequenceTracker = 0;
-        sDebugTimer = 0;
-        return FALSE;
-    }
-    sDebugTimer++;
-
-    return FALSE;
-}
+// _EDIT_ remove unused 'debug_sequence_tracker' function
 
 #include "behaviors/moving_coin.inc.c"
 #include "behaviors/seaweed.inc.c"

@@ -1,15 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #include "src/engine/surface_collision.h"
 #include "src/engine/surface_load.h"
+#include "src/engine/math_util.h"
 #include "src/game/area.h"
 #include "src/game/camera.h"
 #include "src/game/game_init.h"
 #include "src/game/level_update.h"
 #include "src/game/mario.h"
 #include "src/game/mario_step.h"
+#include "src/game/object_list_processor.h"
+#include "src/game/spawn_object.h"
 
 #include "bruteforce/framework/candidates.h"
 #include "bruteforce/framework/interface.h"
@@ -21,6 +25,31 @@
 #include "bruteforce/algorithms/genetic/algorithm.h"
 
 #include "perturbator.h"
+#include "behavior_function_map.h"
+
+extern BehaviorScript bhvMario[];
+
+static void remapBehaviorScript(BehaviorScriptArray script) {
+    u32 i;
+    for (i = 0; i < script.size; i++) {
+        u8 command = script.data[i] >> 0x18; 
+        if (command == 0x2A) { // LOAD_COLLISION_DATA
+            // TODO: warn on mapping not found
+            s16* mappedValue = 0;
+            u32 k;
+            for (k = 0; k < bfStaticState.dynamic_object_tris.size; k++) {
+                if (bfStaticState.dynamic_object_tris.data[k].overrides == (BehaviorScript)script.data[i + 1]) {
+                    mappedValue = bfStaticState.dynamic_object_tris.data[k].data;
+                    break;
+                }
+            }
+            script.data[i + 1] = (BehaviorScript)mappedValue;
+        }
+        else if (command == 0x0C) { // EXECUTE_NATIVE_FUNC
+            script.data[i + 1] = (BehaviorScript)bf_map_native_behavior_func((u32)script.data[i + 1]);
+        }
+    }
+}
 
 static void initGame()
 {
@@ -47,13 +76,54 @@ static void initGame()
     // Still required to initialize something?
     execute_mario_action(gMarioState->marioObj);
     update_camera(gCurrentArea->camera);
+
+    if (bfStaticState.update_objects) {
+        clear_objects();
+        gMarioState->marioObj = gMarioObject = create_object(bhvMario);
+        vec3f_copy(gMarioObject->header.gfx.pos, gMarioState->pos);
+        u32 i;
+        for (i = 0; i < bfStaticState.behavior_scripts.size; i++)
+            remapBehaviorScript(bfStaticState.behavior_scripts.data[i]);
+    }
 }
 
-static void updateGame(OSContPad *input)
+static void resetObjects() {
+    clear_objects();
+    clear_dynamic_surfaces();
+    gMarioState->marioObj = gMarioObject = create_object(bhvMario);
+    vec3f_copy(gMarioObject->header.gfx.pos, gMarioState->pos);
+
+    u32 i;
+    for (i = 0; i < bfStaticState.object_states.size; i++) {
+        BfObjectState *state = &bfStaticState.object_states.data[i];
+        struct Object *obj = create_object(bfStaticState.behavior_scripts.data[state->behavior_script_index].data);
+        memcpy(obj->rawData.asU32, &state->raw_data, sizeof(u32) * 0x50);
+        obj->activeFlags = state->active_flags;
+        obj->bhvDelayTimer = state->bhv_delay_timer;
+        memcpy(obj->bhvStack, state->bhv_stack, sizeof(uintptr_t) * 8);
+        obj->bhvStackIndex = state->bhv_stack_index;
+        obj->collidedObjInteractTypes = state->collided_obj_interact_types;
+        obj->hitboxRadius = state->hitbox_radius;
+        obj->hitboxHeight = state->hitbox_height;
+        obj->hurtboxRadius = state->hurtbox_radius;
+        obj->hurtboxHeight = state->hurtbox_height;
+        obj->hitboxDownOffset = state->hitbox_down_offset;
+    }
+}
+
+static void updateGame(OSContPad *input, UNUSED u32 frame_index)
 {
+    if (bfStaticState.update_objects && frame_index == 0)
+        resetObjects();
+
     bf_update_controller(input);
     adjust_analog_stick(gPlayer1Controller);
-    execute_mario_action(gMarioState->marioObj);
+    
+    if (bfStaticState.update_objects)
+        area_update_objects();
+    else
+        execute_mario_action(gMarioState->marioObj);
+    
     if (gCurrentArea != NULL)
     {
         update_camera(gCurrentArea->camera);
@@ -72,7 +142,7 @@ static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, u32 fram
         if (frame_idx < perturbator->min_frame || frame_idx > perturbator->max_frame)
             continue;
 
-        if (perturbator->max_perturbation > 0 && randFloat() < perturbator->perturbation_chance)
+        if (perturbator->max_perturbation > 0 && bf_random_float() < perturbator->perturbation_chance)
         {
             u16 perturb = (u16)(perturbator->max_perturbation);
             u8 perturbation_x = (rand() % (2 * perturb) - perturb);

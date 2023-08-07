@@ -9,16 +9,17 @@ struct BowserFallingPlatformData {
 
 struct BowserFallingPlatformData sBowserFallingPlatform[] = {
     { NULL, 0, 0, 0 },
-    { bowser_3_seg7_collision_07004B94,  -800, -1000, -20992 },
-    { bowser_3_seg7_collision_07004C18, -1158,   390, -18432 },
-    { bowser_3_seg7_collision_07004C9C, -1158,   390,  -7680 },
-    { bowser_3_seg7_collision_07004D20,     0,  1240,  -6144 },
-    { bowser_3_seg7_collision_07004DA4,     0,  1240,   6144 },
-    { bowser_3_seg7_collision_07004E28,  1158,   390,   7680 },
-    { bowser_3_seg7_collision_07004EAC,  1158,   390,  18432 },
-    { bowser_3_seg7_collision_07004F30,   800, -1000,  20992 },
-    { bowser_3_seg7_collision_07004FB4,   800, -1000, -31744 },
-    { bowser_3_seg7_collision_07005038,  -800, -1000,  31744 },
+    // _EDIT_ Remove sBowserFallingPlatform
+    // { bowser_3_seg7_collision_07004B94,  -800, -1000, -20992 },
+    // { bowser_3_seg7_collision_07004C18, -1158,   390, -18432 },
+    // { bowser_3_seg7_collision_07004C9C, -1158,   390,  -7680 },
+    // { bowser_3_seg7_collision_07004D20,     0,  1240,  -6144 },
+    // { bowser_3_seg7_collision_07004DA4,     0,  1240,   6144 },
+    // { bowser_3_seg7_collision_07004E28,  1158,   390,   7680 },
+    // { bowser_3_seg7_collision_07004EAC,  1158,   390,  18432 },
+    // { bowser_3_seg7_collision_07004F30,   800, -1000,  20992 },
+    // { bowser_3_seg7_collision_07004FB4,   800, -1000, -31744 },
+    // { bowser_3_seg7_collision_07005038,  -800, -1000,  31744 },
 };
 
 void falling_bowser_plat_act_start(void) {

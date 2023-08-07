@@ -8,6 +8,9 @@
 
 #include "include/types.h"
 
+long long bf_readers_util_read_int(Json *jsonNode);
+
+void bf_read_uintptr_t(Json *, uintptr_t *);
 void bf_read_s32(Json *, s32 *);
 void bf_read_s16(Json *, s16 *);
 void bf_read_u32(Json *, u32 *);
@@ -49,9 +52,5 @@ typedef s16 *EnvironmentRegions;
 void bf_read_EnvironmentRegions(Json *, EnvironmentRegions *);
 
 void bf_read_Vec3f(Json *, Vec3f *);
-
-#define JSON_PARSE_FIELD(target, type, field_name, node) \
-    if (strcmp(node->name, field_name) == 0)             \
-        target##bf_read_##type(node);
 
 #endif // BF_READERS_H

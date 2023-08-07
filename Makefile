@@ -12,7 +12,7 @@ FIND := $(call find-command,find)
 default: all
 
 # Preprocessor definitions
-DEFINES :=
+DEFINES := NO_SEGMENTED_MEMORY
 
 # Optimization flag
 OPT_FLAGS := -O3

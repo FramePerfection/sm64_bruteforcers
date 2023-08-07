@@ -9,7 +9,7 @@
 #include "src/game/level_update.h"
 #include <stdlib.h>
 
-f32 randFloat()
+f32 bf_random_float()
 {
     return ((float)rand() / (float)(RAND_MAX));
 }
@@ -28,9 +28,16 @@ static void s_init_surfaces(Triangles tris, u8 dynamic)
     }
 }
 
+
+extern s32 gNumStaticSurfaceNodes;
+extern s32 gNumStaticSurfaces;
+extern s32 gSurfaceNodesAllocated;
+extern s32 gSurfacesAllocated;
 void bf_init_static_surfaces(Triangles tris)
 {
     s_init_surfaces(tris, FALSE);
+    gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
+    gNumStaticSurfaces = gSurfacesAllocated;
 }
 
 void bf_init_dynamic_surfaces(Triangles tris)
@@ -106,48 +113,6 @@ struct Surface *bf_gen_surface(s16 x1, s16 y1, s16 z1, s16 x2, s16 y2, s16 z2, s
 }
 
 /**
- * Initialize a geo node with a given type. Sets all links such that there
- * are no siblings, parent or children for this node.
- */
-void init_scene_graph_node_links(struct GraphNode *graphNode, s32 type)
-{
-    graphNode->type = type;
-    graphNode->flags = GRAPH_RENDER_ACTIVE;
-    graphNode->prev = graphNode;
-    graphNode->next = graphNode;
-    graphNode->parent = NULL;
-    graphNode->children = NULL;
-}
-
-/**
- * Allocates and returns a newly created object node
- */
-struct GraphNodeObject *init_graph_node_object(UNUSED struct AllocOnlyPool *pool,
-                                               struct GraphNodeObject *graphNode,
-                                               struct GraphNode *sharedChild, Vec3f pos, Vec3s angle,
-                                               Vec3f scale)
-{
-    if (graphNode != NULL)
-    {
-        init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_OBJECT);
-        vec3f_copy(graphNode->pos, pos);
-        vec3f_copy(graphNode->scale, scale);
-        vec3s_copy(graphNode->angle, angle);
-        graphNode->sharedChild = sharedChild;
-        graphNode->throwMatrix = NULL;
-        graphNode->animInfo.animID = 0;
-        graphNode->animInfo.curAnim = NULL;
-        graphNode->animInfo.animFrame = 0;
-        graphNode->animInfo.animFrameAccelAssist = 0;
-        graphNode->animInfo.animAccel = 0x10000;
-        graphNode->animInfo.animTimer = 0;
-        graphNode->node.flags |= GRAPH_RENDER_HAS_ANIMATION;
-    }
-
-    return graphNode;
-}
-
-/**
  * Take the updated controller struct and calculate the new x, y, and distance floats.
  */
 void adjust_analog_stick(struct Controller *controller)
@@ -210,7 +175,6 @@ void bf_init_area()
 void bf_init_mario()
 {
     gMarioState->marioObj = calloc(1, sizeof(struct Object));
-    init_graph_node_object(NULL, (struct GraphNodeObject *)gMarioState->marioObj, NULL, gVec3fZero, gVec3sZero, gVec3fOne);
     gMarioState->marioBodyState = calloc(1, sizeof(struct MarioBodyState));
     gMarioState->statusForCamera = &gPlayerCameraState[0];
     gMarioState->controller = gPlayer1Controller = calloc(1, sizeof(OSContPad));

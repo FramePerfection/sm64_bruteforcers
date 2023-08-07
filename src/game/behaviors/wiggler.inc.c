@@ -141,7 +141,8 @@ void wiggler_init_segments(void) {
             struct Object *bodyPart =
                 spawn_object_relative(i, 0, 0, 0, o, MODEL_WIGGLER_BODY, bhvWigglerBody);
             if (bodyPart != NULL) {
-                obj_init_animation_with_sound(bodyPart, wiggler_seg5_anims_0500C874, 0);
+            // _EDIT_ remove reference to 'wiggler_seg5_anims_0500C874'
+                obj_init_animation_with_sound(bodyPart, 0 /*wiggler_seg5_anims_0500C874*/, 0);
                 bodyPart->header.gfx.animInfo.animFrame = (23 * i) % 26 - 1;
             }
         }

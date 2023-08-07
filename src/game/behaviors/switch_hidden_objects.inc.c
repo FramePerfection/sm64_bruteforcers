@@ -81,7 +81,8 @@ void hidden_breakable_box_actions(void) {
 void hidden_unbreakable_box_actions(void) {
     struct Object *sp1C;
 
-    obj_set_collision_data(o, wdw_seg7_collision_07018528);
+    // _EDIT_ remove 'wdw_seg7_collision_07018528' reference
+    // obj_set_collision_data(o, wdw_seg7_collision_07018528);
 
     if (o->oAction == 0) {
         cur_obj_disable_rendering();

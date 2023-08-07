@@ -1434,7 +1434,7 @@ void update_mario_inputs(struct MarioState *m) {
 /**
  * Set's the camera preset for submerged action behaviors.
  */
-__attribute__((weak)) void set_submerged_cam_preset_and_spawn_bubbles(struct MarioState *m) {
+WEAK void set_submerged_cam_preset_and_spawn_bubbles(struct MarioState *m) {
     f32 heightBelowWater;
     s16 camPreset;
 
@@ -1531,7 +1531,7 @@ void update_mario_health(struct MarioState *m) {
 /**
  * Updates some basic info for camera usage.
  */
-__attribute__((weak)) void update_mario_info_for_cam(struct MarioState *m) {
+WEAK void update_mario_info_for_cam(struct MarioState *m) {
     m->marioBodyState->action = m->action;
     m->statusForCamera->action = m->action;
 
@@ -1717,6 +1717,7 @@ void func_sh_8025574C(void) {
 /**
  * Main function for executing Mario's behavior.
  */
+// TODO: Get rid of this include
 #include "bruteforce/framework/candidates.h"
 s32 execute_mario_action(UNUSED struct Object *o) {
     s32 inLoop = TRUE;
@@ -1725,10 +1726,8 @@ s32 execute_mario_action(UNUSED struct Object *o) {
         gMarioState->marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
         mario_reset_bodystate(gMarioState);
         update_mario_inputs(gMarioState);
-#ifdef BF_ENABLE_INTERACTIONS
         mario_handle_special_floors(gMarioState);
         mario_process_interactions(gMarioState);
-#endif
 
         // If Mario is OOB, stop executing actions.
         if (gMarioState->floor == NULL) {

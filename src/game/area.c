@@ -28,9 +28,9 @@ struct Area gAreaData[8];
 
 struct WarpTransition gWarpTransition;
 
-s16 gCurrCourseNum;
-s16 gCurrActNum;
-s16 gCurrAreaIndex;
+extern s16 gCurrCourseNum;
+extern s16 gCurrActNum;
+extern s16 gCurrAreaIndex;
 s16 gSavedCourseNum;
 s16 gMenuOptSelectIndex;
 s16 gSaveOptSelectIndex;
@@ -38,7 +38,7 @@ s16 gSaveOptSelectIndex;
 struct SpawnInfo *gMarioSpawnInfo = &gPlayerSpawnInfos[0];
 struct GraphNode **gLoadedGraphNodes = D_8033A160;
 struct Area *gAreas = gAreaData;
-struct Area *gCurrentArea = NULL;
+extern struct Area *gCurrentArea; // = NULL;
 struct CreditsEntry *gCurrCreditsEntry = NULL;
 Vp *D_8032CE74 = NULL;
 Vp *D_8032CE78 = NULL;
@@ -49,7 +49,10 @@ u8 gWarpTransRed = 0;
 u8 gWarpTransGreen = 0;
 u8 gWarpTransBlue = 0;
 s16 gCurrSaveFileNum = 1;
-s16 gCurrLevelNum = LEVEL_MIN;
+extern s16 gCurrLevelNum; // = LEVEL_MIN;
+
+// _EDIT_ from rendering_graph_node.c
+u16 gAreaUpdateCounter = 0;
 
 /*
  * The following two tables are used in get_mario_spawn_type() to determine spawn type
@@ -102,28 +105,6 @@ void set_warp_transition_rgb(u8 red, u8 green, u8 blue) {
     gWarpTransRed = red;
     gWarpTransGreen = green;
     gWarpTransBlue = blue;
-}
-
-void print_intro_text(void) {
-#ifdef VERSION_EU
-    s32 language = eu_get_language();
-#endif
-    if ((gGlobalTimer & 31) < 20) {
-        if (gControllerBits == 0) {
-#ifdef VERSION_EU
-            print_text_centered(SCREEN_WIDTH / 2, 20, gNoControllerMsg[language]);
-#else
-            print_text_centered(SCREEN_WIDTH / 2, 20, "NO CONTROLLER");
-#endif
-        } else {
-#ifdef VERSION_EU
-            print_text(20, 20, "START");
-#else
-            print_text_centered(60, 38, "PRESS");
-            print_text_centered(60, 20, "START");
-#endif
-        }
-    }
 }
 
 u32 get_mario_spawn_type(struct Object *o) {
@@ -207,14 +188,16 @@ void clear_area_graph_nodes(void) {
     s32 i;
 
     if (gCurrentArea != NULL) {
-        geo_call_global_function_nodes(&gCurrentArea->unk04->node, GEO_CONTEXT_AREA_UNLOAD);
+        // _EDIT_ remove 'geo_call_global_function_nodes(...);'
+        // geo_call_global_function_nodes(&gCurrentArea->unk04->node, GEO_CONTEXT_AREA_UNLOAD);
         gCurrentArea = NULL;
         gWarpTransition.isActive = FALSE;
     }
 
     for (i = 0; i < 8; i++) {
         if (gAreaData[i].unk04 != NULL) {
-            geo_call_global_function_nodes(&gAreaData[i].unk04->node, GEO_CONTEXT_AREA_INIT);
+            // _EDIT_ remove 'geo_call_global_function_nodes(...);'
+            // geo_call_global_function_nodes(&gAreaData[i].unk04->node, GEO_CONTEXT_AREA_INIT);
             gAreaData[i].unk04 = NULL;
         }
     }
@@ -226,8 +209,9 @@ void load_area(s32 index) {
         gCurrAreaIndex = gCurrentArea->index;
 
         if (gCurrentArea->terrainData != NULL) {
-            load_area_terrain(index, gCurrentArea->terrainData, gCurrentArea->surfaceRooms,
-                              gCurrentArea->macroObjects);
+            // _EDIT_ remove 'load_area_terrain(...);'
+            // load_area_terrain(index, gCurrentArea->terrainData, gCurrentArea->surfaceRooms,
+            //                   gCurrentArea->macroObjects);
         }
 
         if (gCurrentArea->objectSpawnInfos != NULL) {
@@ -235,14 +219,16 @@ void load_area(s32 index) {
         }
 
         load_obj_warp_nodes();
-        geo_call_global_function_nodes(&gCurrentArea->unk04->node, GEO_CONTEXT_AREA_LOAD);
+        // _EDIT_ remove 'geo_call_global_function_nodes(...);'
+        // geo_call_global_function_nodes(&gCurrentArea->unk04->node, GEO_CONTEXT_AREA_LOAD);
     }
 }
 
 void unload_area(void) {
     if (gCurrentArea != NULL) {
         unload_objects_from_area(0, gCurrentArea->index);
-        geo_call_global_function_nodes(&gCurrentArea->unk04->node, GEO_CONTEXT_AREA_UNLOAD);
+        // _EDIT_ remove 'geo_call_global_function_nodes(...);'
+        // geo_call_global_function_nodes(&gCurrentArea->unk04->node, GEO_CONTEXT_AREA_UNLOAD);
 
         gCurrentArea->flags = 0;
         gCurrentArea = NULL;
@@ -251,7 +237,7 @@ void unload_area(void) {
 }
 
 void load_mario_area(void) {
-    stop_sounds_in_continuous_banks();
+    // _EDIT_ remove 'stop_sounds_in_continuous_banks();'
     load_area(gMarioSpawnInfo->areaIndex);
 
     if (gCurrentArea->index == gMarioSpawnInfo->areaIndex) {
@@ -357,59 +343,60 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
     play_transition(transType, time, red, green, blue);
 }
 
+// TODO: See what of this can safely be removed
+// _EDIT_ stubbed render_game
 void render_game(void) {
-    if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
-        geo_process_root(gCurrentArea->unk04, D_8032CE74, D_8032CE78, gFBSetColor);
+    // if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
+    //     geo_process_root(gCurrentArea->unk04, D_8032CE74, D_8032CE78, gFBSetColor);
 
-        gSPViewport(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(&D_8032CF00));
+    //     gSPViewport(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(&D_8032CF00));
 
-        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, BORDER_HEIGHT, SCREEN_WIDTH,
-                      SCREEN_HEIGHT - BORDER_HEIGHT);
-        render_hud();
+    //     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, BORDER_HEIGHT, SCREEN_WIDTH,
+    //                   SCREEN_HEIGHT - BORDER_HEIGHT);
+    //     render_hud();
 
-        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-        render_text_labels();
-        do_cutscene_handler();
-        print_displaying_credits_entry();
+    //     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    //     render_text_labels();
+    //     do_cutscene_handler();
+    //     print_displaying_credits_entry();
 
-        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, BORDER_HEIGHT, SCREEN_WIDTH,
-                      SCREEN_HEIGHT - BORDER_HEIGHT);
-        gMenuOptSelectIndex = render_menus_and_dialogs();
-        if (gMenuOptSelectIndex != MENU_OPT_NONE) {
-            gSaveOptSelectIndex = gMenuOptSelectIndex;
-        }
+    //     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, BORDER_HEIGHT, SCREEN_WIDTH,
+    //                   SCREEN_HEIGHT - BORDER_HEIGHT);
+    //     gMenuOptSelectIndex = render_menus_and_dialogs();
+    //     if (gMenuOptSelectIndex != MENU_OPT_NONE) {
+    //         gSaveOptSelectIndex = gMenuOptSelectIndex;
+    //     }
 
-        if (D_8032CE78 != NULL) {
-            make_viewport_clip_rect(D_8032CE78);
-        } else {
-            gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, BORDER_HEIGHT, SCREEN_WIDTH,
-                          SCREEN_HEIGHT - BORDER_HEIGHT);
-        }
+    //     if (D_8032CE78 != NULL) {
+    //         make_viewport_clip_rect(D_8032CE78);
+    //     } else {
+    //         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, BORDER_HEIGHT, SCREEN_WIDTH,
+    //                       SCREEN_HEIGHT - BORDER_HEIGHT);
+    //     }
 
-        if (gWarpTransition.isActive) {
-            if (gWarpTransDelay == 0) {
-                gWarpTransition.isActive = !render_screen_transition(0, gWarpTransition.type, gWarpTransition.time,
-                                                                     &gWarpTransition.data);
-                if (!gWarpTransition.isActive) {
-                    if (gWarpTransition.type & 1) {
-                        gWarpTransition.pauseRendering = TRUE;
-                    } else {
-                        set_warp_transition_rgb(0, 0, 0);
-                    }
-                }
-            } else {
-                gWarpTransDelay--;
-            }
-        }
-    } else {
-        render_text_labels();
-        if (D_8032CE78 != NULL) {
-            clear_viewport(D_8032CE78, gWarpTransFBSetColor);
-        } else {
-            clear_framebuffer(gWarpTransFBSetColor);
-        }
-    }
+    //     if (gWarpTransition.isActive) {
+    //         if (gWarpTransDelay == 0) {
+    //             gWarpTransition.isActive = !render_screen_transition(0, gWarpTransition.type, gWarpTransition.time,
+    //                                                                  &gWarpTransition.data);
+    //             if (!gWarpTransition.isActive) {
+    //                 if (gWarpTransition.type & 1) {
+    //                     gWarpTransition.pauseRendering = TRUE;
+    //                 } else {
+    //                     set_warp_transition_rgb(0, 0, 0);
+    //                 }
+    //             }
+    //         } else {
+    //             gWarpTransDelay--;
+    //         }
+    //     }
+    // } else {
+    //     if (D_8032CE78 != NULL) {
+    //         clear_viewport(D_8032CE78, gWarpTransFBSetColor);
+    //     } else {
+    //         clear_framebuffer(gWarpTransFBSetColor);
+    //     }
+    // }
 
-    D_8032CE74 = NULL;
-    D_8032CE78 = NULL;
+    // D_8032CE74 = NULL;
+    // D_8032CE78 = NULL;
 }

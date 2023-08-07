@@ -408,39 +408,6 @@ void stub_debug_5(void) {
 }
 
 /*
- * If Mario's object exists, this function tries to print available object debug
- * information depending on the debug sys ID. Additional information (updated obj
- * count, floor misses, and an unknown wall counter) is also printed.
- */
-void try_print_debug_mario_object_info(void) {
-    if (gMarioObject != NULL) {
-        switch (sDebugPage) {
-            case DEBUG_PAGE_CHECKSURFACEINFO:
-                print_surfaceinfo();
-                break;
-            case DEBUG_PAGE_EFFECTINFO:
-                print_effectinfo();
-                break;
-            case DEBUG_PAGE_ENEMYINFO:
-                print_enemyinfo();
-                break;
-            default:
-                break;
-        }
-    }
-
-    print_debug_top_down_mapinfo("obj  %d", gObjectCounter);
-
-    if (gNumFindFloorMisses != 0) {
-        print_debug_bottom_up("NULLBG %d", gNumFindFloorMisses);
-    }
-
-    if (gUnknownWallCount != 0) {
-        print_debug_bottom_up("WALL   %d", gUnknownWallCount);
-    }
-}
-
-/*
  * Similar to above, but with level information. (checkinfo, mapinfo,
  * stageinfo)
  */

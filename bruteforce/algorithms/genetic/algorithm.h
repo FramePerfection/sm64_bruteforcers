@@ -6,7 +6,7 @@
 
 typedef void (*PerturbInputFunc)(Candidate *candidate, OSContPad *controller, u32 frame_index);
 typedef void (*ScoringFunc)(Candidate *candidate, u32 frame_index, boolean *abort);
-typedef void (*UpdateGameFunc)(OSContPad *inputs);
+typedef void (*UpdateGameFunc)(OSContPad *inputs, u32 frame_index);
 
 void bf_algorithm_genetic_loop(InputSequence *inputs, UpdateGameFunc updateGame, PerturbInputFunc perturbInput, ScoringFunc updateScore);
 
