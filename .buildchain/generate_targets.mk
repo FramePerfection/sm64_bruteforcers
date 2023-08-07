@@ -20,4 +20,4 @@ endif
 		| $(CC) -E -CC -P -	\
 		| sed -e 's/$(NEWLINE_TOKEN) /\n/g' -e 's/$(NEWLINE_TOKEN)//g' -e 's/__QUOTE__/\"/g' -e 's/__TAB__/\t/g' -e 's/\t /\t/g' \
 		> .vscode/tasks.json
-	@echo successfully created .tasks/launch.json
+	@echo successfully created .vscode/tasks.json
