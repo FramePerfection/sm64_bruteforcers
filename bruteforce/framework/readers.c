@@ -19,6 +19,7 @@ long long bf_readers_util_read_int(Json *jsonNode) {
 #define read_int(cast_type) \
 void bf_read_##cast_type(Json *jsonNode, cast_type *target) { *target = (cast_type)bf_readers_util_read_int(jsonNode); }
 
+read_int(uintptr_t)
 read_int(s32)
 read_int(s16)
 read_int(u32)

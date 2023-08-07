@@ -98,16 +98,16 @@ static void resetObjects() {
         BfObjectState *state = &bfStaticState.object_states.data[i];
         struct Object *obj = create_object(bfStaticState.behavior_scripts.data[state->behavior_script_index].data);
         memcpy(obj->rawData.asU32, &state->raw_data, sizeof(u32) * 0x50);
-        /* obj->activeFlags = state->active_flags;
+        obj->activeFlags = state->active_flags;
         obj->bhvDelayTimer = state->bhv_delay_timer;
-        memcpy(obj->bhvStack, state->bhv_stack, sizeof(uint8_t) * 8);
+        memcpy(obj->bhvStack, state->bhv_stack, sizeof(uintptr_t) * 8);
         obj->bhvStackIndex = state->bhv_stack_index;
         obj->collidedObjInteractTypes = state->collided_obj_interact_types;
         obj->hitboxRadius = state->hitbox_radius;
         obj->hitboxHeight = state->hitbox_height;
         obj->hurtboxRadius = state->hurtbox_radius;
         obj->hurtboxHeight = state->hurtbox_height;
-        obj->hitboxDownOffset = state->hitbox_down_offset; */
+        obj->hitboxDownOffset = state->hitbox_down_offset;
     }
 }
 

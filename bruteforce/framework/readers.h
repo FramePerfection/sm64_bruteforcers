@@ -10,6 +10,7 @@
 
 long long bf_readers_util_read_int(Json *jsonNode);
 
+void bf_read_uintptr_t(Json *, uintptr_t *);
 void bf_read_s32(Json *, s32 *);
 void bf_read_s16(Json *, s16 *);
 void bf_read_u32(Json *, u32 *);
