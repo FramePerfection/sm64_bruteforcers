@@ -1714,6 +1714,12 @@ void func_sh_8025574C(void) {
 }
 #endif
 
+// _EDIT_ weak stub for mario_execute_object_action
+WEAK s32 mario_execute_object_action(UNUSED struct MarioState *m) {
+	bf_desync("mario_execute_object_action not implemented.");
+	return 0;
+}
+
 /**
  * Main function for executing Mario's behavior.
  */
@@ -1767,7 +1773,7 @@ s32 execute_mario_action(UNUSED struct Object *o) {
                     break;
 
                 case ACT_GROUP_OBJECT:
-                    NOT_IMPL(object)// inLoop = mario_execute_object_action(gMarioState);
+                    inLoop = mario_execute_object_action(gMarioState);
                     break;
             }
         }
