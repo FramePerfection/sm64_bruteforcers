@@ -114,11 +114,16 @@ end
 
 local function getOriginalInputs()
 	print("Getting original inputs...")
-	
+
+	local forwardDone = nil;
+
 	local function grabFrame()
 		local inputFrame = gGlobalTimer.Read() - globalTimerAtSavestate + 1
 		local currentInput = joypad.get(1)
 		originalInputs[inputFrame] = currentInput
+		if (inputFrame > MAX_ACCEPTED_INPUTS) then
+			forwardDone();
+		end
 	end
 
 	local function done()
@@ -133,6 +138,8 @@ local function getOriginalInputs()
 
 		print("Waiting for bruteforce results...")
 	end
+
+	forwardDone = done;
 
 	emu.atinput(grabFrame)
 	emu.atloadstate(done) -- assumes that "loop movie playback" option is enabled and reacts to the automatic loadstate from its occurrence

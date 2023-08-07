@@ -19,6 +19,12 @@ BFDynamicState bfInitialDynamicState;
 BFControlState *bfControlState;
 ProgramState *programState;
 
+// TODO: Maybe obsolete this warning ignore with an additional macro such as BF_IMMEDIATE_STATIC_STATE?
+// Some expansions of BF_STATIC_STATE may cause a memcpy into the location their resource originates from,
+// specifically those that are used as directly accessed control state, such as bfStaticState->survivors_per_generation
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrestrict"
+
 static void s_read_state_json(Json *node)
 {
     // clang-format off
@@ -143,3 +149,5 @@ void bf_update_control_state(char *input)
     }
     Json_dispose(root);
 }
+
+#pragma GCC diagnostic pop

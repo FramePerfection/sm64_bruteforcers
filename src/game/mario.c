@@ -56,6 +56,8 @@ s32 is_anim_at_end(struct MarioState *m) {
  * Checks if Mario's animation has surpassed 2 frames before its end point.
  */
 s32 is_anim_past_end(struct MarioState *m) {
+    // _EDIT_ stub is_anim_past_end
+    return FALSE;
     struct Object *o = m->marioObj;
 
     return o->header.gfx.animInfo.animFrame >= (o->header.gfx.animInfo.curAnim->loopEnd - 2);
@@ -139,6 +141,9 @@ s16 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel)
  * Sets the animation to a specific "next" frame from the frame given.
  */
 void set_anim_to_frame(struct MarioState *m, s16 animFrame) {
+    // _EDIT_ stub set_anim_to_frame
+    return;
+    
     struct AnimInfo *animInfo = &m->marioObj->header.gfx.animInfo;
     struct Animation *curAnim = animInfo->curAnim;
 
@@ -1714,6 +1719,12 @@ void func_sh_8025574C(void) {
 }
 #endif
 
+// _EDIT_ weak stub for mario_execute_object_action
+WEAK s32 mario_execute_object_action(UNUSED struct MarioState *m) {
+	bf_desync("mario_execute_object_action not implemented.");
+	return 0;
+}
+
 /**
  * Main function for executing Mario's behavior.
  */
@@ -1767,7 +1778,7 @@ s32 execute_mario_action(UNUSED struct Object *o) {
                     break;
 
                 case ACT_GROUP_OBJECT:
-                    NOT_IMPL(object)// inLoop = mario_execute_object_action(gMarioState);
+                    inLoop = mario_execute_object_action(gMarioState);
                     break;
             }
         }
