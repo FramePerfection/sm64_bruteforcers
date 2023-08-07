@@ -15,9 +15,9 @@
 
 // TODO: replace this with a vec3 type
 #define BF_DYNAMIC_VEC3(name, expr, documentation) \
-	BF_DYNAMIC_STATE(f32, name##_x, expr[0], "")   \
-	BF_DYNAMIC_STATE(f32, name##_y, expr[1], "")   \
-	BF_DYNAMIC_STATE(f32, name##_z, expr[2], "")
+	BF_DYNAMIC_STATE(f32, name##_x, expr[0], "The x component of "documentation)   \
+	BF_DYNAMIC_STATE(f32, name##_y, expr[1], "The y component of "documentation)   \
+	BF_DYNAMIC_STATE(f32, name##_z, expr[2], "The z component of "documentation)
 #define __NL__
 
 // Define BFControlState
