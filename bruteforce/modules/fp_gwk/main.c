@@ -12,7 +12,9 @@
 #include "src/game/mario.h"
 #include "src/game/mario_step.h"
 
-#include "bruteforce/framework/candidates.h"
+#include "bruteforce/algorithms/genetic/candidates.h"
+#include "bruteforce/algorithms/genetic/algorithm.h"
+
 #include "bruteforce/framework/interface.h"
 #include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/m64.h"
@@ -106,9 +108,6 @@ void bruteforceLoop()
 {
     clock_t lastClock = clock();
     u32 gen_mod = bfControlState->print_interval;
-    u32 gen_merge_mod = bfControlState->merge_interval;
-    if (gen_mod == 0)
-        gen_mod = 100;
 
     u32 gen;
     for (gen = 0; gen < bfStaticState.max_generations; gen++)
@@ -161,20 +160,7 @@ void bruteforceLoop()
         bf_update_survivors(survivors);
         bf_update_best(best, survivors);
 
-        if (isParentProcess())
-        {
-            if (gen % gen_mod == 0)
-                for (candidate_idx = 0; candidate_idx < bfStaticState.survivors_per_generation; candidate_idx++)
-                    bf_safe_printf("%d:\t%a;\t%f\n", candidate_idx, survivors[candidate_idx].score, survivors[candidate_idx].stats.hSpeed);
-
-            // We're the parent process. Send a merge request to all children and merge, then send the merged results back to the children.
-            if (gen % gen_merge_mod == 0)
-            {
-                bf_parent_merge_candidates(survivors);
-            }
-        }
-        else
-            bf_child_update_messages(best);
+        bf_algorithm_genetic_update_interprocess(survivors);
     }
 }
 
@@ -195,7 +181,9 @@ void main(int argc, char *argv[])
     bf_init_candidates(original_inputs, &survivors);
     bf_init_candidates(original_inputs, &best);
 
-    bf_initialize_multi_process(original_inputs);
+    bf_algorithm_genetic_init(original_inputs);
+    bf_start_multiprocessing();
+    
     programState->bestScore = minSpeed;
 
     bruteforceLoop();

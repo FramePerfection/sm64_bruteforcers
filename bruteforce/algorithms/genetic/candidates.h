@@ -13,10 +13,6 @@
 #define STR2(x) STR1(x)
 #define MODULE_PATH_STR STR2(MODULE_PATH)
 
-extern u8 desynced;
-
-void bf_desync(char *message);
-
 typedef struct Candidate_s
 {
     InputSequence *sequence;
@@ -28,6 +24,6 @@ typedef struct Candidate_s
 void bf_init_candidates(InputSequence *original_inputs, Candidate **survivors);
 void bf_update_survivors(Candidate *survivors);
 void bf_update_best(Candidate *best, Candidate *survivors);
-void bf_merge_candidates(Candidate *survivors, Candidate **externalSurvivors, u32 externalSurvivorsCount);
+void bf_merge_candidates(Candidate *survivors, Candidate *externalSurvivors, u32 externalSurvivorsCount, u32 stride);
 
 #endif // BF_CANDIDATES_H

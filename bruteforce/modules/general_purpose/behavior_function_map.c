@@ -14,7 +14,7 @@ void *bf_map_native_behavior_func(int input) {
 #undef BF_MAP_BEHAVIOR_FUNC
 		default:
 			bf_safe_printf("Encountered unmapped behavior function address '0x%08X'!\n", input);
-			return NULL;
+			return 0;
 	}
 
 }

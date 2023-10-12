@@ -1,6 +1,5 @@
 #include "bruteforce/framework/interprocess.h"
 
-#include "bruteforce/framework/candidates.h"
 #include "bruteforce/framework/interface.h"
 #include "bruteforce/framework/states.h"
 
@@ -9,30 +8,24 @@
 
 #ifdef _WIN32
 #include <windows.h>
-static HANDLE *parentToChildWritePipes;
-static HANDLE *childToParentReadPipes;
-static HANDLE childReadPipe, childWritePipe;
-static OVERLAPPED readOverlapped;
-static BOOL pipeReadPending = FALSE;
-static HANDLE hMapFile;
-static void *pBuf;
-static HANDLE mutex;
+static HANDLE sMapFile = NULL;
+static void *sSharedMemory = NULL;
+static HANDLE mutex = NULL;
 #endif
 
-#define BUF_SIZE (sizeof(ProgramState) + sizeof(BFControlState))
+#define ALIGN_8(input) (((input + 7) / 8) * 8)
 
-u32 transmissionCandidateSize;
-u32 sequenceSize;
-u32 pipeBufferSize;
-char *pipeBuffer;
+static unsigned int sProcessIndex;
 
-extern BOOL APIENTRY MyCreatePipeEx(
-    OUT LPHANDLE lpReadPipe,
-    OUT LPHANDLE lpWritePipe,
-    IN LPSECURITY_ATTRIBUTES lpPipeAttributes,
-    IN DWORD nSize,
-    DWORD dwReadMode,
-    DWORD dwWriteMode);
+static struct SharedMemoryInitNode_s {
+    unsigned int offset;
+    MemoryAllocatedCallback callback;
+    struct SharedMemoryInitNode_s *next;
+};
+typedef struct SharedMemoryInitNode_s SharedMemoryInitNode;
+static SharedMemoryInitNode *sSharedMemoryInitList = NULL;
+static sReservedSharedMemoryBytes = ALIGN_8(sizeof(ProgramState)) + ALIGN_8(sizeof(BFControlState));
+
 
 static void createMutex()
 {
@@ -43,22 +36,7 @@ static void createMutex()
     mutex = CreateMutex(&saAttr, FALSE, "bf_print_lock");
 }
 
-static void createPipe(HANDLE *readPipe, HANDLE *writePipe)
-{
-    SECURITY_ATTRIBUTES saAttr;
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
-    saAttr.bInheritHandle = TRUE;
-    saAttr.lpSecurityDescriptor = NULL;
-
-    if (!MyCreatePipeEx(readPipe, writePipe, &saAttr, 0, FILE_FLAG_OVERLAPPED, 0))
-    {
-        bf_safe_printf("Failed to create pipe: Error code %ld\n", GetLastError());
-        return;
-    }
-    bf_safe_printf("Successfully created pipes %p (read) and %p (write)\n", *readPipe, *writePipe);
-}
-
-static void createProcess(HANDLE readPipe, HANDLE writePipe, HANDLE hJob)
+static void createProcess(HANDLE hJob, unsigned int processIndex)
 {
     STARTUPINFO si;
     memset(&si, 0, sizeof(STARTUPINFO));
@@ -66,9 +44,9 @@ static void createProcess(HANDLE readPipe, HANDLE writePipe, HANDLE hJob)
     memset(&pi, 0, sizeof(PROCESS_INFORMATION));
 
     TCHAR lpszArgs[1024];
-    sprintf(lpszArgs, "main.exe --child=%p;%p;%p", readPipe, writePipe, hMapFile);
+    sprintf(lpszArgs, "main.exe --child=%p;%d", sMapFile, processIndex);
     if (override_config_file != NULL)
-        sprintf(lpszArgs + strlen(lpszArgs), " --file %s --outputmode %s", override_config_file, output_mode);
+        sprintf(lpszArgs + strlen(lpszArgs), " --file=%s --outputmode=%s", override_config_file, output_mode);
 
     if (!CreateProcess(NULL, lpszArgs, NULL, NULL, TRUE, CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi))
     {
@@ -80,28 +58,28 @@ static void createProcess(HANDLE readPipe, HANDLE writePipe, HANDLE hJob)
         bf_safe_printf("Failed AssignProcessToJobObject: %ld\n", GetLastError());
 }
 
-static void createMapFile()
+static void createMapFile(unsigned int bufferSize)
 {
     SECURITY_ATTRIBUTES saAttr;
     saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
     saAttr.bInheritHandle = TRUE;
     saAttr.lpSecurityDescriptor = NULL;
 
-    hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, &saAttr, PAGE_READWRITE, 0, BUF_SIZE, NULL);
-    if (hMapFile == NULL)
+    sMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, &saAttr, PAGE_READWRITE, 0, bufferSize, NULL);
+    if (sMapFile == NULL)
     {
         bf_safe_printf("Could not create file mapping (%ld).\n", GetLastError());
         return;
     }
 }
 
-static void createMapFileView()
+static void createMapFileView(unsigned int bufferSize)
 {
-    pBuf = MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, BUF_SIZE);
-    if (pBuf == NULL)
+    sSharedMemory = MapViewOfFile(sMapFile, FILE_MAP_ALL_ACCESS, 0, 0, bufferSize);
+    if (sSharedMemory == NULL)
     {
         bf_safe_printf("Could not map view of file (%ld).\n", GetLastError());
-        CloseHandle(hMapFile);
+        CloseHandle(sMapFile);
         return;
     }
 }
@@ -115,189 +93,82 @@ static void createChildProcesses()
     jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
     SetInformationJobObject(hJob, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli));
 
-    s32 num_processes = max(bfStaticState.max_processes, 1) - 1;
-
-    parentToChildWritePipes = calloc(num_processes, sizeof(HANDLE));
-    childToParentReadPipes = calloc(num_processes, sizeof(HANDLE));
-
-    bf_safe_printf("Running %d processes...\n", num_processes);
+    bf_safe_printf("Running %d processes...\n", bfStaticState.max_processes);
     s32 i;
-    for (i = 0; i < num_processes; i++)
-    {
-        HANDLE childReadPipe, childWritePipe;
-
-        createPipe(&childReadPipe, &parentToChildWritePipes[i]);
-        createPipe(&childToParentReadPipes[i], &childWritePipe);
-        createProcess(childReadPipe, childWritePipe, hJob);
-    }
+    for (i = 1; i < bfStaticState.max_processes; i++)
+        createProcess(hJob, i);
 }
 
-u8 isParentProcess()
+u8 bf_is_parent_process()
 {
     return child_args == NULL;
 }
 
-void bf_initialize_multi_process(InputSequence *original_inputs)
+unsigned int bf_get_process_index() {
+    return sProcessIndex;
+}
+
+void bf_reserve_shared_memory(unsigned int size, MemoryAllocatedCallback callback)
 {
-    sequenceSize = sizeof(InputSequence) + original_inputs->count * sizeof(OSContPad);
-    transmissionCandidateSize = sizeof(Candidate) + sequenceSize;
-    pipeBufferSize = transmissionCandidateSize * bfStaticState.survivors_per_generation;
-    pipeBuffer = malloc(pipeBufferSize);
+    SharedMemoryInitNode *n = sSharedMemoryInitList;
+    SharedMemoryInitNode *newNode = malloc(sizeof(SharedMemoryInitNode));
+    newNode->callback = callback;
+    newNode->offset = sReservedSharedMemoryBytes;
+    newNode->next = NULL;
+    sReservedSharedMemoryBytes += ALIGN_8(size);
+    if (n == NULL)
+        sSharedMemoryInitList = newNode;
+    else
+    {
+        while (n->next != NULL)
+            n = n->next;
+        n->next = newNode;
+    }
+}
 
-    ZeroMemory(&readOverlapped, sizeof(OVERLAPPED));
-    readOverlapped.hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-
+void bf_start_multiprocessing()
+{
+    createMutex();
     if (child_args != NULL)
     {
-        char *arg0, *arg1, *arg2;
+        char *arg0, *arg1;
         arg0 = strtok(child_args, ";");
         arg1 = strtok(NULL, ";");
-        arg2 = strtok(NULL, ";");
-        if (arg2 == NULL)
+        if (arg1 == NULL)
         {
             bf_safe_printf("Invalid arguments to create child process. Exiting...\n");
             exit(0);
         }
         char *end;
-        childReadPipe = (HANDLE)strtol(arg0, &end, 0x10);
-        childWritePipe = (HANDLE)strtol(arg1, &end, 0x10);
-        hMapFile = (HANDLE)strtol(arg2, &end, 0x10);
-        createMapFileView();
-        createMutex();
+        sMapFile = (HANDLE)strtol(arg0, &end, 0x10);
+        sProcessIndex = (unsigned int)strtol(arg1, &end, 10);
+        createMapFileView(sReservedSharedMemoryBytes);
     }
     else
     {
-        childReadPipe = NULL;
-        childWritePipe = NULL;
-
-        createMapFile();
-        createMapFileView();
-        createMutex();
+        sProcessIndex = 0;
+        createMapFile(sReservedSharedMemoryBytes);
+        createMapFileView(sReservedSharedMemoryBytes);
         createChildProcesses();
         bf_listen_to_inputs();
     }
-    programState = pBuf;
+    
+    programState = sSharedMemory;
     BFControlState *initialState = bfControlState;
-    bfControlState = (BFControlState *)(pBuf + sizeof(ProgramState));
+    bfControlState = (BFControlState *)(sSharedMemory + ALIGN_8(sizeof(ProgramState)));
     memcpy(bfControlState, initialState, sizeof(BFControlState));
-}
+    SharedMemoryInitNode *n;
+    for (n = sSharedMemoryInitList; n != NULL; n = n->next)
+        n->callback(sSharedMemory + n->offset);
 
-static void writeSurvivorsToBuffer(Candidate *survivors)
-{
-    u32 i;
-    for (i = 0; i < bfStaticState.survivors_per_generation; i++)
-    {
-        memcpy(pipeBuffer + transmissionCandidateSize * i, &survivors[i], sizeof(Candidate));
-        memcpy(pipeBuffer + transmissionCandidateSize * i + sizeof(Candidate), survivors[i].sequence, sequenceSize);
-    }
-}
-
-void bf_parent_merge_candidates(Candidate *survivors)
-{
-    s32 numChildProcesses = bfStaticState.max_processes - 1;
-    if (numChildProcesses <= 0)
-        return;
-
-    DWORD written, read;
-    sprintf(pipeBuffer, "merge");
-    s32 childProcId;
-
-    // Send a merge request to all children
-    for (childProcId = 0; childProcId < bfStaticState.max_processes - 1; childProcId++)
-    {
-        if (!WriteFile(parentToChildWritePipes[childProcId], pipeBuffer, pipeBufferSize, &written, NULL))
-        {
-            bf_safe_printf("Failed to write sync message:%ld\n", GetLastError());
-        }
-    }
-
-    u32 numRuns = bfStaticState.survivors_per_generation;
-    u32 k = 0;
-
-    char *mergeBuffer = malloc(pipeBufferSize * numChildProcesses);
-    Candidate **externalCandidates = malloc(sizeof(Candidate *) * numRuns * numChildProcesses);
-    // Read each merge block in turn
-    for (childProcId = 0; childProcId < numChildProcesses; childProcId++)
-    {
-        if (!ReadFile(childToParentReadPipes[childProcId], mergeBuffer + childProcId * pipeBufferSize, pipeBufferSize, &read, NULL))
-        {
-            bf_safe_printf("Failed to read merge message:%ld\n", GetLastError());
-        }
-
-        u32 i;
-        for (i = 0; i < numRuns; i++)
-        {
-            Candidate *candidate = (Candidate *)(mergeBuffer + i * transmissionCandidateSize + childProcId * pipeBufferSize);
-            candidate->sequence = (InputSequence *)(candidate + 1);
-            externalCandidates[k++] = candidate;
-        }
-    }
-
-    bf_merge_candidates(survivors, externalCandidates, k);
-    free(mergeBuffer);
-
-    // Send the merge result to each child process
-    writeSurvivorsToBuffer(survivors);
-    for (childProcId = 0; childProcId < numChildProcesses; childProcId++)
-    {
-        if (!WriteFile(parentToChildWritePipes[childProcId], pipeBuffer, pipeBufferSize, &written, NULL))
-        {
-            bf_safe_printf("Failed to write merge result to child %d: %ld\n", childProcId, GetLastError());
-        }
-    }
-}
-
-void bf_child_update_messages(Candidate *survivors)
-{
-    if (!pipeReadPending)
-    {
-        pipeReadPending = TRUE;
-        DWORD read;
-        ReadFile(childReadPipe, pipeBuffer, pipeBufferSize, &read, &readOverlapped);
-    }
-
-    if (WAIT_OBJECT_0 == WaitForSingleObject(readOverlapped.hEvent, 0))
-    {
-        char *cmd = malloc(pipeBufferSize);
-        sscanf(pipeBuffer, "%s", cmd);
-        // The parent has requested a merge. Send our best attempts at this moment, then wait for the merged results.
-
-        if (strcmp(cmd, "merge") == 0)
-        {
-            DWORD written, read;
-            writeSurvivorsToBuffer(survivors);
-            if (!WriteFile(childWritePipe, pipeBuffer, pipeBufferSize, &written, NULL))
-            {
-                bf_safe_printf("Failed to fulfil merge command: %ld", GetLastError());
-            }
-
-            if (!ReadFile(childReadPipe, pipeBuffer, pipeBufferSize, &read, NULL))
-            {
-                bf_safe_printf("Failed to read merge message:%ld\n", GetLastError());
-            }
-            u32 i;
-            for (i = 0; i < bfStaticState.survivors_per_generation; i++)
-            {
-                Candidate *candidate = (Candidate *)(pipeBuffer + i * transmissionCandidateSize);
-                candidate->sequence = (InputSequence *)(candidate + 1);
-                survivors[i].score = candidate->score;
-                survivors[i].stats = candidate->stats;
-                bf_clone_m64_inputs(survivors[i].sequence, candidate->sequence);
-            }
-        }
-
-        free(cmd);
-
-        ResetEvent(readOverlapped.hEvent);
-        pipeReadPending = FALSE;
-    }
+    bf_safe_printf("process initialized with id %d.\n", bf_get_process_index());
 }
 
 void bf_safe_printf(const char *fmt, ...)
 {
     if (mutex)
         WaitForSingleObject(mutex, INFINITE);
-    else if (!isParentProcess())
+    else if (!bf_is_parent_process())
         return;
     va_list argptr;
     va_start(argptr, fmt);

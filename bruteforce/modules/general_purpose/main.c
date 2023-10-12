@@ -15,13 +15,13 @@
 #include "src/game/object_list_processor.h"
 #include "src/game/spawn_object.h"
 
-#include "bruteforce/framework/candidates.h"
 #include "bruteforce/framework/interface.h"
 #include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/m64.h"
 #include "bruteforce/framework/misc_util.h"
 #include "bruteforce/framework/states.h"
 
+#include "bruteforce/algorithms/genetic/candidates.h"
 #include "bruteforce/algorithms/genetic/algorithm.h"
 
 #include "perturbator.h"
@@ -184,6 +184,10 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort)
     }
 }
 
+static void printState(u32 currentGeneration, float fps) {
+    bf_safe_printf("Generation %d starting... (%f FPS) (Best score: %f)\n", currentGeneration, fps, programState->bestScore);
+}
+
 void main(int argc, char *argv[])
 {
     bf_parse_command_line_args(argc, argv);
@@ -199,9 +203,11 @@ void main(int argc, char *argv[])
         exit(-1);
     }
 
-    bf_initialize_multi_process(original_inputs);
-    if (isParentProcess())
+    bf_algorithm_genetic_init(original_inputs);
+    bf_start_multiprocessing();
+
+    if (bf_is_parent_process())
         programState->bestScore = -INFINITY;
 
-    bf_algorithm_genetic_loop(original_inputs, &updateGame, &perturbInput, &updateScore);
+    bf_algorithm_genetic_loop(original_inputs, &bfInitialDynamicState, &updateGame, &perturbInput, &updateScore, &printState, NULL);
 }
