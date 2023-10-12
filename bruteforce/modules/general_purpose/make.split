@@ -7,7 +7,7 @@ $(eval $(NAME)_dep: force; \
 
 
 $(NAME)REQUIRED_OBJECTS := $(addprefix bruteforce/modules/$(NAME)/,main.o scoring_method.o perturbator.o behavior_function_map.o object_utils.o)
-$(NAME)REQUIRED_OBJECTS += bruteforce/$(NAME)/algorithms/genetic/algorithm.o
+$(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/$(NAME)/algorithms/genetic/,algorithm.o candidates.o)
 $(NAME)REQUIRED_OBJECTS += $(addprefix src/engine/,math_util.o surface_collision.o surface_load_reduced.o surface_load_objects.o behavior_script.o graph_node.o)
 $(NAME)REQUIRED_OBJECTS += $(addprefix src/game/,camera_reduced.o $(MARIO_STEP_OBJECTS) area.o memory.o \
 												 object_list_processor.o behavior_actions.o object_helpers.o \

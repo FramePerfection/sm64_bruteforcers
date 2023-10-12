@@ -13,5 +13,6 @@ void bf_update_control_state();
 extern char *override_config_file;
 extern char *child_args;
 extern char *output_mode;
+extern u8 desynced;
 
 #endif // BF_INTERFACE_H

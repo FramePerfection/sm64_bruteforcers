@@ -10,7 +10,7 @@
 #include "src/game/mario.h"
 #include "src/game/mario_step.h"
 
-#include "bruteforce/framework/candidates.h"
+#include "bruteforce/algorithms/genetic/candidates.h"
 #include "bruteforce/framework/interface.h"
 #include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/m64.h"
@@ -94,6 +94,10 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort)
     }
 }
 
+static void printState(u32 currentGeneration, float fps) {
+    bf_safe_printf("Generation %d starting... (%f FPS) (Best score: %f)\n", currentGeneration, fps, programState->bestScore);
+}
+
 void main(int argc, char *argv[])
 {
     bf_parse_command_line_args(argc, argv);
@@ -109,12 +113,8 @@ void main(int argc, char *argv[])
         exit(-1);
     }
 
-    Candidate *survivors;
-    Candidate *best;
-    bf_init_candidates(original_inputs, &survivors);
-    bf_init_candidates(original_inputs, &best);
+    bf_algorithm_genetic_init(original_inputs);
+    bf_start_multiprocessing();
 
-    bf_initialize_multi_process(original_inputs);
-
-    bf_algorithm_genetic_loop(original_inputs, &updateGame, &perturbInput, &updateScore);
+    bf_algorithm_genetic_loop(original_inputs, &bfInitialDynamicState, &updateGame, &perturbInput, &updateScore, &printState, NULL);
 }

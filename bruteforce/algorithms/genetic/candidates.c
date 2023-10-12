@@ -1,6 +1,5 @@
-#include "bruteforce/framework/candidates.h"
+#include "bruteforce/algorithms/genetic/candidates.h"
 
-#include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/states.h"
 
 #include "sm64.h"
@@ -86,7 +85,7 @@ void bf_update_survivors(Candidate *survivors)
     s_apply_temp(survivors);
 }
 
-void bf_merge_candidates(Candidate *survivors, Candidate **externalSurvivors, u32 externalSurvivorsCount)
+void bf_merge_candidates(Candidate *survivors, Candidate *externalSurvivors, u32 externalSurvivorsCount, u32 stride)
 {
     s_clear_temp();
 
@@ -98,7 +97,9 @@ void bf_merge_candidates(Candidate *survivors, Candidate **externalSurvivors, u3
 
     for (candidate_idx = 0; candidate_idx < externalSurvivorsCount; candidate_idx++)
     {
-        s_insert_sorted(externalSurvivors[candidate_idx]);
+        Candidate *externalCandidate = (Candidate*)((char*)externalSurvivors + stride);
+        externalCandidate->sequence = externalCandidate + sizeof(Candidate);
+        s_insert_sorted(externalCandidate);
     }
 
     s_apply_temp(survivors);
@@ -120,13 +121,4 @@ void bf_update_best(Candidate *temp, Candidate *survivors)
     }
 
     s_apply_temp(temp);
-}
-
-u8 desynced;
-
-void bf_desync(char *message)
-{
-    desynced = TRUE;
-    if (bfStaticState.display_desync_messages)
-        bf_safe_printf(message);
 }

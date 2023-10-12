@@ -3,7 +3,7 @@
 
 #include <PR/ultratypes.h>
 
-#include "bruteforce/framework/candidates.h"
+#include "bruteforce/algorithms/genetic/candidates.h"
 #include "bruteforce/framework/json.h"
 #include "bruteforce/framework/quarter_steps.h"
 #include "bruteforce/framework/types.h"

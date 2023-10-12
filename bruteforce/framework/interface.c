@@ -1,6 +1,7 @@
 #include "bruteforce/framework/interface.h"
 
 #include "bruteforce/framework/interprocess.h"
+#include "bruteforce/framework/states.h"
 #include "bruteforce/framework/m64.h"
 
 #include <getopt.h>
@@ -9,6 +10,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+
 
 #define CONTROL_STATE_JSON_BUFFER 4096
 
@@ -23,6 +25,8 @@ char *output_mode = "m64";
 char *m64_input = NULL;
 char *m64_output = NULL;
 u32 max_write_fails = 10;
+
+u8 desynced;
 
 const char *bf_read_file(const char *fileName)
 {
@@ -175,3 +179,10 @@ u8 bf_output_input_sequence(u32 globalTimerAtStart, InputSequence *inputSequence
     return TRUE;
 }
 #undef TRY_WRITE
+
+void bf_desync(char *message)
+{
+    desynced = TRUE;
+    if (bfStaticState.display_desync_messages)
+        bf_safe_printf(message);
+}

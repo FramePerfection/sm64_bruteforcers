@@ -12,7 +12,7 @@
 #include "src/game/mario.h"
 #include "src/game/mario_step.h"
 
-#include "bruteforce/framework/candidates.h"
+#include "bruteforce/algorithms/genetic/candidates.h"
 #include "bruteforce/framework/interface.h"
 #include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/m64.h"
@@ -109,8 +109,6 @@ static void initGame()
     bf_init_static_surfaces(bfStaticState.static_tris);
     bf_init_dynamic_surfaces(bfStaticState.dynamic_tris);
 
-    // srand(bfStaticState.rnd_seed);
-
     init_camera(gCamera);
     // Still required to initialize something?
     execute_mario_action(gMarioState->marioObj);
@@ -188,6 +186,10 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort)
     }
 }
 
+static void printState(u32 currentGeneration, float fps) {
+    bf_safe_printf("Generation %d starting... (%f FPS) (Best score: %f)\n", currentGeneration, fps, programState->bestScore);
+}
+
 void main(int argc, char *argv[])
 {
     bf_parse_command_line_args(argc, argv);
@@ -260,10 +262,11 @@ void main(int argc, char *argv[])
     bf_output_input_sequence(bfInitialDynamicState.global_timer, original_inputs);
 
     // 2nd phase: optimize inputs to reduce overall error across frames
-    bf_initialize_multi_process(original_inputs);
+    bf_algorithm_genetic_init(original_inputs);
+    bf_start_multiprocessing();
 
-    if (isParentProcess())
+    if (bf_is_parent_process())
         programState->bestScore = -INFINITY;
 
-    bf_algorithm_genetic_loop(original_inputs, &updateGame, &perturbInput, &updateScore);
+    bf_algorithm_genetic_loop(original_inputs, &bfInitialDynamicState, &updateGame, &perturbInput, &updateScore, &printState, NULL);
 }
