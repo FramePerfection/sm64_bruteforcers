@@ -16,6 +16,7 @@ BF_DYNAMIC_STATE(f32, mario_slide_vel_x, gMarioState->slideVelX, "The x componen
 BF_DYNAMIC_STATE(f32, mario_slide_vel_z, gMarioState->slideVelZ, "The z component of Mario's sliding velocity vector")
 BF_DYNAMIC_STATE(f32, mario_h_speed, gMarioState->forwardVel, "Mario's forward speed.")
 BF_DYNAMIC_STATE(u32, mario_action, gMarioState->action, "Mario's current action, represented as a hexadecimal 32 bit integer.")
+BF_DYNAMIC_STATE(u16, mario_action_state, gMarioState->actionState, "Mario's action state.")
 BF_DYNAMIC_STATE(u16, mario_action_timer, gMarioState->actionTimer, "Mario's action timer.")
 BF_DYNAMIC_STATE(u8, mario_wallkick_timer, gMarioState->wallKickTimer, "Mario's wallkick timer.")
 BF_DYNAMIC_STATE(u32, mario_previous_action, gMarioState->prevAction, "Mario's previous action, represented as a hexadecimal 32 bit integer.")
