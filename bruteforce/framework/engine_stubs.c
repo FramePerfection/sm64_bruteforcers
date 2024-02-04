@@ -62,7 +62,7 @@ u16 level_control_timer(UNUSED s32 timerOp) { return 0; }
 void spawn_wind_particles(UNUSED s16 pitch, UNUSED s16 yaw) {}
 
 // ingame_menu.c
-s16 get_dialog_id(void) { return 0; }
+s16 get_dialog_id(void) { return -1; /*DIALOG_NONE*/ }
 void set_menu_mode(UNUSED s16 mode) {}
 s8 gRedCoinsCollected; // Yes, it IS weird that this value is defined in that file
 
