@@ -6,6 +6,8 @@
 typedef struct
 {
 	f64 bestScore;
+	u32 furthestActionMatch;
+	u8 breakLoop;
 } ProgramState;
 
 typedef struct

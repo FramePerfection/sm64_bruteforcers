@@ -4,3 +4,6 @@
 !test.m64
 !reference_run.json
 !RecordReference.lua
+!original.ghost
+!empty-frames.m64
+!synced.st

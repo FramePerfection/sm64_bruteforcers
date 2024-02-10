@@ -1740,6 +1740,9 @@ s32 execute_mario_action(UNUSED struct Object *o) {
         mario_handle_special_floors(gMarioState);
         mario_process_interactions(gMarioState);
 
+        // _EDIT_: This usually happens in interaction.c (I think)
+        gMarioState->flags &= ~MARIO_PUNCHING & ~MARIO_KICKING & ~MARIO_TRIPPING;
+
         // If Mario is OOB, stop executing actions.
         if (gMarioState->floor == NULL) {
             return 0;
