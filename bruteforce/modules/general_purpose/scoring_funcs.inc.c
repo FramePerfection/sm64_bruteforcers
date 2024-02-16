@@ -73,10 +73,8 @@ SCORING_FUNC(MatchHSpeed)
 #include <math.h>
 
 extern struct MarioState *gMarioState;
-extern
 
-	f64
-	sm_MaximizeHSpeed(MaximizeHSpeedParameters args, Candidate *candidate, u8 *success, u8 *abort)
+f64 sm_MaximizeHSpeed(MaximizeHSpeedParameters args, Candidate *candidate, u8 *success, u8 *abort)
 {
 	*success = TRUE;
 	return gMarioState->forwardVel;
