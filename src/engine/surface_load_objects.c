@@ -13,6 +13,8 @@
 #include "game/object_list_processor.h"
 #include "surface_load.h"
 
+extern struct Surface *read_surface_data(s16 *vertexData, s16 **vertexIndices);
+
 /**
  * Read the data for vertices for reference by triangles.
  */
@@ -74,6 +76,7 @@ void transform_object_vertices(s16 **data, s16 *vertexData) {
  * Load in the surfaces for the gCurrentObject. This includes setting the flags, exertion, and room.
  */
 void load_object_surfaces(s16 **data, s16 *vertexData) {
+    struct Surface *surface;
     s32 surfaceType;
     s32 i;
     s32 numSurfaces;
@@ -102,7 +105,7 @@ void load_object_surfaces(s16 **data, s16 *vertexData) {
     }
 
     for (i = 0; i < numSurfaces; i++) {
-        struct Surface *surface = read_surface_data(vertexData, data);
+        surface = read_surface_data(vertexData, data);
 
         if (surface != NULL) {
             surface->object = gCurrentObject;

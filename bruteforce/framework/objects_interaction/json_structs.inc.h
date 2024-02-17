@@ -26,7 +26,8 @@
 	BF_JSON_STRUCT_FIELD(f32, hurtbox_height) \
 	BF_JSON_STRUCT_FIELD(f32, hitbox_down_offset) \
 	BF_JSON_STRUCT_FIELD(uintptr_tArray8, bhv_stack) \
-	BF_JSON_STRUCT_FIELD(u32, behavior_script_index)
+	BF_JSON_STRUCT_FIELD(u32, behavior_script_index) \
+	BF_JSON_STRUCT_FIELD(s32, parent_object_index)
 #include "bruteforce/framework/interface/json_struct_reader.inc.c"
 #include "bruteforce/framework/interface/json_array.inc.c"
 #undef BF_JSON_STRUCT_NAME

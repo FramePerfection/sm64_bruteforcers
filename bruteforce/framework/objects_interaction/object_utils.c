@@ -5,6 +5,9 @@
 #include "bruteforce/framework/interface/json.h"
 
 #include "bruteforce/framework/objects_interaction/behavior_function_map.h"
+
+#include "src/engine/behavior_script.h"
+
 #include <string.h>
 #include <stdlib.h>
 
@@ -59,28 +62,45 @@ void bf_remap_behavior_scripts(BehaviorScriptArrayArray behavior_scripts, Object
         remapBehaviorScript(behavior_scripts.data[i], object_triangles);
 }
 
+static void copyObjectData(struct Object *obj, BfObjectState *state) {
+    memcpy(obj->rawData.asU32, &state->raw_data, sizeof(u32) * 0x50);
+    obj->activeFlags = state->active_flags;
+    obj->bhvDelayTimer = state->bhv_delay_timer;
+    // memcpy(obj->bhvStack, state->bhv_stack, sizeof(uintptr_t) * 8);
+    // obj->bhvStackIndex = state->bhv_stack_index;
+    obj->collidedObjInteractTypes = state->collided_obj_interact_types;
+    obj->hitboxRadius = state->hitbox_radius;
+    obj->hitboxHeight = state->hitbox_height;
+    obj->hurtboxRadius = state->hurtbox_radius;
+    obj->hurtboxHeight = state->hurtbox_height;
+    obj->hitboxDownOffset = state->hitbox_down_offset;
+}
 
 void bf_reset_objects(BehaviorScriptArrayArray behavior_scripts, BfObjectStateArray object_states) {
+    // clear objects and related data
     clear_objects();
     clear_dynamic_surfaces();
     gMarioState->marioObj = gMarioObject = create_object(bhvMario);
     vec3f_copy(gMarioObject->header.gfx.pos, gMarioState->pos);
 
+    // create objects
     u32 i;
+    struct Object *createdObjects[object_states.size];
     for (i = 0; i < object_states.size; i++) {
         BfObjectState *state = &object_states.data[i];
         struct Object *obj = create_object(behavior_scripts.data[state->behavior_script_index].data);
-        memcpy(obj->rawData.asU32, &state->raw_data, sizeof(u32) * 0x50);
-        obj->activeFlags = state->active_flags;
-        obj->bhvDelayTimer = state->bhv_delay_timer;
-        memcpy(obj->bhvStack, state->bhv_stack, sizeof(uintptr_t) * 8);
-        obj->bhvStackIndex = state->bhv_stack_index;
-        obj->collidedObjInteractTypes = state->collided_obj_interact_types;
-        obj->hitboxRadius = state->hitbox_radius;
-        obj->hitboxHeight = state->hitbox_height;
-        obj->hurtboxRadius = state->hurtbox_radius;
-        obj->hurtboxHeight = state->hurtbox_height;
-        obj->hitboxDownOffset = state->hitbox_down_offset;
+        createdObjects[i] = obj;
+        gCurrentObject = obj;
+        copyObjectData(obj, state);
+        cur_obj_update();
+        copyObjectData(obj, state);
+    }
+
+    // attach parent objects
+    for (i = 0; i < object_states.size; i++) {
+        BfObjectState *state = &object_states.data[i];
+        if (state->parent_object_index != -1)
+            createdObjects[i]->parentObj = createdObjects[state->parent_object_index];
     }
 }
 
