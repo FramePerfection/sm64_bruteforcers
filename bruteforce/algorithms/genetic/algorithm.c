@@ -4,8 +4,9 @@
 
 #include "src/game/game_init.h"
 
+#include "bruteforce/framework/interface/interface.h"
+
 #include "bruteforce/framework/interprocess.h"
-#include "bruteforce/framework/interface.h"
 #include "bruteforce/framework/states.h"
 #include "bruteforce/framework/misc_util.h"
 

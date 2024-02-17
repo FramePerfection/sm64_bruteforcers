@@ -1,7 +1,7 @@
 
 #ifdef BF_STATE_INCLUDE
 
-#include "types.h"
+#include "bruteforce/framework/interface/types.h"
 extern struct MarioState *gMarioState;
 extern s16 sSwimStrength;
 extern u8 gSpecialTripleJump;

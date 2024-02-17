@@ -6,7 +6,7 @@
 #undef BF_BUILD_JSON_STRUCT_ARRAY
 #undef BF_BUILD_JSON_ARRAY_READER
 
-#include "bruteforce/framework/json.h"
+#include "json.h"
 
 #define CONCAT(A, B) A##B
 #define CONCAT2(A, B, C) A##B##C

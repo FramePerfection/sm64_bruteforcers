@@ -1,5 +1,5 @@
 #ifdef BF_STATE_INCLUDE
-#include "types.h"
+#include "bruteforce/framework/interface/types.h"
 extern char *m64_input;
 extern char *m64_output;
 extern u32 gGlobalTimer;

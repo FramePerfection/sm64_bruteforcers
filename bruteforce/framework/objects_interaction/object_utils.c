@@ -1,8 +1,9 @@
 
 #include "bruteforce/framework/objects_interaction/object_utils.h"
 
-#include "bruteforce/framework/readers.h"
-#include "bruteforce/framework/json.h"
+#include "bruteforce/framework/interface/readers.h"
+#include "bruteforce/framework/interface/json.h"
+
 #include "bruteforce/framework/objects_interaction/behavior_function_map.h"
 #include <string.h>
 #include <stdlib.h>

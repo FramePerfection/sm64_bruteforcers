@@ -15,9 +15,10 @@
 #include "bruteforce/algorithms/genetic/candidates.h"
 #include "bruteforce/algorithms/genetic/algorithm.h"
 
-#include "bruteforce/framework/interface.h"
+#include "bruteforce/framework/interface/interface.h"
+#include "bruteforce/framework/interface/m64.h"
+
 #include "bruteforce/framework/interprocess.h"
-#include "bruteforce/framework/m64.h"
 #include "bruteforce/framework/misc_util.h"
 #include "bruteforce/framework/quarter_steps.h"
 #include "bruteforce/framework/states.h"

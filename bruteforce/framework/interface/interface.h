@@ -1,7 +1,7 @@
 #ifndef BF_INTERFACE_H
 #define BF_INTERFACE_H
 
-#include "bruteforce/framework/m64.h"
+#include "m64.h"
 
 void bf_parse_command_line_args(int argc, char *argv[]);
 u8 bf_output_input_sequence(u32 globalTimerAtStart, InputSequence *inputSequence);

@@ -1,6 +1,6 @@
-#include "bruteforce/framework/readers.h"
+#include "readers.h"
 
-#include "bruteforce/framework/json.h"
+#include "json.h"
 
 #include "sm64.h"
 #include <ctype.h>

@@ -1,9 +1,8 @@
 #include "bruteforce/framework/states.h"
 
-#include "bruteforce/framework/interface.h"
+#include "bruteforce/framework/interface/interface.h"
+#include "bruteforce/framework/interface/json.h"
 #include "bruteforce/framework/interprocess.h"
-#include "bruteforce/framework/json.h"
-#include "bruteforce/framework/readers.h"
 
 #include <stdio.h>
 #include <stdlib.h>

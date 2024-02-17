@@ -10,10 +10,11 @@
 #include "src/game/mario.h"
 #include "src/game/mario_step.h"
 
+#include "bruteforce/framework/interface/interface.h"
+#include "bruteforce/framework/interface/m64.h"
+
 #include "bruteforce/algorithms/genetic/candidates.h"
-#include "bruteforce/framework/interface.h"
 #include "bruteforce/framework/interprocess.h"
-#include "bruteforce/framework/m64.h"
 #include "bruteforce/framework/misc_util.h"
 #include "bruteforce/framework/states.h"
 

@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include "src/game/camera.h"
+#include "bruteforce/framework/interface/types.h"
 
 extern Vec3f sOldPosition;
 extern Vec3f sOldFocus;

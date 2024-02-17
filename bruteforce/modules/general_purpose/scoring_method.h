@@ -3,10 +3,12 @@
 
 #include <PR/ultratypes.h>
 
-#include "bruteforce/algorithms/genetic/candidates.h"
-#include "bruteforce/framework/json.h"
+#include "bruteforce/framework/interface/json.h"
+#include "bruteforce/framework/interface/types.h"
+
 #include "bruteforce/framework/quarter_steps.h"
-#include "bruteforce/framework/types.h"
+
+#include "bruteforce/algorithms/genetic/candidates.h"
 
 typedef f64 (*scoringFunc)(void *, Candidate *, u8 *, u8 *);
 

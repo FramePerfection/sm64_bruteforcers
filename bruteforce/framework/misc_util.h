@@ -1,8 +1,8 @@
 #ifndef BF_MISC_UTIL_H
 #define BF_MISC_UTIL_H
 
-#include "bruteforce/framework/readers.h"
-#include "bruteforce/framework/types.h"
+#include "bruteforce/framework/interface/readers.h"
+#include "bruteforce/framework/interface/types.h"
 
 #include "engine/graph_node.h"
 #include <PR/ultratypes.h>

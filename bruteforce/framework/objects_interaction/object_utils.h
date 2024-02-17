@@ -2,7 +2,9 @@
 #define OBJECT_UTILS_H
 
 #include "include/types.h"
-#include "bruteforce/framework/readers.h"
+
+#include "bruteforce/framework/interface/readers.h"
+
 #include "src/game/spawn_object.h"
 #include "src/game/object_list_processor.h"
 #include "src/engine/math_util.h"

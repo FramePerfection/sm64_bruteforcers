@@ -5,8 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "bruteforce/framework/interface/readers.h"
+
 #include "bruteforce/framework/interprocess.h"
-#include "bruteforce/framework/readers.h"
 #include "bruteforce/framework/states.h"
 
 void bf_read_ScoringMethods(Json *jsonNode, ScoringMethods *target)

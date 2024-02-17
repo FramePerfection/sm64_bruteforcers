@@ -1,7 +1,7 @@
 #ifndef BF_QUARTER_STEPS_H
 #define BF_QUARTER_STEPS_H
 
-#include "bruteforce/framework/json.h"
+#include "bruteforce/framework/interface/json.h"
 
 #include "include/types.h"
 

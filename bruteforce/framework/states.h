@@ -1,7 +1,7 @@
 #ifndef BF_STATES_H
 #define BF_STATES_H
 
-#include "bruteforce/framework/readers.h"
+#include "bruteforce/framework/interface/readers.h"
 
 #define STATE_INCLUDE <bruteforce/modules/MODULE_PATH/state.h>
 #include STATE_INCLUDE

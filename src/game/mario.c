@@ -1728,8 +1728,6 @@ WEAK s32 mario_execute_object_action(UNUSED struct MarioState *m) {
 /**
  * Main function for executing Mario's behavior.
  */
-// TODO: Get rid of this include
-#include "bruteforce/framework/interface.h"
 s32 execute_mario_action(UNUSED struct Object *o) {
     s32 inLoop = TRUE;
 

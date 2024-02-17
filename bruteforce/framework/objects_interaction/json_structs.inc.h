@@ -1,15 +1,15 @@
 #define BF_JSON_STRUCT_NAME BehaviorScript
-#include "bruteforce/framework/json_array.inc.c"
+#include "bruteforce/framework/interface/json_array.inc.c"
 #undef BF_JSON_STRUCT_NAME
 
 #define BF_JSON_STRUCT_NAME uintptr_t
 #define BF_JSON_ARRAY_SIZE 8
-#include "bruteforce/framework/json_array.inc.c"
+#include "bruteforce/framework/interface/json_array.inc.c"
 #undef BF_JSON_STRUCT_NAME
 
 #define BF_JSON_STRUCT_NAME u32
 #define BF_JSON_ARRAY_SIZE 0x50
-#include "bruteforce/framework/json_array.inc.c"
+#include "bruteforce/framework/interface/json_array.inc.c"
 #undef BF_JSON_STRUCT_NAME
 
 #define BF_JSON_STRUCT_NAME BfObjectState
@@ -27,14 +27,14 @@
 	BF_JSON_STRUCT_FIELD(f32, hitbox_down_offset) \
 	BF_JSON_STRUCT_FIELD(uintptr_tArray8, bhv_stack) \
 	BF_JSON_STRUCT_FIELD(u32, behavior_script_index)
-#include "bruteforce/framework/json_struct_reader.inc.c"
-#include "bruteforce/framework/json_array.inc.c"
+#include "bruteforce/framework/interface/json_struct_reader.inc.c"
+#include "bruteforce/framework/interface/json_array.inc.c"
 #undef BF_JSON_STRUCT_NAME
 
 #define BF_JSON_STRUCT_NAME BehaviorScriptArray
-#include "bruteforce/framework/json_array.inc.c"
+#include "bruteforce/framework/interface/json_array.inc.c"
 #undef BF_JSON_STRUCT_NAME
 
 #define BF_JSON_STRUCT_NAME ObjectTriangles
-#include "bruteforce/framework/json_array.inc.c"
+#include "bruteforce/framework/interface/json_array.inc.c"
 #undef BF_JSON_STRUCT_NAME
