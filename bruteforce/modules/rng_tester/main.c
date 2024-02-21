@@ -18,6 +18,7 @@
 
 #include "bruteforce/framework/interface/interface.h"
 #include "bruteforce/framework/interface/m64.h"
+#include "bruteforce/framework/interface/debug_json_writer.h"
 
 #include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/misc_util.h"
@@ -25,10 +26,27 @@
 #include "bruteforce/framework/objects_interaction/object_utils.h"
 #include "bruteforce/framework/objects_interaction/behavior_function_map.h"
 
+#include "include/object_fields.h"
+
 extern BehaviorScript bhvMario[];
+
+u16 rng_index;
+static u16 rngIndices[0x10000];
+static u16 rngByIndex[0x10001];
+extern u16 random_u16();
+
+static BFDebugJsonWriter *debugWriter = NULL;
 
 static void initGame()
 {
+    u32 i;
+    gRandomSeed16 = 0;
+    for (i = 0; i < 0x10000; i++) {
+        u16 rng = random_u16();
+        rngIndices[rng] = i + 1;
+        rngByIndex[i + 1] = rng;
+    }
+
     bf_init_camera();
     bf_init_area();
     bf_init_mario();
@@ -58,12 +76,22 @@ static void initGame()
         vec3f_copy(gMarioObject->header.gfx.pos, gMarioState->pos);
         bf_remap_behavior_scripts(bfStaticState.behavior_scripts, bfStaticState.dynamic_object_tris);
     }
+
+    debugWriter = bf_create_debug_json_writer();
+
+    if (bfStaticState.from_level_load)
+        bfInitialDynamicState.rng_value = rngByIndex[bfStaticState.from_level_load_rng_index];
 }
 
 static void updateGame(OSContPad *input, UNUSED u32 frame_index)
 {
-    if (bfStaticState.update_objects && frame_index == 0)
+    BFDynamicState lul;
+    if (bfStaticState.update_objects && frame_index == 0) {
+        bf_save_dynamic_state(&lul);
         bf_reset_objects(bfStaticState.behavior_scripts, bfStaticState.object_states);
+        if (!bfStaticState.from_level_load)
+            bf_load_dynamic_state(&lul);
+    }
 
     bf_update_controller(input);
     adjust_analog_stick(gPlayer1Controller);
@@ -82,7 +110,9 @@ static void updateGame(OSContPad *input, UNUSED u32 frame_index)
 
 void main(int argc, char *argv[])
 {
+    BFDynamicState state;
     u32 i;
+    u16 initialRng;
 
     bf_parse_command_line_args(argc, argv);
 
@@ -98,8 +128,51 @@ void main(int argc, char *argv[])
     }
 
     bf_load_dynamic_state(&bfInitialDynamicState);
+    initialRng = gRandomSeed16;
 
-    for (i = 0; i < bfStaticState.m64_end - bfStaticState.m64_start; i++) {
-        updateGame(&original_inputs->inputs[i], i);
+    if (bfStaticState.debug_desyncs) {
+        for (i = 0; i < bfStaticState.m64_end - bfStaticState.m64_start; i++) {
+            updateGame(&original_inputs->inputs[i], i);
+
+            bf_save_dynamic_state(&state);
+            state.rng_index = rngIndices[state.rng_value];
+            
+            bf_append_debug_json(debugWriter, &state);
+        }
     }
+    else {
+        float min_thwomp_y = INFINITY;
+        s32 min_thwomp_timer = 0x7FFFFFFF;
+        do {
+            bf_load_dynamic_state(&bfInitialDynamicState);
+
+            // simulate spawning a single dust particle
+            for (i = 0; i < 1; i++)
+                random_u16();
+            bf_save_dynamic_state(&bfInitialDynamicState);
+
+            for (i = 0; i < bfStaticState.m64_end - bfStaticState.m64_start; i++) {
+                updateGame(&original_inputs->inputs[i], i);
+            }
+
+            struct Object *thwomp = (struct Object *)gObjectListArray[9].next;
+            if (thwomp->oAction == 1 && thwomp->oPosY <= min_thwomp_y) {
+                min_thwomp_y = thwomp->oPosY;
+                if (thwomp->oPosY < min_thwomp_y)
+                    min_thwomp_timer = 0x7FFFFFFF;
+                if (thwomp->oThwompRandomTimer - thwomp->oTimer <= min_thwomp_timer) {
+                    min_thwomp_timer = thwomp->oThwompRandomTimer - thwomp->oTimer;
+                    bf_safe_printf("RNG Index: %d; Score: %d, Thwomp Y: %f; Thwomp timer: %d; Thwomp random timer: %d\n",
+                        rngIndices[bfInitialDynamicState.rng_value],
+                        min_thwomp_timer,
+                        min_thwomp_y,
+                        thwomp->oTimer,
+                        thwomp->oThwompRandomTimer);
+                }
+            }
+
+        } while(bfInitialDynamicState.rng_value != initialRng);
+        bf_safe_printf("Exhaustive search completed!\n");
+    }
+    bf_output_debug_json(debugWriter, "debug_output.json");
 }

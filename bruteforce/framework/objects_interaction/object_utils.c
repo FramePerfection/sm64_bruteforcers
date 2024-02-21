@@ -7,6 +7,7 @@
 #include "bruteforce/framework/objects_interaction/behavior_function_map.h"
 
 #include "src/engine/behavior_script.h"
+#include "include/object_fields.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -82,6 +83,9 @@ void bf_reset_objects(BehaviorScriptArrayArray behavior_scripts, BfObjectStateAr
     clear_dynamic_surfaces();
     gMarioState->marioObj = gMarioObject = create_object(bhvMario);
     vec3f_copy(gMarioObject->header.gfx.pos, gMarioState->pos);
+    gMarioState->marioObj->oPosX = gMarioSpawnInfo->startPos[0];
+    gMarioState->marioObj->oPosY = gMarioSpawnInfo->startPos[1];
+    gMarioState->marioObj->oPosZ = gMarioSpawnInfo->startPos[2];
 
     // create objects
     u32 i;
@@ -91,7 +95,9 @@ void bf_reset_objects(BehaviorScriptArrayArray behavior_scripts, BfObjectStateAr
         struct Object *obj = create_object(behavior_scripts.data[state->behavior_script_index].data);
         createdObjects[i] = obj;
         gCurrentObject = obj;
+        // TODO: This must be a partial update for when the object just spawned?
         copyObjectData(obj, state);
+        obj->oDistanceToMario = 19000.0f;
         cur_obj_update();
         copyObjectData(obj, state);
     }

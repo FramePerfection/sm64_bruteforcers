@@ -1719,9 +1719,17 @@ void func_sh_8025574C(void) {
 }
 #endif
 
+#include "bruteforce/framework/interface/interface.h"
+
 // _EDIT_ weak stub for mario_execute_object_action
 WEAK s32 mario_execute_object_action(UNUSED struct MarioState *m) {
-	bf_desync("mario_execute_object_action not implemented.");
+	bf_desync("'mario_execute_object_action' is not supported in this module.");
+	return 0;
+}
+
+// _EDIT_ weak stub for mario_actions_cutscene
+WEAK s32 mario_execute_cutscene_action(UNUSED struct MarioState *m) {
+	bf_desync("'mario_execute_cutscene_action' is not supported in this module.");
 	return 0;
 }
 
@@ -1771,7 +1779,7 @@ s32 execute_mario_action(UNUSED struct Object *o) {
                     break;
 
                 case ACT_GROUP_CUTSCENE:
-                    NOT_IMPL(cutscene)// inLoop = mario_execute_cutscene_action(gMarioState);
+                    inLoop = mario_execute_cutscene_action(gMarioState);
                     break;
 
                 case ACT_GROUP_AUTOMATIC:

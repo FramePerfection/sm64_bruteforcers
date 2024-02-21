@@ -25,7 +25,6 @@
 #include "bruteforce/algorithms/genetic/algorithm.h"
 
 #include "perturbator.h"
-#include "bruteforce/framework/objects_interaction/behavior_function_map.h"
 
 static void initGame()
 {

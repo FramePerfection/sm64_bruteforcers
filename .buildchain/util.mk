@@ -39,7 +39,15 @@ ALGORITHMS := genetic
 SPECIAL_O ?= $(addprefix framework/,states?bf_state_definitions.inc.c interprocess?state.h interface/interface?state.h interface/debug_json_writer?state.h) algorithms/genetic/candidates?state.h
 SPECIAL_O += $(foreach a,$(ALGORITHMS),algorithms/$(a)/algorithm?state.h)
 
-MARIO_STEP_OBJECTS := mario_step.o mario.o mario_actions_airborne.o mario_actions_moving.o mario_actions_stationary.o mario_actions_submerged.o
+# Object files needed to simulate the most common mario actions
+MARIO_STEP_OBJECTS := 	mario_step.o mario.o mario_actions_airborne.o \
+						mario_actions_moving.o mario_actions_stationary.o \
+						mario_actions_submerged.o
+
+# Object files needed to simulate interactions with objects, as well as cutscene actions (thanks sm64 for being tangled)
+OBJECTS_INTERACTION_OBJECTS := $(addprefix src/game/,object_list_processor.o behavior_actions.o object_helpers.o \
+								obj_behaviors.o obj_behaviors_2.o platform_displacement.o spawn_object.o object_collision.o \
+								mario_actions_cutscene.o mario_actions_object.o interaction.o)
 
 word-dot = $(word $2,$(subst ?, ,$1))
 
