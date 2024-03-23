@@ -18,13 +18,14 @@
 
 #include "bruteforce/framework/interface/interface.h"
 #include "bruteforce/framework/interface/m64.h"
-#include "bruteforce/framework/interface/debug_json_writer.h"
 
 #include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/misc_util.h"
 #include "bruteforce/framework/states.h"
 #include "bruteforce/framework/objects_interaction/object_utils.h"
 #include "bruteforce/framework/objects_interaction/behavior_function_map.h"
+
+#include "bruteforce/algorithms/debug_desyncs/algorithm.h"
 
 #include "include/object_fields.h"
 
@@ -34,8 +35,6 @@ u16 rng_index;
 static u16 rngIndices[0x10000];
 static u16 rngByIndex[0x10001];
 extern u16 random_u16();
-
-static BFDebugJsonWriter *debugWriter = NULL;
 
 static char csvBuffer[10000000];
 static u32 csvCursor = 0;
@@ -80,8 +79,6 @@ static void initGame()
         bf_remap_behavior_scripts(bfStaticState.behavior_scripts, bfStaticState.dynamic_object_tris);
     }
 
-    debugWriter = bf_create_debug_json_writer();
-
     if (bfStaticState.from_level_load)
         bfInitialDynamicState.rng_value = rngByIndex[bfStaticState.from_level_load_rng_index];
 }
@@ -113,7 +110,6 @@ static void updateGame(OSContPad *input, UNUSED u32 frame_index)
 
 void main(int argc, char *argv[])
 {
-    BFDynamicState state;
     u32 i;
 
     bf_parse_command_line_args(argc, argv);
@@ -123,7 +119,7 @@ void main(int argc, char *argv[])
 
     bf_safe_printf("Loading m64...\n");
     InputSequence *original_inputs;
-    if (!bf_read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_end, &original_inputs))
+    if (!bf_read_default_m64_and_debug_desyncs(&original_inputs, updateGame))
     {
         bf_safe_printf("Failed to load m64! (%s) Exiting...\n", bfStaticState.m64_input);
         exit(-1);
@@ -132,57 +128,44 @@ void main(int argc, char *argv[])
     bf_load_dynamic_state(&bfInitialDynamicState);
     bfInitialDynamicState.rng_value = gRandomSeed16 = rngByIndex[bfStaticState.min_rng_index];
         
-    if (bfStaticState.debug_desyncs) {
+    float min_thwomp_y = INFINITY;
+    s32 min_thwomp_timer = 0x7FFFFFFF;
+    
+    bf_safe_printf("running tests...\n");
+    csvCursor += sprintf(csvBuffer + csvCursor, "RNG Index; RNG End; Score; Action; Thwomp Y; Thwomp timer; Thwomp random timer\n");
+    do {
+        struct Object *thwomp = (struct Object *)gObjectListArray[9].next;
+        if (thwomp->oAction == 1 && thwomp->oPosY <= min_thwomp_y) {
+            min_thwomp_y = thwomp->oPosY;
+            if (thwomp->oPosY < min_thwomp_y)
+                min_thwomp_timer = 0x7FFFFFFF;
+            if (thwomp->oThwompRandomTimer - thwomp->oTimer <= min_thwomp_timer) {
+                min_thwomp_timer = thwomp->oThwompRandomTimer - thwomp->oTimer;
+            }
+        }
+
+        csvCursor += sprintf(csvBuffer + csvCursor, "%d; %d; %d; %d; %f; %d; %d\n",
+            rngIndices[bfInitialDynamicState.rng_value],
+            rngIndices[rngIndices[gRandomSeed16]],
+            thwomp->oThwompRandomTimer - thwomp->oTimer,
+            thwomp->oAction,
+            thwomp->oPosY,
+            thwomp->oTimer,
+            thwomp->oThwompRandomTimer);
+
+        bf_load_dynamic_state(&bfInitialDynamicState);
+
+        // simulate spawning a single RNG invocation
+        random_u16();
+        bf_save_dynamic_state(&bfInitialDynamicState);
+
         for (i = 0; i < bfStaticState.m64_end - bfStaticState.m64_start; i++) {
             updateGame(&original_inputs->inputs[i], i);
-
-            bf_save_dynamic_state(&state);
-            state.rng_index = rngIndices[state.rng_value];
-            
-            bf_append_debug_json(debugWriter, &state);
         }
-    }
-    else {
-        float min_thwomp_y = INFINITY;
-        s32 min_thwomp_timer = 0x7FFFFFFF;
-        
-        bf_safe_printf("running tests...\n");
-        csvCursor += sprintf(csvBuffer + csvCursor, "RNG Index; RNG End; Score; Action; Thwomp Y; Thwomp timer; Thwomp random timer\n");
-        do {
-            struct Object *thwomp = (struct Object *)gObjectListArray[9].next;
-            if (thwomp->oAction == 1 && thwomp->oPosY <= min_thwomp_y) {
-                min_thwomp_y = thwomp->oPosY;
-                if (thwomp->oPosY < min_thwomp_y)
-                    min_thwomp_timer = 0x7FFFFFFF;
-                if (thwomp->oThwompRandomTimer - thwomp->oTimer <= min_thwomp_timer) {
-                    min_thwomp_timer = thwomp->oThwompRandomTimer - thwomp->oTimer;
-                }
-            }
-
-            csvCursor += sprintf(csvBuffer + csvCursor, "%d; %d; %d; %d; %f; %d; %d\n",
-                rngIndices[bfInitialDynamicState.rng_value],
-                rngIndices[rngIndices[gRandomSeed16]],
-                thwomp->oThwompRandomTimer - thwomp->oTimer,
-                thwomp->oAction,
-                thwomp->oPosY,
-                thwomp->oTimer,
-                thwomp->oThwompRandomTimer);
-
-            bf_load_dynamic_state(&bfInitialDynamicState);
-
-            // simulate spawning a single RNG invocation
-            random_u16();
-            bf_save_dynamic_state(&bfInitialDynamicState);
-
-            for (i = 0; i < bfStaticState.m64_end - bfStaticState.m64_start; i++) {
-                updateGame(&original_inputs->inputs[i], i);
-            }
-        } while(rngIndices[bfInitialDynamicState.rng_value] != bfStaticState.max_rng_index);
-        bf_safe_printf("Exhaustive search completed!\nBest found score with action 1 is %d\n", min_thwomp_timer);
-        
-        FILE *file = fopen(bfStaticState.csv_output_path, "w");
-        fprintf(file, csvBuffer);
-        fclose(file);
-    }
-    bf_output_debug_json(debugWriter, "debug_output.json");
+    } while(rngIndices[bfInitialDynamicState.rng_value] != bfStaticState.max_rng_index);
+    bf_safe_printf("Exhaustive search completed!\nBest found score with action 1 is %d\n", min_thwomp_timer);
+    
+    FILE *file = fopen(bfStaticState.csv_output_path, "w");
+    fprintf(file, csvBuffer);
+    fclose(file);
 }

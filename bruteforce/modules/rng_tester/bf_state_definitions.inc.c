@@ -22,7 +22,6 @@ BF_STATIC_STATE(u16, min_rng_index, bfStaticState.min_rng_index, "The minimum rn
 BF_STATIC_STATE(u16, max_rng_index, bfStaticState.max_rng_index, "The maximum rng index at which to stop simulating runs. If equal to min_rng_index, an exhaustive search will be performed.")
 BF_STATIC_STATE(boolean, from_level_load, bfStaticState.from_level_load, "If set, rng will not be reset after initially updating loaded objects.")
 BF_STATIC_STATE(u16, from_level_load_rng_index, bfStaticState.from_level_load_rng_index, "If from_level_load is set, this should be the rng index during the star select screen.")
-BF_STATIC_STATE(boolean, debug_desyncs, bfStaticState.debug_desyncs, "If set, the input run is played back once and 'debug_output.json' is written, capturing the dynamic state on each frame.")
 BF_STATIC_STATE(boolean, update_objects, bfStaticState.update_objects, "Enables logic to update objects.")
 BF_STATIC_STATE(boolean, relative_frame_numbers, bfStaticState.relative_frame_numbers, "If set, frame numbers will be interpreted as relative to 'm64_start'.")
 __NL__
