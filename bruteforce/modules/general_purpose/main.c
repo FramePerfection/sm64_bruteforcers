@@ -78,6 +78,7 @@ static void updateGame(OSContPad *input, UNUSED u32 frame_index)
     {
         update_camera(gCurrentArea->camera);
     }
+    gGlobalTimer++;
 }
 
 static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, u32 frame_idx)
