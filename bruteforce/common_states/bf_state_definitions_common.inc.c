@@ -26,7 +26,5 @@ __NL__
 
 BF_DYNAMIC_STATE(u32, global_timer, gGlobalTimer, "The global timer value on the frame represented by m64_start. Used to synchronize tools.")
 __NL__
-__NL__
-BF_DYNAMIC_STATE(u16, previous_buttons, gPlayer1Controller->buttonDown, "The buttons that were held on the Player 1 controller since at least the previous frame.")
 
 #endif
