@@ -8,7 +8,7 @@
 #include "types.h"
 #include "scoring_method.h"
 #include "perturbator.h"
-#include "object_utils.h"
+#include "bruteforce/framework/objects_interaction/object_utils.h"
 extern f32 minSpeed;
 extern s16 gCurrLevelNum;
 extern s16 gCurrCourseNum;

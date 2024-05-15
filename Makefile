@@ -1,5 +1,7 @@
 #Makefile to build bruteforcer modules and configure build chain
 
+export TEMP=TEMP
+
 BUILD_CHAIN := .buildchain/
 
 SKIP_LAUNCH_JSON := 0
@@ -208,7 +210,7 @@ endif
 ALL_DIRS := $(BUILD_DIR) $(BINARY_DIRS) $(addprefix $(BUILD_DIR)/,$(SRC_DIRS) $(ULTRA_SRC_DIRS) $(ULTRA_BIN_DIRS) $(BIN_DIRS))
 
 # Make sure build directory exists before compiling anything
-DUMMY := $(shell mkdir -p $(ALL_DIRS))
+DUMMY := $(shell mkdir -p $(ALL_DIRS) ./TEMP)
 
 
 #==============================================================================#

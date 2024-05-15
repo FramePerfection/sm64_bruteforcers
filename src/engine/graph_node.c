@@ -731,6 +731,9 @@ void geo_obj_init_spawninfo(struct GraphNodeObject *graphNode, struct SpawnInfo 
  * Initialize the animation of an object node
  */
 void geo_obj_init_animation(struct GraphNodeObject *graphNode, struct Animation **animPtrAddr) {
+    // _EDIT_ do not even think about it
+    return;
+    
     struct Animation **animSegmented = segmented_to_virtual(animPtrAddr);
     struct Animation *anim = segmented_to_virtual(*animSegmented);
 
@@ -746,6 +749,9 @@ void geo_obj_init_animation(struct GraphNodeObject *graphNode, struct Animation 
  * Initialize the animation of an object node
  */
 void geo_obj_init_animation_accel(struct GraphNodeObject *graphNode, struct Animation **animPtrAddr, u32 animAccel) {
+    // _EDIT_ do not even think about it
+    return;
+
     struct Animation **animSegmented = segmented_to_virtual(animPtrAddr);
     struct Animation *anim = segmented_to_virtual(*animSegmented);
 

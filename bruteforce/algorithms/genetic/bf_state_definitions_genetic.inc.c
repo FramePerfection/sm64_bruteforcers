@@ -11,5 +11,6 @@ BF_CONTROL_STATE(u32, print_interval, "The rate at which to print information ab
 BF_CONTROL_STATE(u32, merge_interval, "\
 The rate at which processes should share their best runs with each other, and merge them down into one set of survivors.__NL__\
 Defaults to 25 when 0 (unset).")
+BF_CONTROL_STATE(u8, reset_token, "When changed, runs in the genetic algorithm will be reset to the previous best.")
 
 #endif

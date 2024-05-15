@@ -1,6 +1,6 @@
 #include "bruteforce/framework/quarter_steps.h"
 
-#include "bruteforce/framework/readers.h"
+#include "bruteforce/framework/interface/readers.h"
 
 #include "src/engine/math_util.h"
 

@@ -4,6 +4,7 @@
 
 #include "sm64.h"
 #include <memory.h>
+#include <stdlib.h>
 
 Candidate **temp = NULL;
 

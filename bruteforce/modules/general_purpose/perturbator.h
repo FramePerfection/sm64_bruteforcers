@@ -3,7 +3,7 @@
 
 #include <PR/ultratypes.h>
 
-#include "bruteforce/framework/json.h"
+#include "bruteforce/framework/interface/json.h"
 
 typedef struct Perturbator_s
 {

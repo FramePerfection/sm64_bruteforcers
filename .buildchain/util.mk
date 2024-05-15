@@ -33,13 +33,21 @@ endef
 find-command = $(shell which $(1) 2>/dev/null)
 
 # List of bruteforcing algorithms
-ALGORITHMS := genetic
+ALGORITHMS := genetic debug_desyncs
 
 # List of o files compiled from the same source, but into different module directories, and their dependencies, separated by <o-file>?<dependency>
-SPECIAL_O ?= $(addprefix framework/,states?bf_state_definitions.inc.c interprocess?state.h interface?state.h) algorithms/genetic/candidates?state.h
+SPECIAL_O ?= $(addprefix framework/,states?bf_state_definitions.inc.c interprocess?state.h interface/interface?state.h interface/debug_json_writer?state.h) algorithms/genetic/candidates?state.h
 SPECIAL_O += $(foreach a,$(ALGORITHMS),algorithms/$(a)/algorithm?state.h)
 
-MARIO_STEP_OBJECTS := mario_step.o mario.o mario_actions_airborne.o mario_actions_moving.o mario_actions_stationary.o mario_actions_submerged.o
+# Object files needed to simulate the most common mario actions
+MARIO_STEP_OBJECTS := 	mario_step.o mario.o mario_actions_airborne.o \
+						mario_actions_moving.o mario_actions_stationary.o \
+						mario_actions_submerged.o
+
+# Object files needed to simulate interactions with objects, as well as cutscene actions (thanks sm64 for being tangled)
+OBJECTS_INTERACTION_OBJECTS := $(addprefix src/game/,object_list_processor.o behavior_actions.o object_helpers.o \
+								obj_behaviors.o obj_behaviors_2.o platform_displacement.o spawn_object.o object_collision.o \
+								mario_actions_cutscene.o mario_actions_object.o interaction.o)
 
 word-dot = $(word $2,$(subst ?, ,$1))
 
@@ -56,8 +64,10 @@ endef
 
 # Function to register a module from its make.split file
 define register-module
-$(eval $(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/framework/, m64.o readers.o json.o engine_feed.o engine_stubs.o misc_util.o pipeex.o quarter_steps.o))
-$(eval $(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/$(NAME)/framework/, states.o interprocess.o interface.o))
+$(eval $(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/framework/interface/, m64.o readers.o json.o interface.o debug_json_writer.o))
+$(eval $(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/framework/, engine_feed.o engine_stubs.o misc_util.o pipeex.o quarter_steps.o))
+$(eval $(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/$(NAME)/framework/, states.o interprocess.o))
+$(eval $(NAME)REQUIRED_OBJECTS += $(addprefix bruteforce/$(NAME)/algorithms/debug_desyncs/,algorithm.o))
 $(eval $(NAME)REQUIRED_O_FILES := $(addprefix $(BUILD_DIR)/, $($(NAME)REQUIRED_OBJECTS)))
 ALL_TARGETS += $(NAME)
 SRC_DIRS += bruteforce/$(NAME)
@@ -66,7 +76,7 @@ $(eval $(NAME): MODULE_PATH := $(NAME))
 $(eval $(NAME): $($(NAME)ADDITIONAL_DEPENDENCIES))
 $(NAME): $($(NAME)REQUIRED_O_FILES)
 	$(CC) -o $(BINARY_DIR)/$(NAME)/main.exe $($(NAME)REQUIRED_O_FILES)
-	$(call create-state-definition-file,./bruteforce/framework/generate_state_definition.c,state_definitions.txt)
+	$(call create-state-definition-file,./bruteforce/framework/interface/generate_state_definition.c,state_definitions.txt)
 
 $(foreach o,$(SPECIAL_O),$(eval $(call special,$(NAME),$(o))))
 endef

@@ -67,3 +67,6 @@ struct MarioState *gMarioState = &gMarioStates[0];
 
 // main.c
 s8 gDebugLevelSelect = FALSE;
+
+// behavior_script.c
+u16 gRandomSeed16;

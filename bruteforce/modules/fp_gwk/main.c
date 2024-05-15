@@ -14,10 +14,12 @@
 
 #include "bruteforce/algorithms/genetic/candidates.h"
 #include "bruteforce/algorithms/genetic/algorithm.h"
+#include "bruteforce/algorithms/debug_desyncs/algorithm.h"
 
-#include "bruteforce/framework/interface.h"
+#include "bruteforce/framework/interface/interface.h"
+#include "bruteforce/framework/interface/m64.h"
+
 #include "bruteforce/framework/interprocess.h"
-#include "bruteforce/framework/m64.h"
 #include "bruteforce/framework/misc_util.h"
 #include "bruteforce/framework/quarter_steps.h"
 #include "bruteforce/framework/states.h"
@@ -50,7 +52,7 @@ void initGame()
     srand((unsigned)time(&t));
 }
 
-void updateGame(OSContPad *input)
+void updateGame(OSContPad *input, UNUSED u32 frame_index)
 {
     bf_update_controller(input);
     adjust_analog_stick(gPlayer1Controller);
@@ -147,7 +149,7 @@ void bruteforceLoop()
                     OSContPad *currentInput = &inputs->inputs[frame_idx];
                     if (!keepOriginal)
                         perturbInput(currentInput);
-                    updateGame(currentInput);
+                    updateGame(currentInput, frame_idx);
                     updateScore(candidate, frame_idx);
                 }
 
@@ -173,7 +175,7 @@ void main(int argc, char *argv[])
     initGame();
 
     bf_safe_printf("Loading m64...\n");
-    if (!bf_read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_end, &original_inputs))
+    if (!bf_read_default_m64_and_debug_desyncs(&original_inputs, updateGame))
     {
         bf_safe_printf("Failed to load m64! Exiting...\n");
         exit(-1);

@@ -1,8 +1,8 @@
 #ifndef BF_ALGORITHMS_GENETIC_H
 #define BF_ALGORITHMS_GENETIC_H
 
-#include "bruteforce/algorithms/genetic/candidates.h"
-#include "bruteforce/framework/types.h"
+#include "candidates.h"
+#include "bruteforce/framework/interface/types.h"
 
 typedef struct BFDynamicState_s BFDynamicState;
 

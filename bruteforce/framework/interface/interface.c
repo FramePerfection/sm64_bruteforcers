@@ -1,8 +1,7 @@
-#include "bruteforce/framework/interface.h"
+#include "interface.h"
 
 #include "bruteforce/framework/interprocess.h"
 #include "bruteforce/framework/states.h"
-#include "bruteforce/framework/m64.h"
 
 #include <getopt.h>
 #include <stdio.h>
@@ -10,7 +9,6 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-
 
 #define CONTROL_STATE_JSON_BUFFER 4096
 

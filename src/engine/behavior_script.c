@@ -28,7 +28,8 @@
 
 #define BHV_CMD_GET_ADDR_OF_CMD(index) (uintptr_t)(&gCurBhvCommand[index])
 
-static u16 gRandomSeed16;
+// _EDIT_ moved definition to engine_feed.c
+extern u16 gRandomSeed16;
 
 // Unused function that directly jumps to a behavior command and resets the object's stack index.
 UNUSED static void goto_behavior_unused(const BehaviorScript *bhvAddr) {
@@ -37,7 +38,7 @@ UNUSED static void goto_behavior_unused(const BehaviorScript *bhvAddr) {
 }
 
 // Generate a pseudorandom integer from 0 to 65535 from the random seed, and update the seed.
-WEAK u16 random_u16(void) {
+u16 random_u16(void) {
     u16 temp1, temp2;
 
     if (gRandomSeed16 == 22026) {

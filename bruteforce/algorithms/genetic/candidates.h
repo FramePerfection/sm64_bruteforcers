@@ -1,7 +1,7 @@
 #ifndef BF_CANDIDATES_H
 #define BF_CANDIDATES_H
 
-#include "bruteforce/framework/m64.h"
+#include "bruteforce/framework/interface/m64.h"
 
 #include <PR/ultratypes.h>
 #include <stdio.h>

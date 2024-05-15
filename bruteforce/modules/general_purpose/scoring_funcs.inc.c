@@ -67,16 +67,14 @@ SCORING_FUNC(MatchHSpeed)
 
 // not necessary for compilation, but allows intellisense to find struct definitions
 #include "bruteforce/modules/general_purpose/scoring_method.h"
-#include "bruteforce/framework/types.h"
+#include "bruteforce/framework/interface/types.h"
 #include "bruteforce/framework/quarter_steps.h"
 
 #include <math.h>
 
 extern struct MarioState *gMarioState;
-extern
 
-	f64
-	sm_MaximizeHSpeed(MaximizeHSpeedParameters args, Candidate *candidate, u8 *success, u8 *abort)
+f64 sm_MaximizeHSpeed(MaximizeHSpeedParameters args, Candidate *candidate, u8 *success, u8 *abort)
 {
 	*success = TRUE;
 	return gMarioState->forwardVel;

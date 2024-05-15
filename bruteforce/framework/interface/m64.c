@@ -1,4 +1,4 @@
-#include "bruteforce/framework/m64.h"
+#include "m64.h"
 
 #include "bruteforce/framework/interprocess.h"
 

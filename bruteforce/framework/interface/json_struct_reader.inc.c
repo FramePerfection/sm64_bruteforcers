@@ -27,7 +27,7 @@ Usage:
 #error BF_JSON_STRUCT_NAME must be defined
 #endif
 
-#include "bruteforce/framework/json.h"
+#include "json.h"
 #include "bruteforce/framework/interprocess.h"
 
 #define CONCAT(A, B) A##B

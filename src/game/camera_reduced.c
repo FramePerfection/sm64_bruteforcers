@@ -33,18 +33,11 @@
 #include "engine/graph_node.h"
 #include "level_table.h"
 
-
 // From behavior_script.c
-// Generate a pseudorandom float in the range [0, 1).
-WEAK f32 random_float(void) {
-    f32 rnd = random_u16();
-    return rnd / (double) 0x10000;
-}
-
-static u16 gRandomSeed16;
+extern u16 gRandomSeed16;
 
 // Generate a pseudorandom integer from 0 to 65535 from the random seed, and update the seed.
-u16 random_u16(void) {
+WEAK u16 random_u16(void) {
     u16 temp1, temp2;
 
     if (gRandomSeed16 == 22026) {
@@ -70,6 +63,12 @@ u16 random_u16(void) {
     }
 
     return gRandomSeed16;
+}
+
+// Generate a pseudorandom float in the range [0, 1).
+WEAK f32 random_float(void) {
+    f32 rnd = random_u16();
+    return rnd / (double) 0x10000;
 }
 
 // From object_helpers.c

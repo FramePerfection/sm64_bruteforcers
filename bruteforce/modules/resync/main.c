@@ -13,13 +13,14 @@
 #include "src/game/mario_step.h"
 
 #include "bruteforce/algorithms/genetic/candidates.h"
-#include "bruteforce/framework/interface.h"
-#include "bruteforce/framework/interprocess.h"
-#include "bruteforce/framework/m64.h"
+#include "bruteforce/framework/interface/interface.h"
+#include "bruteforce/framework/interface/m64.h"
 #include "bruteforce/framework/misc_util.h"
 #include "bruteforce/framework/states.h"
+#include "bruteforce/framework/interprocess.h"
 
 #include "bruteforce/algorithms/genetic/algorithm.h"
+#include "bruteforce/algorithms/debug_desyncs/algorithm.h"
 
 typedef struct ReferenceFrame_s
 {
@@ -283,7 +284,7 @@ void main(int argc, char *argv[])
 
     bf_safe_printf("Loading m64...\n");
     InputSequence *original_inputs;
-    if (!bf_read_m64_from_file(bfStaticState.m64_input, bfStaticState.m64_start, bfStaticState.m64_end, &original_inputs))
+    if (!bf_read_default_m64_and_debug_desyncs(&original_inputs, updateGame))
     {
         bf_safe_printf("Failed to load m64! (%s) Exiting...\n", bfStaticState.m64_input);
         exit(-1);
