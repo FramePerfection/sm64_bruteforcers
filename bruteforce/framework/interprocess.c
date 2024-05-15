@@ -25,7 +25,7 @@ static struct SharedMemoryInitNode_s {
 };
 typedef struct SharedMemoryInitNode_s SharedMemoryInitNode;
 static SharedMemoryInitNode *sSharedMemoryInitList = NULL;
-static sReservedSharedMemoryBytes = ALIGN_8(sizeof(ProgramState)) + ALIGN_8(sizeof(BFControlState));
+static u64 sReservedSharedMemoryBytes = ALIGN_8(sizeof(ProgramState)) + ALIGN_8(sizeof(BFControlState));
 
 
 static void createMutex()
