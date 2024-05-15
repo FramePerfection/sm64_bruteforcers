@@ -133,6 +133,7 @@ void bf_algorithm_genetic_loop(
     PrintStateFunc printState, 
     BreakLoopFunc breakLoop)
 {
+    u8 resetToken = 0;
     Candidate *survivors;
     Candidate *best;
     bf_init_candidates(original_inputs, &survivors);
@@ -144,6 +145,15 @@ void bf_algorithm_genetic_loop(
     u32 gen;
     for (gen = 0; gen < bfStaticState.max_generations; gen++)
     {
+        u8 newResetToken = bfControlState->reset_token;
+        // grab the latest output from file if a reset was issued
+        if (resetToken != newResetToken)
+            bf_read_m64_from_file(
+                bfStaticState.m64_output, 
+                bfStaticState.m64_start, 
+                bfStaticState.m64_end, 
+                &original_inputs);
+
         if (breakLoop && breakLoop()) {
             bf_safe_printf("%d broke out of loop prematurely!\n", bf_get_process_index());
             break;
@@ -169,14 +179,18 @@ void bf_algorithm_genetic_loop(
             for (run_idx = 0; run_idx < bfStaticState.runs_per_survivor; run_idx++)
             {
                 Candidate *candidate = &survivors[candidate_idx].children[run_idx];
-                Candidate *original = &survivors[candidate_idx];
+                Candidate *survivor = &survivors[candidate_idx];
 
                 InputSequence *inputs = candidate->sequence;
-                bf_clone_m64_inputs(inputs, original->sequence);
+                if (resetToken != newResetToken)
+                    bf_clone_m64_inputs(inputs, survivor->sequence);
+                else
+                    bf_clone_m64_inputs(inputs, original_inputs);
 
-                u8 keepOriginal = run_idx == 0 && (bf_random_float() > bfControlState->forget_rate);
+                u8 perturbRun = (resetToken == newResetToken) && (run_idx > 0 || (bf_random_float() > bfControlState->forget_rate));
 
                 bf_load_dynamic_state(startingSavestate);
+                gPlayer1Controller->buttonDown = inputs->originalInput.button;
                 desynced = FALSE;
 
                 u32 frame_idx;
@@ -184,7 +198,7 @@ void bf_algorithm_genetic_loop(
                 {
                     frames++;
                     OSContPad *currentInput = &inputs->inputs[frame_idx];
-                    if (!keepOriginal)
+                    if (!perturbRun)
                         perturbInput(candidate, currentInput, frame_idx);
                     updateGame(currentInput, frame_idx);
                     boolean abort = desynced;
@@ -193,6 +207,8 @@ void bf_algorithm_genetic_loop(
                         break;
                 }
             }
+
+            resetToken = newResetToken;
         }
 
         // sort by scoring
