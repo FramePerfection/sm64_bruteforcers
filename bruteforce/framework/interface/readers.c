@@ -60,6 +60,10 @@ void bf_read_boolean(Json *jsonNode, boolean *target)
     }
     else if (jsonNode->type == Json_Number)
         *target = (jsonNode->valueInt != 0) ? 1 : 0;
+    else if (jsonNode->type == Json_True)
+        *target = 1;
+    else if (jsonNode->type == Json_False)
+        *target = 0;
 }
 
 static f32 s_advance_read(Json **nodePtr)
