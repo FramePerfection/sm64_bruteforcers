@@ -41,7 +41,7 @@ void clear_static_surfaces(void) {
 }
 
 // TODO: proper fix for this
-static struct SurfaceNode surfaceNodePool[10000];
+static struct SurfaceNode surfaceNodePool[100000];
 /**
  * Allocate the part of the surface node pool to contain a surface node.
  */
