@@ -13,6 +13,10 @@
 #include "game/object_list_processor.h"
 #include "surface_load.h"
 
+// _EDIT_ add import from surface_load_reduced
+extern s32 surface_has_force(s16 surfaceType);
+extern s32 surf_has_no_cam_collision(s16 surfaceType);
+extern void add_surface(struct Surface *surface, s32 dynamic);
 extern struct Surface *read_surface_data(s16 *vertexData, s16 **vertexIndices);
 
 /**
@@ -97,7 +101,7 @@ void load_object_surfaces(s16 **data, s16 *vertexData) {
 
     // The DDD warp is initially loaded at the origin and moved to the proper
     // position in paintings.c and doesn't update its room, so set it here.
-    
+
     if (gCurrentObject->behavior == segmented_to_virtual(bhvDddWarp)) {
         room = 5;
     } else {

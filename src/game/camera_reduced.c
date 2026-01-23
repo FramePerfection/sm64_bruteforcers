@@ -3,6 +3,7 @@
 
 
 #include <ultra64.h>
+#include <stdio.h>
 
 #define INCLUDED_FROM_CAMERA_C
 
@@ -1343,7 +1344,7 @@ void mode_outward_radial_camera(struct Camera *c) {
  */
 s32 update_parallel_tracking_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     printf("Warning: Parallel tracking camera has no state associations\n");
-    
+
     Vec3f path[2];
     Vec3f parMidPoint;
     Vec3f marioOffset;

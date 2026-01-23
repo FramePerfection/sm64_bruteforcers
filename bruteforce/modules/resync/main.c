@@ -125,7 +125,7 @@ static void updateGame(OSContPad *input, UNUSED u32 frame_index)
     gGlobalTimer++;
 }
 
-static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, u32 frame_idx)
+static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, UNUSED u32 frame_idx)
 {
     if (!bfStaticState.relative_frame_numbers)
         frame_idx += bfStaticState.m64_start;

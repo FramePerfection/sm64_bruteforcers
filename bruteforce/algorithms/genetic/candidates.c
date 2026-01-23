@@ -99,7 +99,7 @@ void bf_merge_candidates(Candidate *survivors, Candidate *externalSurvivors, u32
     for (candidate_idx = 0; candidate_idx < externalSurvivorsCount; candidate_idx++)
     {
         Candidate *externalCandidate = (Candidate*)((char*)externalSurvivors + stride);
-        externalCandidate->sequence = externalCandidate + sizeof(Candidate);
+        externalCandidate->sequence = (InputSequence *)(externalCandidate + sizeof(Candidate));
         s_insert_sorted(externalCandidate);
     }
 

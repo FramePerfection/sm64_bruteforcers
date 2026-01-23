@@ -1,5 +1,7 @@
 #include <PR/ultratypes.h>
 
+#include "bruteforce/framework/interface/interface.h"
+
 #include "sm64.h"
 #include "mario.h"
 #include "audio/external.h"

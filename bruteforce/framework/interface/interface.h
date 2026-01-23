@@ -13,7 +13,7 @@ u8 bf_output_input_sequence(u32 globalTimerAtStart, InputSequence *inputSequence
 
 const char *bf_read_file(const char *fileName);
 void bf_listen_to_inputs();
-void bf_update_control_state();
+void bf_update_control_state(char *);
 
 void bf_desync(char *message);
 

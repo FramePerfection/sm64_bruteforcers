@@ -1,6 +1,7 @@
 #include "bruteforce/algorithms/genetic/algorithm.h"
 
 #include <time.h>
+#include <string.h>
 
 #include "src/game/game_init.h"
 
@@ -59,7 +60,7 @@ static void sParentRequestMergeCandidates()
 }
 
 static void sParentPerformMergeCandidates(Candidate *survivors) {
-    bf_merge_candidates(survivors, sTransmissionBuffer + sCandidateTransmissionBufferSize, bfStaticState.survivors_per_generation * (bfStaticState.max_processes - 1), sCandidateTransmissionSize);
+    bf_merge_candidates(survivors, (Candidate *)(sTransmissionBuffer + sCandidateTransmissionBufferSize), bfStaticState.survivors_per_generation * (bfStaticState.max_processes - 1), sCandidateTransmissionSize);
     sWriteSurvivorsToBuffer(survivors);
 
     // Notify child processes that the merge has been processed
@@ -70,7 +71,7 @@ static void sParentPerformMergeCandidates(Candidate *survivors) {
 }
 
 static void sChildMergeCandidates(Candidate *survivors) {
-    bf_merge_candidates(survivors, sTransmissionBuffer, bfStaticState.survivors_per_generation, sCandidateTransmissionSize);
+    bf_merge_candidates(survivors, (Candidate *)sTransmissionBuffer, bfStaticState.survivors_per_generation, sCandidateTransmissionSize);
 
     // Notify parent process that the merge has been processed
     unsigned int i = bf_get_process_index();
@@ -125,12 +126,12 @@ void bf_algorithm_genetic_init(InputSequence *original_inputs) {
 }
 
 void bf_algorithm_genetic_loop(
-    InputSequence *original_inputs, 
+    InputSequence *original_inputs,
     BFDynamicState *startingSavestate,
-    UpdateGameFunc updateGame, 
-    PerturbInputFunc perturbInput, 
-    ScoringFunc updateScore, 
-    PrintStateFunc printState, 
+    UpdateGameFunc updateGame,
+    PerturbInputFunc perturbInput,
+    ScoringFunc updateScore,
+    PrintStateFunc printState,
     BreakLoopFunc breakLoop)
 {
     u8 resetToken = 0;
@@ -149,9 +150,9 @@ void bf_algorithm_genetic_loop(
         // grab the latest output from file if a reset was issued
         if (resetToken != newResetToken)
             bf_read_m64_from_file(
-                bfStaticState.m64_output, 
-                bfStaticState.m64_start, 
-                bfStaticState.m64_end, 
+                bfStaticState.m64_output,
+                bfStaticState.m64_start,
+                bfStaticState.m64_end,
                 &original_inputs);
 
         if (breakLoop && breakLoop()) {

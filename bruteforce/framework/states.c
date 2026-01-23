@@ -27,7 +27,7 @@ ProgramState *programState;
 static void s_read_state_json(Json *node)
 {
     // clang-format off
-	
+
 	#define BF_CONTROL_STATE(type, struct_name, documentation) \
 		if (strcmp(#struct_name, node->name) == 0) \
 		{ \
@@ -91,7 +91,7 @@ void bf_load_dynamic_state(BFDynamicState *state)
 	#define BF_DYNAMIC_STATE(type, struct_name, target_expr, documentation) \
 		memcpy(&(target_expr), &state->struct_name, sizeof state->struct_name);
 	#define BF_STATIC_STATE(_0, _1, _2, _3)
-	
+
 	#include STATE_DEFINITION_FILE
 
 	#undef BF_CONTROL_STATE
@@ -103,12 +103,12 @@ void bf_load_dynamic_state(BFDynamicState *state)
 void bf_save_dynamic_state(BFDynamicState *state)
 {
     // clang-format off
-	
+
 	#define BF_CONTROL_STATE(_0, _1, _2)
 	#define BF_DYNAMIC_STATE(type, struct_name, target_expr, documentation) \
 		memcpy(&state->struct_name, &(target_expr), sizeof state->struct_name);
 	#define BF_STATIC_STATE(_0, _1, _2, _3)
-	
+
 	#include STATE_DEFINITION_FILE
 
 	#undef BF_CONTROL_STATE
@@ -123,7 +123,7 @@ void bf_update_control_state(char *input)
     if (!root)
     {
         bf_safe_printf("Invalid conrol state json starting at:\n%s\n", Json_getError());
-        return FALSE;
+        return;
     }
     Json *node = root->child;
     // TODO(Important): lock a mutex to prevent "torn reads" in running processes

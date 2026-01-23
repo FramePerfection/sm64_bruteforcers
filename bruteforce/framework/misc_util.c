@@ -177,7 +177,7 @@ void bf_init_mario()
     gMarioState->marioObj = calloc(1, sizeof(struct Object));
     gMarioState->marioBodyState = calloc(1, sizeof(struct MarioBodyState));
     gMarioState->statusForCamera = &gPlayerCameraState[0];
-    gMarioState->controller = gPlayer1Controller = calloc(1, sizeof(OSContPad));
+    gMarioState->controller = gPlayer1Controller = calloc(1, sizeof(struct Controller));
     gMarioState->area = gCurrentArea;
 }
 
