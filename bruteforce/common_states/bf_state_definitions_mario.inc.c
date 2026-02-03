@@ -5,6 +5,7 @@
 extern struct MarioState *gMarioState;
 extern s16 sSwimStrength;
 extern u8 gSpecialTripleJump;
+extern u32 animation_timer_surrogate;
 
 #else
 
@@ -27,6 +28,7 @@ BF_DYNAMIC_STATE(s16, mario_pitch_velocity, gMarioState->angleVel[0], "Mario's p
 BF_DYNAMIC_STATE(s16, mario_slide_yaw, gMarioState->slideYaw, "Mario's sliding angle.")
 BF_DYNAMIC_STATE(u32, mario_flags, gMarioState->flags, "Mario flags, such as cap state. See sm64.h line 115 for details.")
 BF_DYNAMIC_STATE(u16, mario_cap_timer, gMarioState->capTimer, "Mario's cap timer.")
+BF_DYNAMIC_STATE(u32, animation_timer_surrogate, animation_timer_surrogate, "The Mario object's animation timer.")
 BF_STATIC_STATE(boolean, special_triple_jump, gSpecialTripleJump, "Special triple jump enabled.")
 __NL__
 

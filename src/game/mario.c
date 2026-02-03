@@ -33,6 +33,9 @@
 #include "sound_init.h"
 #include "rumble_init.h"
 
+// _EDIT_ add animation timer surrogate
+u32 animation_timer_surrogate;
+
 u32 unused80339F10;
 u8 unused80339F1C[20];
 
@@ -997,6 +1000,11 @@ static u32 set_mario_action_cutscene(struct MarioState *m, u32 action, UNUSED u3
  * specific function if needed.
  */
 u32 set_mario_action(struct MarioState *m, u32 action, u32 actionArg) {
+    // _EDIT_ reset animation timer surrogate
+    if (m->action != action) {
+        animation_timer_surrogate = 0;
+    }
+
     switch (action & ACT_GROUP_MASK) {
         case ACT_GROUP_MOVING:
             action = set_mario_action_moving(m, action, actionArg);
@@ -1757,7 +1765,7 @@ s32 execute_mario_action(UNUSED struct Object *o) {
         // The function can loop through many action shifts in one frame,
         // which can lead to unexpected sub-frame behavior. Could potentially hang
         // if a loop of actions were found, but there has not been a situation found.
-        // _EDIT_ disable mario_execute_cutscene_action, mario_execute_automatic_action, mario_execute_object_action
+        // _EDIT_ disable mario_execute_automatic_action, mario_execute_object_action
 #define NOT_IMPL(GROUP) bf_desync("action group '"#GROUP"' not implemented\n"); inLoop = FALSE; break;
 
         while (inLoop) {
@@ -1824,6 +1832,9 @@ s32 execute_mario_action(UNUSED struct Object *o) {
 
         return gMarioState->particleFlags;
     }
+
+    // _EDIT_ increment animation timer surrogate
+    animation_timer_surrogate++;
 
     return 0;
 }

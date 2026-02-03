@@ -1028,11 +1028,12 @@ s32 act_spawn_spin_airborne(struct MarioState *m) {
     return FALSE;
 }
 
+// _EDIT_ don't rely on animation information for the action switch
+extern u32 animation_timer_surrogate;
 s32 act_spawn_spin_landing(struct MarioState *m) {
     stop_and_set_height_to_floor(m);
     set_mario_animation(m, MARIO_ANIM_GENERAL_LAND);
-    // _EDIT_ don't rely on animation information for the action switch
-    if (/* is_anim_at_end(m) */ (m->actionTimer++ == 15)) {
+    if (animation_timer_surrogate >= 23) {
         load_level_init_text(0);
         set_mario_action(m, ACT_IDLE, 0);
     }
