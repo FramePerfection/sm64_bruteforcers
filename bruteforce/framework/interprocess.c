@@ -7,12 +7,10 @@
 #include <PR/ultratypes.h>
 #include <string.h>
 
-#ifdef _WIN32
 #include <windows.h>
 static HANDLE sMapFile = NULL;
 static void *sSharedMemory = NULL;
 static HANDLE mutex = NULL;
-#endif
 
 #define ALIGN_8(input) (((input + 7) / 8) * 8)
 
@@ -153,7 +151,7 @@ void bf_start_multiprocessing()
         createChildProcesses();
         bf_listen_to_inputs();
     }
-    
+
     programState = sSharedMemory;
     BFControlState *initialState = bfControlState;
     bfControlState = (BFControlState *)(sSharedMemory + ALIGN_8(sizeof(ProgramState)));

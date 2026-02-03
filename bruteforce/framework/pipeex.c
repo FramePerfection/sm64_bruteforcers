@@ -1,10 +1,10 @@
 /******************************************************************************\
-*       This is a part of the Microsoft Source Code Samples. 
+*       This is a part of the Microsoft Source Code Samples.
 *       Copyright 1995 - 1997 Microsoft Corporation.
-*       All rights reserved. 
-*       This source code is only intended as a supplement to 
+*       All rights reserved.
+*       This source code is only intended as a supplement to
 *       Microsoft Development Tools and/or WinHelp documentation.
-*       See these sources for detailed information regarding the 
+*       See these sources for detailed information regarding the
 *       Microsoft samples programs.
 \******************************************************************************/
 
@@ -22,7 +22,7 @@ Revision History:
 #include <windows.h>
 #include <stdio.h>
 
-static volatile long PipeSerialNumber;
+static volatile int PipeSerialNumber;
 
 BOOL
 APIENTRY
@@ -92,7 +92,7 @@ Return Value:
   }
 
   sprintf( PipeNameBuffer,
-           "\\\\.\\Pipe\\RemoteExeAnon.%08lx.%08lx",
+           "\\\\.\\Pipe\\RemoteExeAnon.%08dx.%08dx",
            GetCurrentProcessId(),
            InterlockedIncrement(&PipeSerialNumber)
          );

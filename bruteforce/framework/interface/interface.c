@@ -12,10 +12,8 @@
 
 #define CONTROL_STATE_JSON_BUFFER 4096
 
-#ifdef _WIN32
 #include <windows.h>
 DWORD threadIdInputListener;
-#endif
 
 char *override_config_file = NULL;
 char *child_args = NULL;
@@ -84,7 +82,7 @@ static char *s_input_string(FILE *fp, size_t bufferSize)
     str = realloc(NULL, sizeof(*str) * bufferSize);
     if (!str)
         return str;
-        
+
     while (EOF != (ch = fgetc(fp)) && ch != '\0')
     {
         str[len++] = ch;
@@ -100,11 +98,7 @@ static char *s_input_string(FILE *fp, size_t bufferSize)
     return realloc(str, sizeof(*str) * len);
 }
 
-#ifdef _WIN32
 static DWORD WINAPI s_listen_to_input_func(__attribute__((unused)) LPVOID lpParam)
-#else
-static void *s_listen_to_input_func()
-#endif
 {
     // loop indefinitely
     while (1)
@@ -129,11 +123,7 @@ static void *s_listen_to_input_func()
 
 void bf_listen_to_inputs()
 {
-#ifdef _WIN32
     CreateThread(NULL, 0, s_listen_to_input_func, NULL, 0, &threadIdInputListener);
-#else
-    // TODO(Important): Implement posix thread start
-#endif
 }
 
 static u8 s_save_to_sequence_file(char *fileName, u32 globalTimerAtStart, InputSequence *inputSequence)

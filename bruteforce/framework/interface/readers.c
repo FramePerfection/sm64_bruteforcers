@@ -10,9 +10,9 @@
 // clang-format off
 
 long long bf_readers_util_read_int(Json *jsonNode) {
-	if (jsonNode->type == Json_String) 
+	if (jsonNode->type == Json_String)
         return strtoll(jsonNode->valueString, NULL, 0);
-	else 
+	else
         return jsonNode->valueInt;
 }
 
@@ -20,8 +20,10 @@ long long bf_readers_util_read_int(Json *jsonNode) {
 void bf_read_##cast_type(Json *jsonNode, cast_type *target) { *target = (cast_type)bf_readers_util_read_int(jsonNode); }
 
 read_int(uintptr_t)
+read_int(s64)
 read_int(s32)
 read_int(s16)
+read_int(u64)
 read_int(u32)
 read_int(u16)
 read_int(u8)
@@ -88,7 +90,7 @@ void bf_read_Triangles(Json *jsonNode, Triangles *target)
 		#define ADVANCE \
 			(s16)vertNode->valueInt; \
 			vertNode = vertNode->next;
-		
+
 		target->data[i].x1 = ADVANCE
 		target->data[i].y1 = ADVANCE
 		target->data[i].z1 = ADVANCE
@@ -135,7 +137,7 @@ void bf_read_HitBoxes(Json *jsonNode, HitBoxes *target)
 		#define ADVANCE \
 			(s16)hitbox->valueInt; \
 			hitbox = hitbox->next;
-		
+
 		target->data[i].x = ADVANCE
 		target->data[i].y = ADVANCE
 		target->data[i].z = ADVANCE

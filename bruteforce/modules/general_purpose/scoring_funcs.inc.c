@@ -25,7 +25,7 @@ SCORING_FUNC(MaximizeHSpeed)
 SCORING_FUNC(CheckAction)
 
 #define PARAM_MEMBERS_CheckWall                                        \
-	PARAM_MEMBER(u32, wall, "Mario's wall reference to check against") \
+	PARAM_MEMBER(u64, wall, "Mario's wall reference to check against") \
 	PARAM_MEMBER(boolean, invert, "Whether to invert result of this check")
 SCORING_FUNC(CheckWall)
 

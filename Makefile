@@ -144,18 +144,18 @@ endif
 
 # Check code syntax with host compiler
 CC_CHECK := gcc
-CC_CHECK_CFLAGS = -fsyntax-only -fsigned-char $(CC_CFLAGS) $(TARGET_CFLAGS) -std=gnu90 -Wall -Wextra -Wno-format-security -Wno-main -DNON_MATCHING -DAVOID_UB $(DEF_INC_CFLAGS)
+CC_CHECK_CFLAGS = -fsyntax-only -fsigned-char -std=gnu90 -Wall -Wextra -Wno-format-security -Wno-main -DNON_MATCHING -DAVOID_UB $(DEF_INC_CFLAGS)
 
 # C compiler options
-CFLAGS = $(OPT_FLAGS) $(TARGET_CFLAGS) $(MIPSISET) $(DEF_INC_CFLAGS)
+CFLAGS = $(OPT_FLAGS) $(DEF_INC_CFLAGS) -m64
 CFLAGS += -mhard-float -fno-stack-protector -fno-common -fno-zero-initialized-in-bss -fno-PIC -fno-strict-aliasing -fno-inline-functions -ffreestanding -fwrapv -Wall -Wextra
 
 ifeq ($(shell getconf LONG_BIT), 32)
   # Work around memory allocation bug in QEMU
   export QEMU_GUEST_BASE := 1
 else
-  # Ensure that gcc treats the code as 32-bit
-  CC_CHECK_CFLAGS += -m32
+  # Ensure that gcc treats the code as 64-bit
+  CC_CHECK_CFLAGS += -m64
 endif
 
 # Prevent a crash with -sopt
@@ -186,7 +186,7 @@ endef
 # Main Targets                                                                 #
 #==============================================================================#
 
-force: 
+force:
 #used to force targets to be built
 
 include $(wildcard ./bruteforce/modules/**/make.split)
@@ -197,7 +197,7 @@ all: $(ALL_TARGETS)
 
 clean:
 	$(RM) -r $(BUILD_DIR_BASE)
-	
+
 
 ifeq ($(VERSION),sh)
   $(BUILD_DIR)/src/audio/load_sh.o: $(SOUND_BIN_DIR)/bank_sets.inc.c $(SOUND_BIN_DIR)/sequences_header.inc.c $(SOUND_BIN_DIR)/ctl_header.inc.c $(SOUND_BIN_DIR)/tbl_header.inc.c
@@ -218,7 +218,7 @@ DUMMY := $(shell mkdir -p $(ALL_DIRS) ./TEMP)
 #==============================================================================#
 
 # Compile C code
-	
+
 $(BUILD_DIR)/bruteforce/%.o: bruteforce/%.c
 	$(call print,Compiling (warnings treated as errors):,$<,$@)
 	$(CC_CHECK) $(CC_CHECK_CFLAGS) -Werror -MMD -MP -MT $@ -MF $(BUILD_DIR)/bruteforce/$*.d $<
