@@ -51,9 +51,9 @@ static void updateGame(OSContPad *input, UNUSED u32 frame_index)
 
 static void perturbInput(UNUSED Candidate *candidate, OSContPad *input, UNUSED u32 frame_idx)
 {
-    if (bfStaticState.max_perturbation > 0 && bf_random_float() < bfStaticState.perturbation_chance)
+    if (bfControlState->max_perturbation > 0 && bf_random_float() < bfControlState->perturbation_chance)
     {
-        u16 perturb = (u16)(bfStaticState.max_perturbation);
+        u16 perturb = (u16)(bfControlState->max_perturbation);
         u8 perturbation_x = (rand() % (2 * perturb) - perturb);
         u8 perturbation_y = (rand() % (2 * perturb) - perturb);
         input->stick_x = (s8)(input->stick_x + perturbation_x);
