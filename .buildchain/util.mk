@@ -45,9 +45,17 @@ MARIO_STEP_OBJECTS := 	mario_step.o mario.o mario_actions_airborne.o \
 						mario_actions_submerged.o
 
 # Object files needed to simulate interactions with objects, as well as cutscene actions (thanks sm64 for being tangled)
-OBJECTS_INTERACTION_OBJECTS := $(addprefix src/game/,object_list_processor.o behavior_actions.o object_helpers.o \
+OBJECTS_INTERACTION_OBJECTS := object_list_processor.o behavior_actions.o object_helpers.o \
 								obj_behaviors.o obj_behaviors_2.o platform_displacement.o spawn_object.o object_collision.o \
-								mario_actions_cutscene.o mario_actions_object.o interaction.o)
+								mario_actions_cutscene.o mario_actions_object.o \
+								interaction.o
+
+# Object files needed to simulate most non-specialized scenarios, composing MARIO_STEP_OBJECTS and OBJECTS_INTERACTION_OBJECTS
+COMMON_LOGIC_OBJECTS := \
+	$(addprefix src/engine/,math_util.o surface_collision.o surface_load_reduced.o surface_load_objects.o behavior_script.o graph_node.o) \
+	$(addprefix src/game/,camera_reduced.o $(MARIO_STEP_OBJECTS)) \
+	$(addprefix src/game/,memory.o area.o $(OBJECTS_INTERACTION_OBJECTS)) \
+	data/behavior_data.o
 
 word-dot = $(word $2,$(subst ?, ,$1))
 
