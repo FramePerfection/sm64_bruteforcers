@@ -3,6 +3,8 @@
 
 #include "engine/graph_node.h"
 
+// TODO: print desync messages for all of these
+
 // interaction.c
 u32 does_mario_have_normal_cap_on_head(UNUSED struct MarioState *m) { return TRUE; }
 u32 get_door_save_file_flag(UNUSED struct Object *door) { return 0; }
@@ -19,3 +21,4 @@ void mario_retrieve_cap(void) {}
 void mario_stop_riding_and_holding(UNUSED struct MarioState *m) {}
 void mario_stop_riding_object(UNUSED struct MarioState *m) {}
 void mario_throw_held_object(UNUSED struct MarioState *m) {}
+s32 mario_update_punch_sequence(UNUSED struct MarioState *m) { return 0; }

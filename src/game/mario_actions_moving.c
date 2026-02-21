@@ -1,7 +1,5 @@
 #include <PR/ultratypes.h>
 
-#include "bruteforce/framework/interface/interface.h"
-
 #include "sm64.h"
 #include "mario.h"
 #include "audio/external.h"
@@ -853,9 +851,7 @@ s32 act_move_punching(struct MarioState *m) {
 
     m->actionState = 1;
 
-    // _EDIT_ desync in mario_update_punch_sequence
-    bf_desync("mario_update_punch_sequence not implemented\n");
-    //mario_update_punch_sequence(m);
+    mario_update_punch_sequence(m);
 
     if (m->forwardVel >= 0.0f) {
         apply_slope_decel(m, 0.5f);
