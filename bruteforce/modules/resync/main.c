@@ -159,7 +159,7 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort)
         return;
     }
 
-    if (frame_idx == 0)
+    if (frame_idx < programState->furthestActionMatch)
         candidate->score = 0;
 
     ReferenceFrame* expected = &referenceFrames[frame_idx + bfStaticState.reference_offset + 1];
