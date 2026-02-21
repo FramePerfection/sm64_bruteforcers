@@ -163,7 +163,7 @@ static void updateScore(Candidate *candidate, u32 frame_idx, boolean *abort)
         candidate->score = 0;
 
     ReferenceFrame* expected = &referenceFrames[frame_idx + bfStaticState.reference_offset + 1];
-        
+
     boolean actionMismatch = gMarioState->action != expected->action;
     if (actionMismatch)
          *abort = TRUE;
@@ -195,6 +195,13 @@ static void printState(u32 currentGeneration, float fps) {
     bf_safe_printf("Generation %d starting... (%f FPS) (Best score: %f at %d frames)\n", currentGeneration, fps, programState->bestScore, programState->furthestActionMatch);
 }
 
+static void printStats(u32 i, f64 minError, ReferenceFrame *expected) {
+    u32 mupenFrame = i + bfStaticState.m64_start + 1;
+    bf_safe_printf("Ended frame %d (%d) with error %f!\n", i, mupenFrame, minError);
+    bf_safe_printf("Expected: x: %f; y: %f; z: %f; angle: %d; hspeed: %f; action: %8X\n", expected->x, expected->y, expected->z, expected->angle, expected->hspeed, expected->action);
+    bf_safe_printf("Actual: x: %f; y: %f; z: %f; angle: %d; hspeed: %f; action: %8X;\n", gMarioState->pos[0], gMarioState->pos[1], gMarioState->pos[2], gMarioState->faceAngle[1], gMarioState->forwardVel, gMarioState->action);
+}
+
 static u32 greedySync(InputSequence *sequence, BFDynamicState *savestate, u32 offset) {
     u32 i;
     s8 x, y;
@@ -207,7 +214,7 @@ static u32 greedySync(InputSequence *sequence, BFDynamicState *savestate, u32 of
     for (i = offset; i < nFramesToMatch; i++)
     {
         u32 k = i + bfStaticState.reference_offset;
-        bf_safe_printf("Matching frame %d...\n", k);
+        bf_safe_printf("Matching frame %d...\n", i);
 
         bf_save_dynamic_state(&state);
         OSContPad cont;
@@ -246,16 +253,16 @@ static u32 greedySync(InputSequence *sequence, BFDynamicState *savestate, u32 of
         updateGame(&sequence->inputs[i], i);
 
         if (expected->action != gMarioState->action) {
+            printStats(i, minError, expected);
+
             bf_safe_printf("Failed to match action for frame %d (%d / %d)!\n", i + bfStaticState.m64_start, i, nFramesToMatch);
             return i;
         }
 
         bf_save_dynamic_state(&state);
 
-        u32 mupenFrame = i + bfStaticState.m64_start + 1;
-        bf_safe_printf("Matched frame %d (%d) with error %f!\n", i, mupenFrame, minError);
-        bf_safe_printf("Expected: x: %f; y: %f; z: %f; angle: %d; hspeed: %f; action: %8X\n", expected->x, expected->y, expected->z, expected->angle, expected->hspeed, expected->action);
-        bf_safe_printf("Actual: x: %f; y: %f; z: %f; angle: %d; hspeed: %f; action: %8X;\n", gMarioState->pos[0], gMarioState->pos[1], gMarioState->pos[2], gMarioState->faceAngle[1], gMarioState->forwardVel, gMarioState->action);
+        printStats(i, minError, expected);
+        bf_safe_printf("Matched frame %d successfully!\n", i);
     }
     bf_safe_printf("Matching frames done!\n");
     return i - 1;
@@ -302,7 +309,7 @@ void main(int argc, char *argv[])
             }
         }
         bf_safe_printf("Automatically set reference offset to %d frames with error %f. (buttons: %4X)\n", bfStaticState.reference_offset, minError, referenceFrames[bfStaticState.reference_offset].buttonDown);
-    
+
         ReferenceFrame *f = &referenceFrames[bfStaticState.reference_offset];
         bf_safe_printf("Expected: x: %f; y: %f; z: %f; angle: %d; hspeed: %f; action: %8X\n", f->x, f->y, f->z, f->angle, f->hspeed, f->action);
         bf_safe_printf("Actual: x: %f; y: %f; z: %f; angle: %d; hspeed: %f; action: %8X; vspeed: %f\n", gMarioState->pos[0], gMarioState->pos[1], gMarioState->pos[2], gMarioState->faceAngle[1], gMarioState->forwardVel, gMarioState->action, gMarioState->vel[1]);
@@ -316,7 +323,7 @@ void main(int argc, char *argv[])
 
     // Initial runthrough, find best input to match on every frame one by one until Mario's action fails to synchronize
     programState->furthestActionMatch = greedySync(original_inputs, &bfInitialDynamicState, 0);
-    
+
     bestInputs = bf_clone_m64(original_inputs);
 
     bf_output_input_sequence(bfInitialDynamicState.global_timer, original_inputs);
@@ -333,10 +340,11 @@ void main(int argc, char *argv[])
             updateGame(&bestInputs->inputs[i], i);
         }
         bf_save_dynamic_state(&savestate);
-        
+
         // run the genetic algorithm until at least one more frame matches the reference run's action
         bf_algorithm_genetic_loop(bestInputs, &savestate, &updateGame, &perturbInput, &updateScore, &printState, &breakLoop);
-        
+        printStats(i, getError(&referenceFrames[i + bfStaticState.reference_offset]), &referenceFrames[i + bfStaticState.reference_offset]);
+
         bf_load_dynamic_state(&bfInitialDynamicState);
         // rerun new best inputs
         for (i = 0; i < programState->furthestActionMatch; i++) {
