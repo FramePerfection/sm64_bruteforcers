@@ -1,7 +1,7 @@
 
 #include "bruteforce/framework/states.h"
 
-#define DEBUG_JSON_BUFFER_SIZE 1000000
+#define DEBUG_JSON_BUFFER_SIZE 10000000
 
 typedef struct BFDebugJsonWriter_s {
 	unsigned int cursor;
